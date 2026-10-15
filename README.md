@@ -1,6 +1,6 @@
-# Meu Treino
+# Na Régua
 
-App pessoal de treino ABC e dieta, feito para o celular. Funciona offline e pode ser instalado na tela inicial.
+App de treino e dieta para o celular, feito para uso pessoal e entre amigos. Funciona offline e pode ser instalado na tela inicial.
 
 ## Instalar no celular
 
@@ -8,6 +8,8 @@ App pessoal de treino ABC e dieta, feito para o celular. Funciona offline e pode
 2. Android: menu ⋮ → **Instalar app**. iPhone: Compartilhar → **Adicionar à Tela de Início**.
 
 ## O que tem
+
+- **Planos**: monte um treino respondendo um questionário (objetivo, dias, tempo, local, lesões, foco e questionário de saúde), edite exercícios, troque entre planos e importe ou exporte arquivos de plano.
 
 - **Hoje**: progresso do dia, próxima refeição, treino, água e hábitos.
 - **Treino**: carga e repetições por série, cronômetro de descanso de 90 s e aviso de quando subir o peso.
@@ -18,4 +20,4 @@ App pessoal de treino ABC e dieta, feito para o celular. Funciona offline e pode
 ## Seus dados
 
 Os registros ficam só no celular (armazenamento do navegador). Nada é enviado para o GitHub nem para outro servidor.
-Use **Progresso → Backup** para baixar uma cópia e restaurar em outro aparelho.
+Use **Progresso → Baixar backup** para baixar uma cópia e restaurar em outro aparelho.
