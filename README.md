@@ -22,3 +22,7 @@ App de treino e dieta para o celular, feito para uso pessoal e entre amigos. Fun
 
 Os registros ficam só no celular (armazenamento do navegador). Nada é enviado para o GitHub nem para outro servidor.
 Use **Progresso → Baixar backup** para baixar uma cópia e restaurar em outro aparelho.
+
+## Créditos
+
+Imagens dos exercícios: [Free Exercise DB](https://github.com/yuhonas/free-exercise-db), domínio público (Unlicense).
