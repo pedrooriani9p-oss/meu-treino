@@ -139,6 +139,14 @@ ol.steps{margin:0;padding-left:20px;font-size:.9rem;display:grid;gap:4px}
 .timer.end{background:var(--ok);color:var(--surface)}
 
 .srows{display:grid;gap:6px}
+.big-cta{font-size:1.05rem;padding:15px 18px;font-family:var(--display);text-transform:uppercase;letter-spacing:.06em}
+.sess.live{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.sess.live .meter{background:var(--line)}
+.mono-big{font-family:var(--mono);font-size:2.4rem}
+.sstats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.sstats div{display:grid}
+.sstats .big{font-size:2rem}
+[hidden]{display:none!important}
 .srow{display:grid;grid-template-columns:44px minmax(0,1fr) auto minmax(0,1fr);gap:8px;align-items:center;max-width:360px}
 .srow input{width:100%;height:44px;padding:4px 10px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font-family:var(--mono);font-size:16px;text-align:center}
 .srow input::placeholder{color:var(--muted);opacity:.7}
@@ -304,6 +312,21 @@ function hitTop(sets,n,top){if(!top||!sets)return false;for(let s=0;s<n;s++){con
 function seriesOf(id){const out={};const L=lifts()[id]||{};Object.keys(L).forEach(d=>{const ws=(L[d]||[]).filter(hasW).map(s=>+s.w);if(ws.length)out[d]=Math.max(...ws)});
   const o=loads()[id]||{};Object.keys(o).forEach(d=>{if(out[d]==null&&o[d]!=='')out[d]=+o[d]});return Object.keys(out).sort().map(d=>[d,out[d]])}
 
+/* ---------- sessão de treino ---------- */
+const mmss=ms=>{const t=Math.max(0,Math.floor(ms/1000));const h=Math.floor(t/3600),m=Math.floor(t%3600/60),s=t%60;return (h?h+':'+String(m).padStart(2,'0'):m)+':'+String(s).padStart(2,'0')};
+function sessStats(d,t){const D=iso(d);let sets=0,vol=0,total=0;TREINOS[t].ex.forEach(([id,,sr])=>{const n=nSets(sr);total+=n;const cur=(lifts()[id]||{})[D]||[];
+  for(let s=0;s<n;s++){if(on(d,'t-'+id+'-'+s)){sets++;const c=cur[s];if(hasW(c)&&c.r)vol+=(+c.w)*(+c.r)}}});return {sets,total,vol:Math.round(vol)}}
+function sessCard(d,t){const ss=dayDoc(d).sess;const st=sessStats(d,t);
+  if(!ss||!ss.start){return +mid(d)===+TODAY?`<section class="card sess"><div><span class="label">Treino ${t} de hoje</span><h3>Pronto para começar?</h3><p class="sub" style="margin:0">O cronômetro do treino começa, a tela fica acesa e o app leva você ao primeiro exercício.</p></div><button class="btn big-cta" data-sess="start">Iniciar treino</button></section>`:''}
+  if(!ss.end)return `<section class="card sess live"><div class="row"><span class="label">Treino em andamento</span><span class="sub mono">${st.sets}/${st.total} séries</span></div>
+    <div class="row" style="align-items:end"><span class="big mono-big" id="sessT">${mmss(Date.now()-ss.start)}</span><button class="btn ghost" data-sess="end">Finalizar treino</button></div>
+    <div class="meter"><i style="width:${st.sets/st.total*100}%"></i></div><p class="sub" id="sessW" style="margin:0">${Date.now()-ss.start>60*60000?'Passou de 60 min de musculação: hora de fechar.':'Meta: até 60 min de musculação.'}</p></section>`;
+  return `<section class="card sess done"><div class="row"><span class="label">Treino concluído</span><button class="btn ghost" data-sess="resume" style="padding:6px 12px">Retomar</button></div>
+    <div class="sstats"><div><span class="big">${Math.round((ss.end-ss.start)/60000)}</span><span class="sub">minutos</span></div><div><span class="big">${st.sets}/${st.total}</span><span class="sub">séries</span></div><div><span class="big">${st.vol.toLocaleString('pt-BR')}</span><span class="sub">kg de volume</span></div></div></section>`}
+function scrollNext(){const n=[...document.querySelectorAll('.ex')].find(e=>!e.classList.contains('done'));if(n)n.scrollIntoView({behavior:'smooth',block:'start'})}
+setInterval(()=>{const el=document.getElementById('sessT');if(!el)return;const ss=dayDoc(sel).sess;if(!ss||!ss.start||ss.end)return;const ms=Date.now()-ss.start;el.textContent=mmss(ms);
+  const w=document.getElementById('sessW');if(w&&ms>60*60000)w.textContent='Passou de 60 min de musculação: hora de fechar.'},1000);
+
 /* ---------- telas ---------- */
 function vHoje(){
   const d=TODAY,p=prog(d),t=TREINO_DIA[d.getDay()],h=new Date().getHours();
@@ -313,7 +336,7 @@ function vHoje(){
   if(t){const T=TREINOS[t];const ks=dayKeys(d).filter(k=>k.startsWith('t-'));const dn=ks.filter(k=>on(d,k)).length;
     tr=`<section class="card"><div class="row"><span class="label">Treino de hoje · 17:00</span><span class="sub mono">${dn}/${ks.length} séries</span></div>
     <div class="row" style="justify-content:start"><span class="tag">${t}</span><h3>${T.nome}</h3></div>
-    <button class="btn" data-go="treino">${dn?'Continuar treino':'Começar treino'}</button></section>`}
+    ${(dd.sess&&dd.sess.start)?`<button class="btn" data-go="treino">${dd.sess.end?'Ver resumo do treino':'Voltar ao treino em andamento'}</button>`:`<button class="btn big-cta" data-sess="start">Iniciar treino</button>`}</section>`}
   else tr=`<section class="card"><span class="label">Treino de hoje</span><h3>Descanso</h3><p class="sub" style="margin:0">Sem musculação. Caminhada leve é bem-vinda; foque em sono e hidratação.</p></section>`;
   return `<div class="head"><div><p class="sub" style="margin:0">${greet} · ${DWL[d.getDay()]}, ${ddmm(d)}</p><h1>Hoje</h1></div>${syncBadge()}</div>
   <span class="chip">${phaseText(d)}</span>
@@ -336,6 +359,7 @@ function vTreino(){
   let h=`<div class="head"><h1>Treino</h1>${syncBadge()}</div>${strip()}`;
   if(!t)return h+`<section class="card"><h2>Descanso</h2><p class="sub" style="margin:0">Domingo é dia de recuperação. Sem musculação.</p></section>`;
   const T=TREINOS[t];const note=dayDoc(d).note||{};
+  h+=sessCard(d,t);
   h+=`<section class="card"><div class="row" style="justify-content:start"><span class="tag">${t}</span><h2>${T.nome}</h2></div><span class="sub">${DWL[d.getDay()]}, ${ddmm(d)} · anote carga e repetições e toque no número da série para marcar e iniciar o descanso. Os valores em cinza são do último treino.</span><div>`;
   T.ex.forEach(([id,nm,sr,nt])=>{const n=nSets(sr);const top=topReps(sr);const prev=prevSession(id,D);const cur=(lifts()[id]||{})[D]||[];let all=true;let rows='';
     for(let s=0;s<n;s++){const k='t-'+id+'-'+s;const v=on(d,k);if(!v)all=false;const c=cur[s]||{};const pv=prev?(prev.sets[s]||prev.sets[prev.sets.length-1]||{}):{};
@@ -462,8 +486,13 @@ function render(){
 function setTab(t){tab=t;try{localStorage.setItem('ui:tab',t)}catch(e){}window.scrollTo(0,0);render();wake()}
 document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>setTab(b.dataset.tab));
 app.addEventListener('click',e=>{
-  const b=e.target.closest('button');if(!b||b.type==='submit')return;
+  const b=e.target.closest('button');if(!b||b.closest('form'))return;
   if(b.dataset.backup){exportBackup();return}
+  if(b.dataset.sess){const x=clone(dayDoc(b.dataset.sess==='start'?TODAY:sel));const D=b.dataset.sess==='start'?TODAY:sel;
+    if(b.dataset.sess==='start'){x.sess={start:Date.now(),end:null};sel=new Date(TODAY);if(tab!=='treino'){tab='treino';try{localStorage.setItem('ui:tab','treino')}catch(e){}}save('day-'+iso(D),x);wake();setTimeout(scrollNext,50)}
+    else if(b.dataset.sess==='end'){x.sess={...(x.sess||{}),end:Date.now()};save('day-'+iso(D),x)}
+    else if(b.dataset.sess==='resume'){x.sess={...(x.sess||{}),end:null};save('day-'+iso(D),x)}
+    return}
   if(b.dataset.go){if(b.dataset.go==='treino')sel=new Date(TODAY);setTab(b.dataset.go);return}
   if(b.dataset.wk){sel=addD(monday(sel),7*+b.dataset.wk);if(tab!=='compras'){const td=monday(TODAY);if(+monday(sel)===+td)sel=new Date(TODAY)}render();return}
   if(b.dataset.k){const d=tab==='hoje'?TODAY:sel;const was=on(d,b.dataset.k);
@@ -510,7 +539,14 @@ document.addEventListener('visibilitychange',()=>{if(document.visibilityState===
 render();wake();
 
 loadPhotos();
-if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+/* atualização automática: busca versão nova ao abrir e ao voltar para o app, e recarrega sozinho */
+if('serviceWorker' in navigator)window.addEventListener('load',async()=>{try{
+  const had=!!navigator.serviceWorker.controller;let reloaded=false;
+  navigator.serviceWorker.addEventListener('controllerchange',()=>{if(had&&!reloaded){reloaded=true;location.reload()}});
+  const reg=await navigator.serviceWorker.register('sw.js',{updateViaCache:'none'});
+  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')reg.update().catch(()=>{})});
+  setInterval(()=>reg.update().catch(()=>{}),30*60000);
+}catch(e){}});
 </script>
 
 </body>
