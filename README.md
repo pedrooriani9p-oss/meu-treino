@@ -9,6 +9,7 @@ App de treino e dieta para o celular, feito para uso pessoal e entre amigos. Fun
 
 ## O que tem
 
+- **Perfis**: cada pessoa cria o seu (nome, idade, altura, peso, objetivo, experiência, local), com PIN opcional. Treinos, dieta e registros ficam separados por perfil.
 - **Planos**: monte um treino respondendo um questionário (objetivo, dias, tempo, local, lesões, foco e questionário de saúde), edite exercícios, troque entre planos e importe ou exporte arquivos de plano.
 
 - **Hoje**: progresso do dia, próxima refeição, treino, água e hábitos.

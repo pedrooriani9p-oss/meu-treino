@@ -206,6 +206,25 @@ select,.edt,.erow input,.bf input{font:inherit;font-size:16px;color:var(--ink);b
 .duo{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .chipb.sm{padding:7px 11px;min-height:38px;font-size:.88rem}
 .emov .link[data-swap]{font-size:.8rem;text-decoration:none;white-space:nowrap}
+.gate{display:grid;gap:16px;padding-top:12px}
+.brand{text-align:center}
+.gate-h{text-align:center;font-size:2rem}
+.plist{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.pcard{display:grid;justify-items:center;gap:6px;padding:20px 10px;border-radius:18px;background:var(--surface);border:1px solid var(--line);text-align:center}
+.pcard .pname{font-weight:600;font-size:1.05rem;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pcard.novo{border-style:dashed}
+.pcard.novo .avatar{background:var(--bg);color:var(--muted);border:1px dashed var(--line)}
+.avatar{width:44px;height:44px;flex:none;border-radius:50%;display:grid;place-items:center;background:var(--accent);color:var(--accent-ink);font-family:var(--display);font-weight:700;font-size:1.3rem}
+.pcard .avatar{width:64px;height:64px;font-size:1.9rem}
+.big-av{width:76px;height:76px;font-size:2.2rem}
+.av-btn{margin-top:6px}
+.gate-card{display:grid;justify-items:center;gap:14px;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:24px 16px}
+.gate-card .gform{width:100%;max-width:280px}
+.gform{display:grid;gap:12px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.pin-in{text-align:center;font-family:var(--mono)!important;font-size:1.6rem!important;letter-spacing:.6em;height:56px!important}
+.msg{margin:0;color:var(--warn);font-weight:600;font-size:.9rem;text-align:center}
+.gate-card .row{width:100%}
 [hidden]{display:none!important}
 </style>
 
@@ -435,16 +454,22 @@ let TODAY=mid(new Date()), sel=new Date(TODAY), tab='hoje', sub=null; /* sub: te
 const docs={};
 function lsGet(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}}
 function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
-try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('doc:'))docs[k.slice(4)]=lsGet(k)}}catch(e){}
+/* perfis: cada perfil guarda seus dados em chaves próprias (p:<id>:doc:<nome>) */
+let PID=null,gate=null;
+const K=k=>'p:'+PID+':doc:'+k;
+const profs=()=>lsGet('profiles')||{list:{},last:null};
+const prof=()=>profs().list[PID]||{};
+function loadDocs(){for(const k of Object.keys(docs))delete docs[k];if(!PID)return;const pre='p:'+PID+':doc:';
+  try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith(pre))docs[k.slice(pre.length)]=lsGet(k)}}catch(e){}}
 try{const t=localStorage.getItem('ui:tab');if(t&&['hoje','treino','dieta','compras','progresso'].includes(t))tab=t}catch(e){}
-function save(id,data,quiet){docs[id]=data;lsSet('doc:'+id,data);if(!quiet)render()}
+function save(id,data,quiet){docs[id]=data;if(PID)lsSet(K(id),data);if(!quiet)render()}
 const dayDoc=d=>docs['day-'+iso(d)]||{chk:{},water:0};
 function toggle(d,k){const x=clone(dayDoc(d));x.chk=x.chk||{};if(x.chk[k])delete x.chk[k];else x.chk[k]=true;save('day-'+iso(d),x)}
 const on=(d,k)=>!!(dayDoc(d).chk||{})[k];
 
 /* ---------- planos ---------- */
 function plans(){
-  if(!docs.plans){docs.plans={treino:{ativo:SEED_TREINO.id,lista:{[SEED_TREINO.id]:clone(SEED_TREINO)}},dieta:{ativo:SEED_DIETA.id,lista:{[SEED_DIETA.id]:clone(SEED_DIETA)}}};lsSet('doc:plans',docs.plans)}
+  if(!docs.plans){docs.plans={treino:{ativo:null,lista:{}},dieta:{ativo:null,lista:{}}};if(PID)lsSet(K('plans'),docs.plans)}
   return docs.plans}
 function savePlans(P,quiet){save('plans',P,quiet)}
 const treinoAtivo=()=>{const P=plans();return P.treino.lista[P.treino.ativo]||null};
@@ -600,7 +625,7 @@ function vHoje(){
     <h3>${esc(nm[2])}</h3><ul style="margin:0;padding-left:18px;font-size:.9rem">${nm[3].map(itemHtml).join('')}</ul>
     <button class="btn" data-k="m-${nm[0]}">Marcar como feita</button></section>`:(meals(d).length?`<section class="card"><span class="label">Refeições</span><h3>Todas feitas hoje</h3></section>`:'');
   else ref=`<section class="card"><span class="label">Alimentação</span><h3>Orientações gerais</h3><p class="sub" style="margin:0">Você não tem um plano de nutricionista no app. Veja as orientações básicas na aba Dieta.</p><button class="btn ghost" data-go="dieta">Ver orientações</button></section>`;
-  return `<div class="head"><div><p class="eyebrow">Na Régua</p><p class="sub" style="margin:0">${greet} · ${DWL[d.getDay()]}, ${ddmm(d)}</p><h1>Hoje</h1></div></div>
+  return `<div class="head"><div><p class="eyebrow">Na Régua</p><p class="sub" style="margin:0">${greet}${prof().nome?', '+esc(prof().nome):''} · ${DWL[d.getDay()]}, ${ddmm(d)}</p><h1>Hoje</h1></div><button class="avatar av-btn" data-gate="picker" aria-label="Trocar de perfil">${esc(inicial(prof().nome))}</button></div>
   ${ph?`<span class="chip">${esc(ph)}</span>`:''}
   <section class="card hero"><div class="row" style="align-items:end"><div><div class="big">${p.total?Math.round(p.done/p.total*100):0}%</div><span class="sub">${p.done} de ${p.total} itens do dia</span></div>
    <div style="text-align:right"><div class="big" style="font-size:2rem">${st}</div><span class="sub">${st===1?'dia seguido':'dias seguidos'} acima de 80%</span></div></div>
@@ -710,7 +735,7 @@ function vProgresso(){
   const first=f=>{const ds=Object.keys(E).filter(d=>E[d][f]!=null&&E[d][f]!=='').sort();return ds.length?+E[ds[0]][f]:null};
   const P=((docs.photos||{}).items||[]).slice().sort((a,b)=>a.d<b.d?-1:1);
   const img=p=>photoURL[p.id]||'';
-  return head('Progresso')+`
+  return head('Progresso')+perfilCard()+`
   <section class="card"><div class="row"><span class="label">Corpo</span><span class="sub">peso 1–2× por semana, medidas a cada 15 dias</span></div>
    ${lineChart(pesoPts)}
    <div class="bodygrid">${BODY.map(([f,l,u])=>{const lb=latestBody(f);const f0=first(f);const dl=lb&&f0!=null?+(lb.v-f0).toFixed(1):null;
@@ -747,11 +772,11 @@ async function addPhoto(file){photoMsg='Salvando foto...';render();
 function baixar(nome,obj){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(obj,null,1)],{type:'application/json'}));a.download=nome;document.body.appendChild(a);a.click();a.remove()}
 function exportBackup(){plans();baixar('na-regua-backup-'+iso(TODAY)+'.json',{app:'na-regua',v:2,em:new Date().toISOString(),docs})}
 async function importBackup(file){try{const j=JSON.parse(await file.text());if(!j||!j.docs)throw 0;
-  for(const [k,v] of Object.entries(j.docs)){docs[k]=v;lsSet('doc:'+k,v)}backupMsg='Backup restaurado ('+Object.keys(j.docs).length+' registros).';render()}catch(e){backupMsg='Esse arquivo não é um backup válido do app.';render()}}
+  for(const [k,v] of Object.entries(j.docs)){docs[k]=v;lsSet(K(k),v)}backupMsg='Backup restaurado ('+Object.keys(j.docs).length+' registros).';render()}catch(e){backupMsg='Esse arquivo não é um backup válido do app.';render()}}
 
 /* ================= planos, questionário e editor ================= */
 let planMsg='',pendDel=null,editId=null,gerado=null;
-let qz=null;const QZ0=()=>({objetivo:'hipertrofia',nivel:'iniciante',dias:[1,3,5],tempo:60,local:'academia',lesoes:[],foco:'nenhum',cardio:'apos',parq:PARQ.map(()=>null),ok:false,seed:Math.floor(Math.random()*1e6)});
+let qz=null;const QZ0=()=>({objetivo:prof().objetivo||'hipertrofia',nivel:prof().nivel||'iniciante',dias:[1,3,5],tempo:60,local:prof().local||'academia',lesoes:[],foco:'nenhum',cardio:'apos',parq:PARQ.map(()=>null),ok:false,seed:Math.floor(Math.random()*1e6)});
 const ORIGEM={professor:'do professor',gerado:'gerado no app',montado:'montado por você',importado:'importado',editado:'editado'};
 const slug=s=>String(s).normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,40)||'plano';
 const back=`<button class="pill" data-back="1">‹ Voltar</button>`;
@@ -823,13 +848,13 @@ function vPreview(){const p=gerado;
 
 /* ---------- montar do meu jeito / editor de treino ---------- */
 let pendSug=null,pendRmT=null;
-const CFG0={local:'academia',objetivo:'hipertrofia',nivel:'intermediario'};
-const cfgOf=p=>Object.assign({},CFG0,p.respostas?{local:p.respostas.local,objetivo:p.respostas.objetivo,nivel:p.respostas.nivel,lesoes:p.respostas.lesoes}:{},p.cfg||{});
+const CFG0=()=>({local:prof().local||'academia',objetivo:prof().objetivo||'hipertrofia',nivel:prof().nivel||'intermediario'});
+const cfgOf=p=>Object.assign({},CFG0(),p.respostas?{local:p.respostas.local,objetivo:p.respostas.objetivo,nivel:p.respostas.nivel,lesoes:p.respostas.lesoes}:{},p.cfg||{});
 const grpOf=e=>e.g||(LIBM[e.id]&&LIBM[e.id].g)||null;
 const joinPt=a=>a.length<2?(a[0]||''):a.slice(0,-1).join(', ')+' e '+a[a.length-1];
 const nomeGrupos=gs=>{const n=gs.map(g=>CHIPM[g][1].toLowerCase());const s=joinPt(n);return s?s[0].toUpperCase()+s.slice(1):''};
 function novoPlanoManual(){const P=plans();const id='t-'+Date.now().toString(36);
-  const p={id,tipo:'treino',nome:'Meu treino',criado:iso(TODAY),origem:'montado',cfg:clone(CFG0),descanso:OBJ.hipertrofia.desc,limite:60,
+  const p={id,tipo:'treino',nome:'Meu treino',criado:iso(TODAY),origem:'montado',cfg:CFG0(),descanso:OBJ[CFG0().objetivo].desc,limite:60,
     dias:{0:null,1:'A',2:'B',3:'C',4:null,5:null,6:null},treinos:{A:{nome:'',grupos:[],ex:[],auto:true},B:{nome:'',grupos:[],ex:[],auto:true},C:{nome:'',grupos:[],ex:[],auto:true}}};
   P.treino.lista[id]=p;savePlans(P,true);return id}
 /* sugere exercícios para os grupos escolhidos de um treino */
@@ -875,12 +900,101 @@ function vEditor(){const P=plans();const p=P.treino.lista[editId];if(!p){sub='pl
    ${ativo?'<button class="btn" data-back="1">Concluir</button>':`<button class="btn big-cta" data-usar="treino:${p.id}" data-fim="1">Usar este treino</button><button class="btn ghost" data-back="1">Salvar sem ativar</button>`}</section>`}
 function editPlan(fn,quiet){const P=plans();const p=P.treino.lista[editId];if(!p)return;fn(p);if(p.origem==='gerado'||p.origem==='professor')p.editado=true;savePlans(P,quiet)}
 
+/* ================= perfis ================= */
+let pinFor=null,pinMsg='',pinReset=false,pfEdit=null,pfMsg='',pfDel=false;
+const OBJ_NOMES={hipertrofia:'Ganhar massa',forca:'Ganhar força',emagrecimento:'Emagrecer',saude:'Saúde e condicionamento'};
+const NIV_NOMES={iniciante:'Iniciante',intermediario:'Intermediário',avancado:'Avançado'};
+const LOC_NOMES={academia:'Academia',halteres:'Só halteres',casa:'Em casa'};
+const inicial=n=>(String(n||'?').trim()[0]||'?').toUpperCase();
+const idade=nasc=>{if(!nasc)return null;const b=fromIso(nasc);let a=TODAY.getFullYear()-b.getFullYear();if(TODAY<new Date(TODAY.getFullYear(),b.getMonth(),b.getDate()))a--;return a>0&&a<120?a:null};
+const hasLegacy=()=>{try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('doc:'))return true}}catch(e){}return false};
+async function hashPin(id,pin){const txt='na-regua:'+id+':'+pin;
+  try{const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(txt));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
+  catch(e){return 'h'+hash(txt)}}
+function saveProfs(P){lsSet('profiles',P)}
+function enterProfile(id){const P=profs();P.last=id;saveProfs(P);PID=id;loadDocs();plans();gate=null;pinFor=null;pinMsg='';pinReset=false;
+  tab='hoje';sub=null;sel=new Date(TODAY);window.scrollTo(0,0);render();loadPhotos();wake()}
+function startGate(){const P=profs();const ids=Object.keys(P.list);
+  if(!ids.length){gate='form';pfEdit=null;return}
+  if(ids.length===1&&!P.list[ids[0]].pin){PID=ids[0];loadDocs();plans();gate=null;return}
+  gate='picker'}
+/* move os dados antigos (de antes dos perfis) para o primeiro perfil */
+function migrarLegado(){const moved=[];try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('doc:'))moved.push(k)}}catch(e){}
+  if(!moved.length)return false;let temPlanos=false;
+  moved.forEach(k=>{const v=lsGet(k);const n=k.slice(4);if(n==='plans')temPlanos=true;lsSet(K(n),v)});moved.forEach(k=>{try{localStorage.removeItem(k)}catch(e){}});
+  if(!temPlanos)lsSet(K('plans'),{treino:{ativo:SEED_TREINO.id,lista:{[SEED_TREINO.id]:clone(SEED_TREINO)}},dieta:{ativo:SEED_DIETA.id,lista:{[SEED_DIETA.id]:clone(SEED_DIETA)}}});
+  return true}
+function deleteProfile(id){const pre='p:'+id+':doc:';const ks=[];try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith(pre))ks.push(k)}}catch(e){}
+  ks.forEach(k=>{try{localStorage.removeItem(k)}catch(e){}});const P=profs();delete P.list[id];if(P.last===id)P.last=null;saveProfs(P)}
+
+/* ---------- telas ---------- */
+const brand=`<div class="brand"><span class="eyebrow">Na Régua</span></div>`;
+function vPicker(){const P=profs();const ids=Object.keys(P.list).sort((a,b)=>(a===P.last?-1:b===P.last?1:P.list[a].nome.localeCompare(P.list[b].nome)));
+  return `${brand}<h1 class="gate-h">Quem vai treinar?</h1>
+  <div class="plist">${ids.map(id=>{const p=P.list[id];return `<button class="pcard" data-pick="${id}"><span class="avatar">${esc(inicial(p.nome))}</span><span class="pname">${esc(p.nome)}</span><span class="sub">${p.pin?'com PIN':'sem PIN'}</span></button>`}).join('')}
+   <button class="pcard novo" data-pnew="1"><span class="avatar">+</span><span class="pname">Novo perfil</span><span class="sub">para outra pessoa</span></button></div>
+  <p class="sub" style="text-align:center;margin:0">Cada perfil tem seus próprios treinos, dieta e registros, guardados só neste celular.</p>`}
+function vPin(){const p=profs().list[pinFor];if(!p){gate='picker';return vPicker()}
+  return `${brand}<div class="gate-card"><span class="avatar big-av">${esc(inicial(p.nome))}</span><h2>${esc(p.nome)}</h2>
+  ${pinReset?`<form id="resetF" class="gform"><p style="margin:0">Para redefinir o PIN, informe a data de nascimento cadastrada no perfil.</p>
+     <label class="bf"><span class="sub">Data de nascimento</span><input type="date" id="rs-nasc"></label>
+     <button class="btn" type="submit">Redefinir PIN</button></form>`
+   :`<form id="pinF" class="gform"><label class="bf"><span class="sub">Digite seu PIN</span><input id="pin-in" class="pin-in" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off" aria-label="PIN de 4 dígitos"></label>
+     <button class="btn" type="submit">Entrar</button></form>`}
+  ${pinMsg?`<p class="msg">${esc(pinMsg)}</p>`:''}
+  <div class="row"><button class="link" data-gate="picker">‹ Outro perfil</button>${pinReset?'':'<button class="link" data-pinreset="1">Esqueci o PIN</button>'}</div></div>`}
+function vPerfilForm(){const P=profs();const p=pfEdit?P.list[pfEdit]:{};const novo=!pfEdit;const primeiro=!Object.keys(P.list).length;
+  const sel=(id,opts,v)=>`<select id="${id}">${Object.entries(opts).map(([k,n])=>`<option value="${k}" ${v===k?'selected':''}>${n}</option>`).join('')}</select>`;
+  return `${brand}<h1 class="gate-h">${novo?(primeiro?'Crie seu perfil':'Novo perfil'):'Editar perfil'}</h1>
+  ${primeiro&&hasLegacy()?'<div class="note ok">Seus treinos, dieta e registros atuais vão ficar guardados neste perfil.</div>':''}
+  <form id="pfF" class="card gform">
+   <label class="bf"><span class="sub">Nome *</span><input id="pf-nome" autocomplete="given-name" value="${esc(p.nome||'')}" required></label>
+   <div class="g2"><label class="bf"><span class="sub">Data de nascimento</span><input type="date" id="pf-nasc" value="${esc(p.nasc||'')}"></label>
+    <label class="bf"><span class="sub">Sexo</span>${sel('pf-sexo',{'':'Prefiro não dizer',m:'Masculino',f:'Feminino'},p.sexo||'')}</label></div>
+   <div class="g2"><label class="bf"><span class="sub">Altura (cm)</span><input id="pf-alt" inputmode="numeric" value="${esc(p.altura||'')}" placeholder="cm"></label>
+    <label class="bf"><span class="sub">${novo?'Peso atual (kg)':'Peso (registre em Progresso)'}</span><input id="pf-peso" inputmode="decimal" value="${novo?'':esc(fmtKg((latestBody('peso')||{}).v||''))}" placeholder="kg" ${novo?'':'disabled'}></label></div>
+   <label class="bf"><span class="sub">Objetivo</span>${sel('pf-obj',OBJ_NOMES,p.objetivo||'hipertrofia')}</label>
+   <div class="g2"><label class="bf"><span class="sub">Experiência</span>${sel('pf-niv',NIV_NOMES,p.nivel||'iniciante')}</label>
+    <label class="bf"><span class="sub">Onde treina</span>${sel('pf-loc',LOC_NOMES,p.local||'academia')}</label></div>
+   <span class="label" style="margin-top:6px">PIN (opcional)</span>
+   <p class="sub" style="margin:0">4 números para ninguém abrir seu perfil por engano. ${pfEdit&&p.pin?'Deixe em branco para manter o atual.':''}</p>
+   <div class="g2"><label class="bf"><span class="sub">PIN</span><input id="pf-pin" type="password" inputmode="numeric" maxlength="4" autocomplete="new-password"></label>
+    <label class="bf"><span class="sub">Repita o PIN</span><input id="pf-pin2" type="password" inputmode="numeric" maxlength="4" autocomplete="new-password"></label></div>
+   ${pfEdit&&p.pin?`<button class="link" type="button" data-pinoff="1" style="justify-self:start">Remover PIN</button>`:''}
+   ${pfMsg?`<p class="msg">${esc(pfMsg)}</p>`:''}
+   <button class="btn big-cta" type="submit">${novo?'Criar perfil':'Salvar'}</button>
+  </form>
+  ${!primeiro?`<div class="row" style="justify-content:center"><button class="link" data-gate="${pfEdit?'back':'picker'}">‹ Voltar</button></div>`:''}
+  ${pfEdit?`<div class="row" style="justify-content:center"><button class="link danger" data-pdel="1">${pfDel?'Confirmar: apagar o perfil e todos os dados dele':'Excluir este perfil'}</button></div>`:''}`}
+async function submitPerfil(){const g=id=>document.getElementById(id);const nome=g('pf-nome').value.trim();const pin=g('pf-pin').value.trim(),pin2=g('pf-pin2').value.trim();
+  if(!nome){pfMsg='Coloque seu nome.';render();return}
+  if(pin||pin2){if(!/^\d{4}$/.test(pin)){pfMsg='O PIN precisa ter 4 números.';render();return}if(pin!==pin2){pfMsg='Os dois PINs estão diferentes.';render();return}}
+  const P=profs();const novo=!pfEdit;const primeiro=!Object.keys(P.list).length;const id=pfEdit||('u'+Date.now().toString(36));
+  const p=Object.assign(P.list[id]||{criado:iso(TODAY)},{nome,nasc:g('pf-nasc').value||'',sexo:g('pf-sexo').value,altura:num(g('pf-alt').value),objetivo:g('pf-obj').value,nivel:g('pf-niv').value,local:g('pf-loc').value});
+  if(pin)p.pin=await hashPin(id,pin);
+  P.list[id]=p;saveProfs(P);pfMsg='';
+  if(novo){PID=id;if(primeiro)migrarLegado();loadDocs();plans();const peso=num(g('pf-peso').value);
+    if(peso!==''&&!latestBody('peso')){const B=clone(docs.body);B.e=B.e||{};B.e[iso(TODAY)]=Object.assign(B.e[iso(TODAY)]||{},{peso});save('body',B,true)}
+    pfEdit=null;enterProfile(id);return}
+  pfEdit=null;gate=null;sub=null;tab='progresso';render()}
+async function submitPin(){const v=document.getElementById('pin-in').value.trim();const p=profs().list[pinFor];
+  if(p&&p.pin===await hashPin(pinFor,v)){enterProfile(pinFor);return}pinMsg='PIN incorreto. Tente de novo.';render();setTimeout(()=>{const i=document.getElementById('pin-in');i&&i.focus()},50)}
+function submitReset(){const v=document.getElementById('rs-nasc').value;const P=profs();const p=P.list[pinFor];
+  if(p&&p.nasc&&v===p.nasc){delete p.pin;saveProfs(P);pinMsg='';const id=pinFor;enterProfile(id);pfEdit=id;gate='form';pfMsg='PIN removido. Se quiser, defina um novo abaixo.';render();return}
+  pinMsg=p&&!p.nasc?'Este perfil não tem data de nascimento cadastrada. Para entrar, será preciso excluir e criar o perfil de novo.':'A data não confere.';render()}
+function perfilCard(){const p=prof();const a=idade(p.nasc);
+  return `<section class="card"><div class="row" style="justify-content:start"><span class="avatar">${esc(inicial(p.nome))}</span><div><h3>${esc(p.nome||'Perfil')}</h3>
+   <span class="sub">${[a?a+' anos':'',p.altura?p.altura+' cm':'',OBJ_NOMES[p.objetivo]||'',NIV_NOMES[p.nivel]||''].filter(Boolean).join(' · ')}</span></div></div>
+   <div class="duo"><button class="btn ghost" data-pedit="1">Editar perfil</button><button class="btn ghost" data-gate="picker">Trocar de perfil</button></div></section>`}
+const GATES={picker:vPicker,pin:vPin,form:vPerfilForm};
+
 /* ================= render e eventos ================= */
 const VIEWS={hoje:vHoje,treino:vTreino,dieta:vDieta,compras:vCompras,progresso:vProgresso};
 const SUBS={planos:vPlanos,quiz:vQuiz,editor:vEditor};
 const app=document.getElementById('app');
 function render(){
   const act=document.activeElement;if(act&&/INPUT|TEXTAREA|SELECT/.test(act.tagName)&&app.contains(act))return;
+  const nav=document.querySelector('.tabs');nav.hidden=!!gate;if(gate){app.innerHTML=`<div class="gate">${GATES[gate]()}</div>`;return}
   app.innerHTML=sub?SUBS[sub]():VIEWS[tab]();
   document.querySelectorAll('.tabs button').forEach(b=>{if(!sub&&b.dataset.tab===tab)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')});
 }
@@ -889,7 +1003,15 @@ function setTab(t){tab=t;sub=null;planMsg='';pendDel=null;try{localStorage.setIt
 document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>setTab(b.dataset.tab));
 
 app.addEventListener('click',e=>{
-  const b=e.target.closest('button');if(!b||b.closest('form')||b.disabled)return;const ds=b.dataset;
+  const b=e.target.closest('button');if(!b||(b.closest('form')&&b.type==='submit')||b.disabled)return;const ds=b.dataset;
+  /* perfis */
+  if(ds.pick){const p=profs().list[ds.pick];if(p&&p.pin){pinFor=ds.pick;pinMsg='';pinReset=false;gate='pin';render();setTimeout(()=>{const i=document.getElementById('pin-in');i&&i.focus()},60)}else enterProfile(ds.pick);return}
+  if(ds.pnew){pfEdit=null;pfMsg='';gate='form';window.scrollTo(0,0);render();return}
+  if(ds.gate){if(ds.gate==='back'){pfEdit=null;pfDel=false;gate=null;render();return}gate=ds.gate;pfDel=false;pinMsg='';window.scrollTo(0,0);render();return}
+  if(ds.pinreset){pinReset=true;pinMsg='';render();return}
+  if(ds.pedit){pfEdit=PID;pfMsg='';pfDel=false;gate='form';window.scrollTo(0,0);render();return}
+  if(ds.pinoff){const P=profs();delete P.list[pfEdit].pin;saveProfs(P);pfMsg='PIN removido.';render();return}
+  if(ds.pdel){if(!pfDel){pfDel=true;render();return}deleteProfile(pfEdit);pfDel=false;pfEdit=null;PID=null;loadDocs();startGate();if(!gate)enterProfile(PID);else render();return}
   /* navegação */
   if(ds.sub){if(ds.sub==='quiz'){qz=QZ0();gerado=null}if(ds.sub==='planos'){planMsg='';pendDel=null}goSub(ds.sub);return}
   if(ds.back){if(sub==='editor'){const P=plans();const ep=P.treino.lista[editId];if(ep){if(ep.origem==='montado'&&!Object.values(ep.treinos).some(T=>T.ex.length)&&P.treino.ativo!==ep.id){delete P.treino.lista[editId];planMsg='Treino vazio descartado.'}else ep.salvo=true}savePlans(P,true);pendSug=null;pendRmT=null;goSub('planos');return}sub=null;gerado=null;planMsg='';pendDel=null;window.scrollTo(0,0);render();return}
@@ -961,6 +1083,9 @@ app.addEventListener('change',e=>{const i=e.target;const ds=i.dataset;
   if(ds.enL){editPlan(p=>{const ex=p.treinos[ds.enL].ex[+ds.i];if(ex)ex[ds.f]=i.value.trim()},true);return}
 });
 app.addEventListener('submit',e=>{e.preventDefault();const f=e.target;
+  if(f.id==='pfF'){submitPerfil();return}
+  if(f.id==='pinF'){submitPin();return}
+  if(f.id==='resetF'){submitReset();return}
   if(f.id==='bodyF'){const B=clone(docs.body);B.e=B.e||{};const ent={};BODY.forEach(([k])=>{const v=num(document.getElementById('b-'+k).value);if(v!=='')ent[k]=v});
     document.activeElement&&document.activeElement.blur();if(Object.keys(ent).length)B.e[iso(TODAY)]=ent;else delete B.e[iso(TODAY)];save('body',B);return}
 });
@@ -982,7 +1107,7 @@ document.getElementById('tSkip').onclick=()=>{clearInterval(tInt);tEl.hidden=tru
 let lock=null;async function wake(){try{if(tab==='treino'&&!sub&&!lock&&navigator.wakeLock){lock=await navigator.wakeLock.request('screen');lock.addEventListener('release',()=>lock=null)}else if((tab!=='treino'||sub)&&lock){lock.release();lock=null}}catch(e){}}
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){const t=mid(new Date());if(+t!==+TODAY){TODAY=t;sel=new Date(t)}render();wake()}});
 
-plans();render();wake();loadPhotos();
+startGate();render();wake();if(!gate)loadPhotos();
 
 /* atualização automática: busca versão nova ao abrir e ao voltar para o app, e recarrega sozinho */
 if('serviceWorker' in navigator)window.addEventListener('load',async()=>{try{
