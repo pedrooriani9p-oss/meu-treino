@@ -438,7 +438,9 @@ body.lock{overflow:hidden}
 .nr-regua b{position:absolute;top:3px;width:1.5px;height:5px;background:#3d433a}
 .nr-regua b.g{height:9px}
 .nr-txt{position:relative;height:1.6rem;display:grid;place-items:center}
-.nr-pct{font-family:var(--mono);font-size:.95rem;color:#9aa296;letter-spacing:.06em;animation:some .2s 1.1s ease forwards}
+.nr-by{font-family:var(--body);font-size:.82rem;letter-spacing:.14em;color:#8d9488;opacity:0;margin-top:-10px;animation:by-in .5s 1.32s ease both}
+.nr-by b{font-weight:600;color:#e2a83a;letter-spacing:.1em}
+@keyframes by-in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 .nr-nome{position:absolute;font-family:var(--display);font-weight:700;font-size:clamp(1.15rem,5.2vw,1.55rem);letter-spacing:.5em;margin-right:-.5em;color:#eef0ec;text-transform:uppercase;white-space:nowrap;opacity:0;animation:nome-in .45s 1.12s ease both}
 .fenda{position:absolute;top:0;bottom:0;left:50%;width:2px;margin-left:-1px;background:#fff4d0;box-shadow:0 0 18px 6px rgba(240,192,96,.7);opacity:0;transform:scaleY(0);animation:fenda .5s 1.55s ease both;z-index:2}
 @keyframes traco{to{stroke-dashoffset:0}}
@@ -456,7 +458,7 @@ body.lock{overflow:hidden}
 .entra #app>*:nth-child(2){animation-delay:.06s}.entra #app>*:nth-child(3){animation-delay:.12s}.entra #app>*:nth-child(n+4){animation-delay:.18s}
 .entra .pcard{animation:entra-app .5s cubic-bezier(.2,.8,.2,1) both}.entra .pcard:nth-child(2){animation-delay:.08s}.entra .pcard:nth-child(3){animation-delay:.16s}
 @keyframes entra-app{from{opacity:0;transform:scale(.97)}to{opacity:1;transform:none}}
-@media (prefers-reduced-motion:reduce){.porta,.nr,.nr .contorno,.nr .enche,.nr .luz,.nr-regua i::after,.nr-pct,.nr-nome,.fenda{animation:none}.nr .contorno{stroke-dashoffset:0}.nr-pct{display:none}.nr-nome{opacity:1}.nr-regua i::after{transform:none}.fenda{display:none}.entra #app>*,.entra .pcard{animation:none}}
+@media (prefers-reduced-motion:reduce){.porta,.nr,.nr .contorno,.nr .enche,.nr .luz,.nr-regua i::after,.nr-nome,.nr-by,.fenda{animation:none}.nr .contorno{stroke-dashoffset:0}.nr-nome,.nr-by{opacity:1}.nr-regua i::after{transform:none}.fenda{display:none}.entra #app>*,.entra .pcard{animation:none}}
 </style>
 
 
@@ -476,7 +478,8 @@ body.lock{overflow:hidden}
     <path class="contorno" pathLength="1" d="M28 188V12H56L97 124V12H146A48 48 0 0 1 157 106.7L190 188H161L131 108H123V188H97L54 76V188Z M123 36H146A24 24 0 0 1 146 84H123Z"/>
    </svg>
    <div class="nr-regua"><i></i><b class="g" style="left:calc(0% - .75px)"></b><b class="" style="left:calc(5% - .75px)"></b><b class="" style="left:calc(10% - .75px)"></b><b class="" style="left:calc(15% - .75px)"></b><b class="" style="left:calc(20% - .75px)"></b><b class="g" style="left:calc(25% - .75px)"></b><b class="" style="left:calc(30% - .75px)"></b><b class="" style="left:calc(35% - .75px)"></b><b class="" style="left:calc(40% - .75px)"></b><b class="" style="left:calc(45% - .75px)"></b><b class="g" style="left:calc(50% - .75px)"></b><b class="" style="left:calc(55% - .75px)"></b><b class="" style="left:calc(60% - .75px)"></b><b class="" style="left:calc(65% - .75px)"></b><b class="" style="left:calc(70% - .75px)"></b><b class="g" style="left:calc(75% - .75px)"></b><b class="" style="left:calc(80% - .75px)"></b><b class="" style="left:calc(85% - .75px)"></b><b class="" style="left:calc(90% - .75px)"></b><b class="" style="left:calc(95% - .75px)"></b><b class="g" style="left:calc(100% - .75px)"></b></div>
-   <div class="nr-txt"><span class="nr-pct">0%</span><span class="nr-nome">Na Régua</span></div>
+   <div class="nr-txt"><span class="nr-nome">Na Régua</span></div>
+   <div class="nr-by">by <b>Pedro Oriani</b></div>
   </div></div>
  <div class="porta d"><div class="nr-box">
    <svg class="nr" viewBox="20 0 180 200">
@@ -491,16 +494,14 @@ body.lock{overflow:hidden}
     <path class="contorno" pathLength="1" d="M28 188V12H56L97 124V12H146A48 48 0 0 1 157 106.7L190 188H161L131 108H123V188H97L54 76V188Z M123 36H146A24 24 0 0 1 146 84H123Z"/>
    </svg>
    <div class="nr-regua"><i></i><b class="g" style="left:calc(0% - .75px)"></b><b class="" style="left:calc(5% - .75px)"></b><b class="" style="left:calc(10% - .75px)"></b><b class="" style="left:calc(15% - .75px)"></b><b class="" style="left:calc(20% - .75px)"></b><b class="g" style="left:calc(25% - .75px)"></b><b class="" style="left:calc(30% - .75px)"></b><b class="" style="left:calc(35% - .75px)"></b><b class="" style="left:calc(40% - .75px)"></b><b class="" style="left:calc(45% - .75px)"></b><b class="g" style="left:calc(50% - .75px)"></b><b class="" style="left:calc(55% - .75px)"></b><b class="" style="left:calc(60% - .75px)"></b><b class="" style="left:calc(65% - .75px)"></b><b class="" style="left:calc(70% - .75px)"></b><b class="g" style="left:calc(75% - .75px)"></b><b class="" style="left:calc(80% - .75px)"></b><b class="" style="left:calc(85% - .75px)"></b><b class="" style="left:calc(90% - .75px)"></b><b class="" style="left:calc(95% - .75px)"></b><b class="g" style="left:calc(100% - .75px)"></b></div>
-   <div class="nr-txt"><span class="nr-pct">0%</span><span class="nr-nome">Na Régua</span></div>
+   <div class="nr-txt"><span class="nr-nome">Na Régua</span></div>
+   <div class="nr-by">by <b>Pedro Oriani</b></div>
   </div></div>
  <div class="fenda"></div>
 </div>
 <script>
 (function(){const el=document.getElementById('intro');if(!el||document.documentElement.classList.contains('sem-intro'))return;
  const reduz=matchMedia('(prefers-reduced-motion: reduce)').matches;let fim=false;const R=document.documentElement;
- /* contador de 0 a 100% junto com o preenchimento */
- const pcts=el.querySelectorAll('.nr-pct');const t0=performance.now();
- (function conta(t){const p=Math.max(0,Math.min(1,(t-t0-450)/850));const e=p<.5?2*p*p:1-Math.pow(-2*p+2,2)/2;pcts.forEach(x=>x.textContent=Math.round(e*100)+'%');if(p<1&&!fim)requestAnimationFrame(conta)})(t0);
  function sair(){if(fim)return;fim=true;R.classList.add('entra');el.classList.add('sai');setTimeout(()=>el.remove(),260);setTimeout(()=>R.classList.remove('entra'),1000)}
  el.addEventListener('click',sair);setTimeout(sair,reduz?1000:2250)})();
 </script>
