@@ -331,6 +331,45 @@ select,.edt,.erow input,.bf input{font:inherit;font-size:16px;color:var(--ink);b
 .cstats b{font-family:var(--display);font-size:1.8rem;line-height:1}
 .cstats span{font-size:.68rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}
 @media (prefers-reduced-motion:reduce){.celeb,.cbox{transition:none}.cring circle,.cring path{animation:none!important;stroke-dashoffset:0}}
+body.lock{overflow:hidden}
+.sheet-bg{position:fixed;inset:0;z-index:30;background:rgba(10,12,10,.55);animation:fadein .2s}
+.sheet{position:fixed;z-index:31;left:0;right:0;bottom:0;max-height:88vh;max-height:88dvh;display:flex;flex-direction:column;background:var(--surface);border-radius:22px 22px 0 0;
+  box-shadow:0 -10px 40px rgba(0,0,0,.25);padding-bottom:env(safe-area-inset-bottom,0px);animation:sheetup .28s cubic-bezier(.2,.9,.3,1.1);outline:none;max-width:680px;margin:0 auto}
+@keyframes sheetup{from{transform:translateY(100%)}to{transform:none}}
+@keyframes fadein{from{opacity:0}}
+.sheet-h{display:grid;gap:10px;padding:8px max(16px,env(safe-area-inset-right,0px)) 10px max(16px,env(safe-area-inset-left,0px));border-bottom:1px solid var(--line)}
+.grab{justify-self:center;width:44px;height:5px;border-radius:3px;background:var(--line)}
+.sheet-h h2{font-size:1.5rem}
+.seg{display:grid;grid-template-columns:1fr 1fr;padding:4px;border-radius:14px;background:var(--bg);border:1px solid var(--line)}
+.seg button{padding:10px;border-radius:10px;font-weight:600;color:var(--muted)}
+.seg button[aria-selected="true"]{background:var(--ink);color:var(--bg)}
+.sheet-f{display:grid;gap:8px;padding:10px max(16px,env(safe-area-inset-right,0px)) 8px max(16px,env(safe-area-inset-left,0px));border-bottom:1px solid var(--line)}
+.pk-q{width:100%;height:46px;padding:4px 14px;border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--ink);font:inherit;font-size:16px}
+.hscroll{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:0 -16px;padding:0 16px}
+.hscroll::-webkit-scrollbar{display:none}
+.hscroll .chipb{flex:none;white-space:nowrap}
+.chipb.alt[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.sheet-b{overflow-y:auto;-webkit-overflow-scrolling:touch;padding:8px max(16px,env(safe-area-inset-right,0px)) 16px max(16px,env(safe-area-inset-left,0px));display:grid;gap:4px;align-content:start;flex:1;min-height:0}
+.sheet-b.gform{gap:12px;padding-top:14px}
+.pk-count{margin:2px 0 4px}
+.pk-item{display:flex;align-items:center;gap:12px;padding:8px;border-radius:14px;text-align:left;width:100%}
+.pk-item:active{background:var(--bg)}
+.pk-item.usado{opacity:.45}
+.pk-txt{display:grid;gap:1px;min-width:0;flex:1}
+.pk-txt b{font-weight:600;font-size:.95rem}
+.pk-cuid{font-size:.72rem;color:var(--warn);font-weight:600}
+.pk-add{flex:none;min-width:36px;height:36px;padding:0 8px;border-radius:999px;display:grid;place-items:center;background:var(--accent-soft);color:var(--ink);font-weight:700;font-size:1.05rem}
+.pk-item.usado .pk-add{background:none;font-size:.7rem;font-weight:600;color:var(--muted)}
+.pk-vazio{display:grid;gap:10px;justify-items:center;text-align:center;padding:24px 8px}
+.pthumb{position:relative;flex:none;width:72px;aspect-ratio:3/2;border-radius:10px;overflow:hidden;background:#fff;border:1px solid var(--line)}
+.pthumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;max-width:100%}
+.pthumb img.b{animation:pose 2.4s ease-in-out infinite}
+.pthumb.sm{width:52px}
+.pthumb.letra{display:grid;place-items:center;background:var(--accent-soft);font-family:var(--display);font-weight:700;font-size:1.4rem;color:var(--ink)}
+.exbtn{display:flex;align-items:center;gap:10px;min-width:0;text-align:left;padding:4px;border-radius:12px;border:1px solid var(--line);background:var(--bg);min-height:44px}
+.exbtn span:last-child{min-width:0;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;font-size:.9rem;font-weight:500}
+.btn.addex{border-style:dashed}
+@media (prefers-reduced-motion:reduce){.sheet,.sheet-bg{animation:none}.pthumb img.b{animation:none;opacity:0}}
 [hidden]{display:none!important}
 </style>
 
@@ -358,7 +397,7 @@ select,.edt,.erow input,.bf input{font:inherit;font-size:16px;color:var(--ink);b
 
 <script>
 /* imagens: Free Exercise DB (github.com/yuhonas/free-exercise-db), domínio público (Unlicense) */
-const IMG={"supino_reto_barra":"Barbell_Bench_Press_-_Medium_Grip","supino_reto_h":"Dumbbell_Bench_Press","supino_incl_h":"Incline_Dumbbell_Press","supino_maq":"Machine_Bench_Press","crucifixo_h":"Dumbbell_Flyes","crossover":"Cable_Crossover","peck_deck":"Butterfly","flexao":"Pushups","flexao_incl":"Incline_Push-Up","supino_elast":"Bench_Press_-_With_Bands","crucifixo_elast":"Cross_Over_-_With_Bands","puxada_frente":"Wide-Grip_Lat_Pulldown","remada_baixa":"Seated_Cable_Rows","remada_unil":"One-Arm_Dumbbell_Row","remada_curv_barra":"Bent_Over_Barbell_Row","remada_curv_h":"Bent_Over_Two-Dumbbell_Row","barra_fixa":"Pullups","pulldown":"Straight-Arm_Pulldown","remada_elast":"Seated_Cable_Rows","remada_invert":"Inverted_Row","pullover_h":"Bent-Arm_Dumbbell_Pullover","remada_maq":"Leverage_Iso_Row","desenv_h":"Dumbbell_Shoulder_Press","desenv_maq":"Machine_Shoulder_Military_Press","desenv_elast":"Shoulder_Press_-_With_Bands","desenv_arnold":"Arnold_Dumbbell_Press","elev_lat_h":"Side_Lateral_Raise","elev_lat_cabo":"Cable_Seated_Lateral_Raise","elev_lat_elast":"Lateral_Raise_-_With_Bands","elev_lat_maq":"Side_Lateral_Raise","crucifixo_inv_h":"Reverse_Flyes","face_pull":"Face_Pull","voador_inv":"Reverse_Machine_Flyes","face_pull_elast":"Band_Pull_Apart","y_solo":"Lying_Rear_Delt_Raise","rosca_barra":"Barbell_Curl","rosca_alt":"Dumbbell_Alternate_Bicep_Curl","rosca_martelo":"Hammer_Curls","rosca_conc":"Concentration_Curls","rosca_cabo":"Standing_Biceps_Cable_Curl","rosca_elast":"Close-Grip_EZ-Bar_Curl_with_Band","triceps_pulley":"Triceps_Pushdown","triceps_testa":"Decline_Dumbbell_Triceps_Extension","triceps_frances":"Dumbbell_One-Arm_Triceps_Extension","triceps_banco":"Bench_Dips","triceps_elast":"Band_Skull_Crusher","flexao_fechada":"Push-Ups_-_Close_Triceps_Position","triceps_coice":"Tricep_Dumbbell_Kickback","agach_barra":"Barbell_Squat","agach_goblet":"Goblet_Squat","agach_sumo":"Plie_Dumbbell_Squat","leg_press":"Leg_Press","hack":"Hack_Squat","extensora":"Leg_Extensions","afundo_h":"Dumbbell_Lunges","bulgaro":"Split_Squat_with_Dumbbells","agach_corpo":"Bodyweight_Squat","afundo_corpo":"Bodyweight_Walking_Lunge","agach_elast":"Box_Squat_with_Bands","step_up":"Dumbbell_Step_Ups","stiff_h":"Stiff-Legged_Dumbbell_Deadlift","stiff_barra":"Stiff-Legged_Barbell_Deadlift","mesa_flex":"Lying_Leg_Curls","cadeira_flex":"Seated_Leg_Curl","romeno_elast":"Band_Good_Morning_Pull_Through","flexora_toalha":"Ball_Leg_Curl","bom_dia":"Good_Morning","flexora_elast":"Lying_Leg_Curls","elev_pelv_barra":"Barbell_Hip_Thrust","elev_pelv_h":"Barbell_Glute_Bridge","ponte":"Butt_Lift_Bridge","ponte_unil":"Single_Leg_Glute_Bridge","abdutora":"Thigh_Abductor","gluteo_cabo":"One-Legged_Cable_Kickback","pant_maq":"Standing_Calf_Raises","pant_h":"Calf_Raise_On_A_Dumbbell","pant_degrau":"Rocking_Standing_Calf_Raise","pant_sentado":"Seated_Calf_Raise","prancha":"Plank","prancha_lat":"Push_Up_to_Side_Plank","crunch":"Crunches","dead_bug":"Dead_Bug","elev_pernas":"Flat_Bench_Lying_Leg_Raise","pallof":"Pallof_Press","pallof_elast":"Pallof_Press","rosca_punho":"Seated_Dumbbell_Palms-Up_Wrist_Curl","rosca_punho_inv":"Seated_Dumbbell_Palms-Down_Wrist_Curl","rosca_inv_barra":"Reverse_Barbell_Curl","rosca_inv_cabo":"Reverse_Cable_Curl","farmer":"Farmers_Walk","rosca_punho_elast":"Seated_Dumbbell_Palms-Up_Wrist_Curl","pendurar":"One_Handed_Hang","rolo_punho":"Wrist_Roller","encolh_h":"Dumbbell_Shrug","encolh_barra":"Barbell_Shrug","encolh_maq":"Leverage_Shrug","encolh_elast":"Dumbbell_Shrug","remada_alta_cabo":"Standing_Dumbbell_Upright_Row","a1":"Dumbbell_Bench_Press","a2":"Incline_Dumbbell_Press","a3":"Dumbbell_Flyes","a4":"Dumbbell_Shoulder_Press","a5":"Side_Lateral_Raise","a6":"Decline_Dumbbell_Triceps_Extension","a7":"Bench_Dips","b1":"Wide-Grip_Lat_Pulldown","b2":"One-Arm_Dumbbell_Row","b3":"Straight-Arm_Pulldown","b4":"Reverse_Flyes","b5":"Dumbbell_Alternate_Bicep_Curl","b6":"Hammer_Curls","b7":"Concentration_Curls","c1":"Plie_Dumbbell_Squat","c2":"Leg_Press","c3":"Dumbbell_Lunges","c4":"Stiff-Legged_Dumbbell_Deadlift","c5":"Lying_Leg_Curls","c6":"Standing_Calf_Raises","c7":"Plank"};
+const IMG={"supino_reto_barra":"Barbell_Bench_Press_-_Medium_Grip","supino_reto_h":"Dumbbell_Bench_Press","supino_incl_h":"Incline_Dumbbell_Press","supino_maq":"Machine_Bench_Press","crucifixo_h":"Dumbbell_Flyes","crossover":"Cable_Crossover","peck_deck":"Butterfly","flexao":"Pushups","flexao_incl":"Incline_Push-Up","supino_elast":"Bench_Press_-_With_Bands","crucifixo_elast":"Cross_Over_-_With_Bands","puxada_frente":"Wide-Grip_Lat_Pulldown","remada_baixa":"Seated_Cable_Rows","remada_unil":"One-Arm_Dumbbell_Row","remada_curv_barra":"Bent_Over_Barbell_Row","remada_curv_h":"Bent_Over_Two-Dumbbell_Row","barra_fixa":"Pullups","pulldown":"Straight-Arm_Pulldown","remada_elast":"Seated_Cable_Rows","remada_invert":"Inverted_Row","pullover_h":"Bent-Arm_Dumbbell_Pullover","remada_maq":"Leverage_Iso_Row","desenv_h":"Dumbbell_Shoulder_Press","desenv_maq":"Machine_Shoulder_Military_Press","desenv_elast":"Shoulder_Press_-_With_Bands","desenv_arnold":"Arnold_Dumbbell_Press","elev_lat_h":"Side_Lateral_Raise","elev_lat_cabo":"Cable_Seated_Lateral_Raise","elev_lat_elast":"Lateral_Raise_-_With_Bands","elev_lat_maq":"Side_Lateral_Raise","crucifixo_inv_h":"Reverse_Flyes","face_pull":"Face_Pull","voador_inv":"Reverse_Machine_Flyes","face_pull_elast":"Band_Pull_Apart","y_solo":"Lying_Rear_Delt_Raise","rosca_barra":"Barbell_Curl","rosca_alt":"Dumbbell_Alternate_Bicep_Curl","rosca_martelo":"Hammer_Curls","rosca_conc":"Concentration_Curls","rosca_cabo":"Standing_Biceps_Cable_Curl","rosca_elast":"Close-Grip_EZ-Bar_Curl_with_Band","triceps_pulley":"Triceps_Pushdown","triceps_testa":"Decline_Dumbbell_Triceps_Extension","triceps_frances":"Dumbbell_One-Arm_Triceps_Extension","triceps_banco":"Bench_Dips","triceps_elast":"Band_Skull_Crusher","flexao_fechada":"Push-Ups_-_Close_Triceps_Position","triceps_coice":"Tricep_Dumbbell_Kickback","agach_barra":"Barbell_Squat","agach_goblet":"Goblet_Squat","agach_sumo":"Plie_Dumbbell_Squat","leg_press":"Leg_Press","hack":"Hack_Squat","extensora":"Leg_Extensions","afundo_h":"Dumbbell_Lunges","bulgaro":"Split_Squat_with_Dumbbells","agach_corpo":"Bodyweight_Squat","afundo_corpo":"Bodyweight_Walking_Lunge","agach_elast":"Box_Squat_with_Bands","step_up":"Dumbbell_Step_Ups","stiff_h":"Stiff-Legged_Dumbbell_Deadlift","stiff_barra":"Stiff-Legged_Barbell_Deadlift","mesa_flex":"Lying_Leg_Curls","cadeira_flex":"Seated_Leg_Curl","romeno_elast":"Band_Good_Morning_Pull_Through","flexora_toalha":"Ball_Leg_Curl","bom_dia":"Good_Morning","flexora_elast":"Lying_Leg_Curls","elev_pelv_barra":"Barbell_Hip_Thrust","elev_pelv_h":"Barbell_Glute_Bridge","ponte":"Butt_Lift_Bridge","ponte_unil":"Single_Leg_Glute_Bridge","abdutora":"Thigh_Abductor","gluteo_cabo":"One-Legged_Cable_Kickback","pant_maq":"Standing_Calf_Raises","pant_h":"Calf_Raise_On_A_Dumbbell","pant_degrau":"Rocking_Standing_Calf_Raise","pant_sentado":"Seated_Calf_Raise","prancha":"Plank","prancha_lat":"Push_Up_to_Side_Plank","crunch":"Crunches","dead_bug":"Dead_Bug","elev_pernas":"Flat_Bench_Lying_Leg_Raise","pallof":"Pallof_Press","pallof_elast":"Pallof_Press","rosca_punho":"Seated_Dumbbell_Palms-Up_Wrist_Curl","rosca_punho_inv":"Seated_Dumbbell_Palms-Down_Wrist_Curl","rosca_inv_barra":"Reverse_Barbell_Curl","rosca_inv_cabo":"Reverse_Cable_Curl","farmer":"Farmers_Walk","rosca_punho_elast":"Seated_Dumbbell_Palms-Up_Wrist_Curl","pendurar":"One_Handed_Hang","rolo_punho":"Wrist_Roller","encolh_h":"Dumbbell_Shrug","encolh_barra":"Barbell_Shrug","encolh_maq":"Leverage_Shrug","encolh_elast":"Dumbbell_Shrug","remada_alta_cabo":"Standing_Dumbbell_Upright_Row","a1":"Dumbbell_Bench_Press","a2":"Incline_Dumbbell_Press","a3":"Dumbbell_Flyes","a4":"Dumbbell_Shoulder_Press","a5":"Side_Lateral_Raise","a6":"Decline_Dumbbell_Triceps_Extension","a7":"Bench_Dips","b1":"Wide-Grip_Lat_Pulldown","b2":"One-Arm_Dumbbell_Row","b3":"Straight-Arm_Pulldown","b4":"Reverse_Flyes","b5":"Dumbbell_Alternate_Bicep_Curl","b6":"Hammer_Curls","b7":"Concentration_Curls","c1":"Plie_Dumbbell_Squat","c2":"Leg_Press","c3":"Dumbbell_Lunges","c4":"Stiff-Legged_Dumbbell_Deadlift","c5":"Lying_Leg_Curls","c6":"Standing_Calf_Raises","c7":"Plank","supino_incl_barra":"Barbell_Incline_Bench_Press_-_Medium_Grip","supino_decl_barra":"Decline_Barbell_Bench_Press","supino_decl_h":"Decline_Dumbbell_Bench_Press","supino_neutro_h":"Dumbbell_Bench_Press_with_Neutral_Grip","crucifixo_incl_h":"Incline_Dumbbell_Flyes","crossover_baixo":"Low_Cable_Crossover","supino_smith":"Smith_Machine_Bench_Press","supino_incl_maq":"Leverage_Incline_Chest_Press","supino_articulado":"Leverage_Chest_Press","mergulho_peito":"Dips_-_Chest_Version","flexao_decl":"Decline_Push-Up","flexao_aberta":"Push-Up_Wide","puxada_fechada":"Close-Grip_Front_Lat_Pulldown","puxada_triangulo":"V-Bar_Pulldown","puxada_unil":"One_Arm_Lat_Pulldown","remada_cavalinho":"T-Bar_Row_with_Handle","remada_smith":"Smith_Machine_Bent_Over_Row","remada_alta_maq":"Leverage_High_Row","remada_unil_cabo":"Seated_One-arm_Cable_Pulley_Rows","pulldown_corda":"Rope_Straight-Arm_Pulldown","barra_assistida":"Band_Assisted_Pull-Up","barra_supinada":"Chin-Up","hiperextensao":"Hyperextensions_Back_Extensions","superman":"Superman","desenv_barra":"Standing_Military_Press","desenv_sent_h":"Seated_Dumbbell_Press","desenv_smith":"Smith_Machine_Overhead_Shoulder_Press","elev_frontal_h":"Front_Dumbbell_Raise","elev_frontal_anilha":"Front_Plate_Raise","elev_frontal_cabo":"Front_Cable_Raise","elev_lat_unil":"One-Arm_Side_Laterals","crucifixo_inv_cabo":"Cable_Rear_Delt_Fly","rosca_direta_h":"Dumbbell_Bicep_Curl","rosca_w":"EZ-Bar_Curl","rosca_scott":"Preacher_Curl","rosca_scott_maq":"Machine_Preacher_Curls","rosca_scott_unil":"One_Arm_Dumbbell_Preacher_Curl","rosca_incl":"Incline_Dumbbell_Curl","rosca_martelo_corda":"Cable_Hammer_Curls_-_Rope_Attachment","rosca_spider":"Spider_Curl","rosca_maq":"Machine_Bicep_Curl","rosca_zottman":"Zottman_Curl","triceps_corda":"Triceps_Pushdown_-_Rope_Attachment","triceps_inv":"Reverse_Grip_Triceps_Pushdown","triceps_testa_barra":"EZ-Bar_Skullcrusher","triceps_frances_corda":"Cable_Rope_Overhead_Triceps_Extension","triceps_sent_h":"Seated_Triceps_Press","supino_fechado":"Close-Grip_Barbell_Bench_Press","mergulho_triceps":"Dips_-_Triceps_Version","triceps_maq":"Machine_Triceps_Extension","agach_frontal":"Front_Barbell_Squat_To_A_Bench","agach_smith":"Smith_Machine_Squat","agach_aberto":"Wide_Stance_Barbell_Squat","agach_banco_h":"Dumbbell_Squat_To_A_Bench","agach_cadeira":"Chair_Squat","leg_press_fechado":"Narrow_Stance_Leg_Press","afundo_barra":"Barbell_Lunge","passada":"Barbell_Walking_Lunge","afundo_reverso":"Dumbbell_Rear_Lunge","step_up_barra":"Barbell_Step_Ups","extensora_unil":"Single-Leg_Leg_Extension","terra_romeno":"Romanian_Deadlift","terra":"Barbell_Deadlift","terra_sumo":"Sumo_Deadlift","bom_dia_barra":"Good_Morning","flexora_em_pe":"Standing_Leg_Curl","nordico":"Floor_Glute-Ham_Raise","ponte_barra":"Barbell_Glute_Bridge","elev_pelv_smith":"Smith_Machine_Hip_Raise","coice_4apoios":"Glute_Kickback","pull_through":"Pull_Through","adutora":"Thigh_Adductor","adutor_cabo":"Cable_Hip_Adduction","monster_walk":"Monster_Walk","ponte_elast":"Hip_Lift_with_Band","pant_leg_press":"Calf_Press_On_The_Leg_Press_Machine","pant_smith":"Smith_Machine_Calf_Raise","pant_burrinho":"Donkey_Calf_Raises","pant_barra":"Standing_Barbell_Calf_Raise","pant_sent_h":"Dumbbell_Seated_One-Leg_Calf_Raise","pant_elast":"Calf_Raises_-_With_Bands","abd_polia":"Cable_Crunch","abd_maq":"Ab_Crunch_Machine","elev_pernas_barra":"Hanging_Leg_Raise","elev_joelhos_paralela":"Knee_Hip_Raise_On_Parallel_Bars","abd_bicicleta":"Air_Bike","abd_obliquo":"Cross-Body_Crunch","russian_twist":"Russian_Twist","abd_infra":"Reverse_Crunch","roda_abd":"Ab_Roller","escalador":"Mountain_Climbers","canivete":"Jackknife_Sit-Up","abd_declinado":"Decline_Crunch","abd_tesoura":"Flutter_Kicks","abd_remador":"Sit-Up","abd_calcanhar":"Alternate_Heel_Touchers","russian_cabo":"Cable_Russian_Twists","rosca_punho_barra":"Seated_Palm-Up_Barbell_Wrist_Curl","rosca_punho_costas":"Standing_Palms-Up_Barbell_Behind_The_Back_Wrist_Curl","pinca_anilha":"Plate_Pinch","encolh_cabo":"Cable_Shrugs","encolh_smith":"Smith_Machine_Behind_the_Back_Shrug","remada_alta_h":"Standing_Dumbbell_Upright_Row","remada_alta_barra":"Upright_Barbell_Row"};
 
 /* ================= Na Régua · dados ================= */
 const DW=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
@@ -526,7 +565,111 @@ const LIB=[
  ['encolh_barra','Encolhimento com barra','trapezio','barra',0,1],
  ['encolh_maq','Encolhimento na máquina','trapezio','maq',0,1],
  ['encolh_elast','Encolhimento com elástico','trapezio','elastico',0,1],
- ['remada_alta_cabo','Remada alta no cabo','trapezio','cabo',0,2,'ombro']
+ ['remada_alta_cabo','Remada alta no cabo','trapezio','cabo',0,2,'ombro'],
+ ['supino_incl_barra', 'Supino inclinado com barra', 'peito', 'barra', 1, 2, 'ombro'],
+ ['supino_decl_barra', 'Supino declinado com barra', 'peito', 'barra', 1, 2, ''],
+ ['supino_decl_h', 'Supino declinado com halteres', 'peito', 'halter', 1, 1, ''],
+ ['supino_neutro_h', 'Supino com halteres, pegada neutra', 'peito', 'halter', 1, 1, ''],
+ ['crucifixo_incl_h', 'Crucifixo inclinado com halteres', 'peito', 'halter', 0, 1, 'ombro'],
+ ['crossover_baixo', 'Crossover de baixo para cima', 'peito', 'cabo', 0, 2, ''],
+ ['supino_smith', 'Supino reto no Smith', 'peito', 'maq', 1, 1, ''],
+ ['supino_incl_maq', 'Supino inclinado na máquina', 'peito', 'maq', 1, 1, ''],
+ ['supino_articulado', 'Supino articulado', 'peito', 'maq', 1, 1, ''],
+ ['mergulho_peito', 'Mergulho nas paralelas (peito)', 'peito', 'corpo', 1, 3, 'ombro'],
+ ['flexao_decl', 'Flexão com pés elevados', 'peito', 'corpo', 1, 2, 'punho'],
+ ['flexao_aberta', 'Flexão com mãos afastadas', 'peito', 'corpo', 1, 1, 'punho'],
+ ['puxada_fechada', 'Puxada frente pegada fechada', 'costas', 'maq', 1, 1, ''],
+ ['puxada_triangulo', 'Puxada com triângulo', 'costas', 'cabo', 1, 1, ''],
+ ['puxada_unil', 'Puxada unilateral no cabo', 'costas', 'cabo', 0, 2, ''],
+ ['remada_cavalinho', 'Remada cavalinho (barra T)', 'costas', 'barra', 1, 2, 'lombar'],
+ ['remada_smith', 'Remada curvada no Smith', 'costas', 'maq', 1, 2, 'lombar'],
+ ['remada_alta_maq', 'Remada alta articulada', 'costas', 'maq', 1, 1, ''],
+ ['remada_unil_cabo', 'Remada sentada unilateral no cabo', 'costas', 'cabo', 1, 1, ''],
+ ['pulldown_corda', 'Pull down com corda', 'costas', 'cabo', 0, 2, ''],
+ ['barra_assistida', 'Barra fixa assistida com elástico', 'costas', 'elastico', 1, 1, 'ombro'],
+ ['barra_supinada', 'Barra fixa supinada', 'costas', 'corpo', 1, 3, 'ombro'],
+ ['hiperextensao', 'Hiperextensão lombar (banco romano)', 'costas', 'maq', 0, 1, ''],
+ ['superman', 'Superman (extensão lombar no solo)', 'costas', 'corpo', 0, 1, ''],
+ ['desenv_barra', 'Desenvolvimento com barra em pé', 'ombro', 'barra', 1, 2, 'ombro,lombar'],
+ ['desenv_sent_h', 'Desenvolvimento sentado com halteres', 'ombro', 'halter', 1, 1, 'ombro'],
+ ['desenv_smith', 'Desenvolvimento no Smith', 'ombro', 'maq', 1, 1, 'ombro'],
+ ['elev_frontal_h', 'Elevação frontal com halteres', 'ombro', 'halter', 0, 1, ''],
+ ['elev_frontal_anilha', 'Elevação frontal com anilha', 'ombro', 'halter', 0, 1, ''],
+ ['elev_frontal_cabo', 'Elevação frontal no cabo', 'ombro', 'cabo', 0, 1, ''],
+ ['elev_lat_unil', 'Elevação lateral unilateral', 'ombro_lat', 'halter', 0, 1, ''],
+ ['crucifixo_inv_cabo', 'Crucifixo inverso no cabo', 'ombro_post', 'cabo', 0, 2, ''],
+ ['rosca_direta_h', 'Rosca direta com halteres', 'biceps', 'halter', 0, 1, ''],
+ ['rosca_w', 'Rosca com barra W', 'biceps', 'barra', 0, 1, ''],
+ ['rosca_scott', 'Rosca Scott com barra', 'biceps', 'barra', 0, 1, ''],
+ ['rosca_scott_maq', 'Rosca Scott na máquina', 'biceps', 'maq', 0, 1, ''],
+ ['rosca_scott_unil', 'Rosca Scott unilateral com halter', 'biceps', 'halter', 0, 1, ''],
+ ['rosca_incl', 'Rosca inclinada com halteres', 'biceps', 'halter', 0, 2, 'ombro'],
+ ['rosca_martelo_corda', 'Rosca martelo na corda', 'biceps', 'cabo', 0, 1, ''],
+ ['rosca_spider', 'Rosca spider', 'biceps', 'barra', 0, 2, ''],
+ ['rosca_maq', 'Rosca na máquina', 'biceps', 'maq', 0, 1, ''],
+ ['rosca_zottman', 'Rosca Zottman', 'biceps', 'halter', 0, 2, ''],
+ ['triceps_corda', 'Tríceps na corda', 'triceps', 'cabo', 0, 1, ''],
+ ['triceps_inv', 'Tríceps no pulley, pegada invertida', 'triceps', 'cabo', 0, 1, ''],
+ ['triceps_testa_barra', 'Tríceps testa com barra W', 'triceps', 'barra', 0, 2, 'punho'],
+ ['triceps_frances_corda', 'Tríceps francês na corda', 'triceps', 'cabo', 0, 1, 'ombro'],
+ ['triceps_sent_h', 'Tríceps francês sentado com halter', 'triceps', 'halter', 0, 1, 'ombro'],
+ ['supino_fechado', 'Supino pegada fechada', 'triceps', 'barra', 1, 2, 'punho'],
+ ['mergulho_triceps', 'Mergulho nas paralelas (tríceps)', 'triceps', 'corpo', 1, 3, 'ombro'],
+ ['triceps_maq', 'Tríceps na máquina', 'triceps', 'maq', 0, 1, ''],
+ ['agach_frontal', 'Agachamento frontal com barra', 'quad', 'barra', 1, 3, 'joelho,punho'],
+ ['agach_smith', 'Agachamento no Smith', 'quad', 'maq', 1, 1, 'joelho'],
+ ['agach_aberto', 'Agachamento com pernas afastadas', 'quad', 'barra', 1, 2, 'joelho,lombar'],
+ ['agach_banco_h', 'Agachamento até o banco com halteres', 'quad', 'halter', 1, 1, ''],
+ ['agach_cadeira', 'Sentar e levantar da cadeira', 'quad', 'corpo', 1, 1, ''],
+ ['leg_press_fechado', 'Leg press com pés juntos', 'quad', 'maq', 1, 1, 'joelho'],
+ ['afundo_barra', 'Afundo com barra', 'quad', 'barra', 1, 2, 'joelho'],
+ ['passada', 'Passada andando com barra', 'quad', 'barra', 1, 2, 'joelho'],
+ ['afundo_reverso', 'Afundo para trás com halteres', 'quad', 'halter', 1, 1, ''],
+ ['step_up_barra', 'Subida no banco com barra', 'quad', 'barra', 1, 2, 'joelho'],
+ ['extensora_unil', 'Cadeira extensora unilateral', 'quad', 'maq', 0, 1, 'joelho'],
+ ['terra_romeno', 'Levantamento terra romeno', 'posterior', 'barra', 1, 2, 'lombar'],
+ ['terra', 'Levantamento terra', 'posterior', 'barra', 1, 3, 'lombar'],
+ ['terra_sumo', 'Levantamento terra sumô', 'posterior', 'barra', 1, 3, 'lombar'],
+ ['bom_dia_barra', 'Bom-dia com barra', 'posterior', 'barra', 1, 2, 'lombar'],
+ ['flexora_em_pe', 'Flexora em pé unilateral', 'posterior', 'maq', 0, 1, ''],
+ ['nordico', 'Flexão nórdica (no solo)', 'posterior', 'corpo', 0, 3, 'joelho'],
+ ['ponte_barra', 'Ponte de glúteo com barra', 'gluteo', 'barra', 1, 1, ''],
+ ['elev_pelv_smith', 'Elevação pélvica no Smith', 'gluteo', 'maq', 1, 1, ''],
+ ['coice_4apoios', 'Coice de glúteo em quatro apoios', 'gluteo', 'corpo', 0, 1, ''],
+ ['pull_through', 'Pull through no cabo', 'gluteo', 'cabo', 1, 2, ''],
+ ['adutora', 'Cadeira adutora', 'gluteo', 'maq', 0, 1, ''],
+ ['adutor_cabo', 'Adução de quadril no cabo', 'gluteo', 'cabo', 0, 1, ''],
+ ['monster_walk', 'Caminhada lateral com elástico (monster walk)', 'gluteo', 'elastico', 0, 1, ''],
+ ['ponte_elast', 'Elevação de quadril com elástico', 'gluteo', 'elastico', 0, 1, ''],
+ ['pant_leg_press', 'Panturrilha no leg press', 'panturrilha', 'maq', 0, 1, ''],
+ ['pant_smith', 'Panturrilha no Smith', 'panturrilha', 'maq', 0, 1, ''],
+ ['pant_burrinho', 'Panturrilha burrinho', 'panturrilha', 'maq', 0, 2, ''],
+ ['pant_barra', 'Panturrilha em pé com barra', 'panturrilha', 'barra', 0, 1, ''],
+ ['pant_sent_h', 'Panturrilha sentado com halter', 'panturrilha', 'halter', 0, 1, ''],
+ ['pant_elast', 'Panturrilha com elástico', 'panturrilha', 'elastico', 0, 1, ''],
+ ['abd_polia', 'Abdominal na polia (ajoelhado)', 'core', 'cabo', 0, 1, ''],
+ ['abd_maq', 'Abdominal na máquina', 'core', 'maq', 0, 1, ''],
+ ['elev_pernas_barra', 'Elevação de pernas na barra', 'core', 'corpo', 0, 3, 'ombro'],
+ ['elev_joelhos_paralela', 'Elevação de joelhos nas paralelas', 'core', 'corpo', 0, 2, 'ombro'],
+ ['abd_bicicleta', 'Abdominal bicicleta', 'core', 'corpo', 0, 1, ''],
+ ['abd_obliquo', 'Abdominal oblíquo cruzado', 'core', 'corpo', 0, 1, ''],
+ ['russian_twist', 'Russian twist', 'core', 'corpo', 0, 2, 'lombar'],
+ ['abd_infra', 'Abdominal infra (reverso)', 'core', 'corpo', 0, 1, ''],
+ ['roda_abd', 'Roda abdominal', 'core', 'corpo', 0, 3, 'lombar,ombro'],
+ ['escalador', 'Escalador (mountain climber)', 'core', 'corpo', 0, 1, 'punho', 1],
+ ['canivete', 'Abdominal canivete', 'core', 'corpo', 0, 2, 'lombar'],
+ ['abd_declinado', 'Abdominal declinado', 'core', 'corpo', 0, 2, 'lombar'],
+ ['abd_tesoura', 'Abdominal tesoura (flutter kicks)', 'core', 'corpo', 0, 1, 'lombar', 1],
+ ['abd_remador', 'Abdominal completo (sit-up)', 'core', 'corpo', 0, 1, 'lombar'],
+ ['abd_calcanhar', 'Toque no calcanhar (oblíquo)', 'core', 'corpo', 0, 1, ''],
+ ['russian_cabo', 'Rotação de tronco no cabo', 'core', 'cabo', 0, 2, ''],
+ ['rosca_punho_barra', 'Rosca de punho com barra', 'antebraco', 'barra', 0, 1, 'punho'],
+ ['rosca_punho_costas', 'Rosca de punho por trás do corpo', 'antebraco', 'barra', 0, 2, 'punho'],
+ ['pinca_anilha', 'Pinça com anilhas (pegada)', 'antebraco', 'halter', 0, 1, '', 1],
+ ['encolh_cabo', 'Encolhimento no cabo', 'trapezio', 'cabo', 0, 1, ''],
+ ['encolh_smith', 'Encolhimento no Smith', 'trapezio', 'maq', 0, 1, ''],
+ ['remada_alta_h', 'Remada alta com halteres', 'trapezio', 'halter', 0, 2, 'ombro'],
+ ['remada_alta_barra', 'Remada alta com barra', 'trapezio', 'barra', 0, 2, 'ombro']
 ].map(([id,nome,g,eq,c,lv,no,t])=>({id,nome,g,eq,c:!!c,lv,no:no?no.split(','):[],t:!!t}));
 const LIBM=Object.fromEntries(LIB.map(e=>[e.id,e]));
 const GRUPOS={peito:'Peito',costas:'Costas',ombro:'Ombros',ombro_lat:'Ombro lateral',ombro_post:'Ombro posterior',biceps:'Bíceps',triceps:'Tríceps',quad:'Quadríceps',posterior:'Posterior de coxa',gluteo:'Glúteos',panturrilha:'Panturrilha',core:'Abdômen e core',antebraco:'Antebraço',trapezio:'Trapézio'};
@@ -623,7 +766,7 @@ function hitTop(sets,n,top){if(!top||!sets||!sets.length)return false;for(let s=
 function seriesOf(id){const out={};const L=lifts()[id]||{};Object.keys(L).forEach(d=>{const ws=(L[d]||[]).filter(hasW).map(s=>+s.w);if(ws.length)out[d]=Math.max(...ws)});
   const o=loads()[id]||{};Object.keys(o).forEach(d=>{if(out[d]==null&&o[d]!=='')out[d]=+o[d]});return Object.keys(out).sort().map(d=>[d,out[d]])}
 /* nome de um exercício pelo id, em qualquer plano salvo */
-function exNome(id){const P=plans();for(const p of Object.values(P.treino.lista))for(const T of Object.values(p.treinos||{}))for(const e of T.ex)if(e.id===id)return e.nome;return LIBM[id]?LIBM[id].nome:id}
+function exNome(id){const P=plans();for(const p of Object.values(P.treino.lista))for(const T of Object.values(p.treinos||{}))for(const e of T.ex)if(e.id===id)return e.nome;const mm=((docs.meus||{}).list||{})[id];return LIBM[id]?LIBM[id].nome:mm?mm.nome:id}
 
 /* ================= gerador de treino ================= */
 const SESSOES={
@@ -781,7 +924,7 @@ function vTreino(){
     const im=exImg(id);
     h+=`<div class="ex${all?' done':''}"><div class="exh">${im?`<button class="thumb" data-zoom="1" aria-label="Ampliar imagem de ${esc(nome)}"><img src="${im[0]}" alt="" loading="lazy"><img class="b" src="${im[1]}" alt="" loading="lazy"></button>`:''}
       <div style="min-width:0;flex:1"><div class="nm">${esc(nome)}</div><div class="mono sub">${esc(sr)}</div>${nota?`<div class="nt">${esc(nota)}</div>`:''}</div></div>
-    <div class="extools"><button class="tool" data-restex="${oid}" aria-label="Mudar descanso deste exercício"><span class="ti">◷</span> Descanso ${fmtRest(rs)}</button>${orig?`<span class="tool on">Trocado hoje</span><button class="tool" data-swaptoday="${oid}">⇄ Outro</button><button class="tool" data-unswap="${oid}">Desfazer</button>`:(grpBase({id:oid,g:(td.T.ex.find(x=>x.id===oid)||{}).g})?`<button class="tool" data-swaptoday="${oid}" aria-label="Trocar este exercício só hoje">⇄ Trocar hoje</button>`:'')}</div>
+    <div class="extools"><button class="tool" data-restex="${oid}" aria-label="Mudar descanso deste exercício"><span class="ti">◷</span> Descanso ${fmtRest(rs)}</button>${orig?`<span class="tool on">Trocado hoje</span><button class="tool" data-pkopen="hoje:${oid}">⇄ Outro</button><button class="tool" data-unswap="${oid}">Desfazer</button>`:`<button class="tool" data-pkopen="hoje:${oid}" aria-label="Trocar este exercício só hoje">⇄ Trocar hoje</button>`}</div>
     <div class="sets">${sets}</div>${fim}<div class="load"><a class="yt" href="${ytLink(nome)}" target="_blank" rel="noopener">▶ ver execução em vídeo</a></div></div>`});
   h+=`</div>${T.cardio?`<div class="chk">${tick(on(d,'cardio'),'data-k="cardio"','Cardio feito')}<span>Cardio: ${esc(T.cardio)}</span></div>`:''}${T.aviso?`<div class="note warn"><b>Atenção.</b> ${esc(T.aviso)}</div>`:''}
   <div class="note">Descanso de ${esc((td.plan.descanso||{}).txt||'90 s')} entre séries${td.plan.limite?` · até ${td.plan.limite} min de treino`:''}.</div>
@@ -1012,9 +1155,9 @@ function vEditor(){const P=plans();const p=P.treino.lista[editId];if(!p){sub='pl
    <span class="sub">Grupos musculares deste treino</span>
    <div class="chips">${CHIPS.map(([k,n])=>`<button class="chipb sm" aria-pressed="${gs.includes(k)}" data-grp="${l}:${k}">${n}</button>`).join('')}</div>
    <button class="btn${T.ex.length?' ghost':''}" data-sug="${l}" ${gs.length?'':'disabled'}>${pendSug===l?'Substituir a lista atual? Toque para confirmar':T.ex.length?'Sugerir exercícios de novo':'Sugerir exercícios'}</button>
-   <div>${T.ex.map((e,i)=>`<div class="erow"><input id="ed-en-${l}-${i}" data-en-l="${l}" data-i="${i}" data-f="nome" value="${esc(e.nome)}" aria-label="Exercício"><input class="esr" id="ed-es-${l}-${i}" data-en-l="${l}" data-i="${i}" data-f="sr" value="${esc(e.sr)}" aria-label="Séries e repetições">
-     <div class="emov">${grpOf(e)?`<button class="link" data-swap="${l}:${i}" aria-label="Trocar por outro do mesmo grupo">⇄ trocar</button>`:''}<button class="link" data-mv="${l}:${i}:-1" aria-label="Subir" ${i?'':'disabled'}>↑</button><button class="link" data-mv="${l}:${i}:1" aria-label="Descer" ${i<T.ex.length-1?'':'disabled'}>↓</button><button class="link danger" data-rm="${l}:${i}" aria-label="Remover">✕</button></div></div>`).join('')}</div>
-   <div class="eadd"><select id="ed-add-${l}" aria-label="Exercício para adicionar">${libOptions(gs)}</select><button class="btn small" data-add="${l}">Adicionar</button></div>
+   <div>${T.ex.map((e,i)=>`<div class="erow"><button class="exbtn" data-pkopen="rep:${l}:${i}" aria-label="Trocar ${esc(e.nome)}">${thumbHtml(e.id,e.nome,'sm')}<span>${esc(e.nome)}</span></button><input class="esr" id="ed-es-${l}-${i}" data-en-l="${l}" data-i="${i}" data-f="sr" value="${esc(e.sr)}" aria-label="Séries e repetições">
+     <div class="emov"><button class="link" data-pkopen="rep:${l}:${i}" aria-label="Trocar exercício">⇄ trocar</button><button class="link" data-mv="${l}:${i}:-1" aria-label="Subir" ${i?'':'disabled'}>↑</button><button class="link" data-mv="${l}:${i}:1" aria-label="Descer" ${i<T.ex.length-1?'':'disabled'}>↓</button><button class="link danger" data-rm="${l}:${i}" aria-label="Remover">✕</button></div></div>`).join('')}</div>
+   <button class="btn ghost addex" data-pkopen="add:${l}">+ Adicionar exercício</button>
    <label class="bf"><span class="sub">Cardio (opcional)</span><input id="ed-tc-${l}" data-tc="${l}" value="${esc(T.cardio||'')}" placeholder="Ex.: 15 min de bike"></label>
    ${letras.length>1?`<button class="link danger" data-rmt="${l}" style="justify-self:start">${pendRmT===l?'Confirmar: excluir o treino '+l:'Excluir treino '+l}</button>`:''}</section>`}).join('')}
   ${letras.length<6?`<section class="card"><button class="btn ghost" data-addt="1">+ Adicionar treino ${'ABCDEF'.split('').find(x=>!p.treinos[x])}</button></section>`:''}
@@ -1120,7 +1263,7 @@ const GATES={picker:vPicker,pin:vPin,form:vPerfilForm};
 const PROTO_G={a1:'peito',a2:'peito',a3:'peito',a4:'ombro',a5:'ombro_lat',a6:'triceps',a7:'triceps',b1:'costas',b2:'costas',b3:'costas',b4:'ombro_post',b5:'biceps',b6:'biceps',b7:'biceps',c1:'quad',c2:'quad',c3:'quad',c4:'posterior',c5:'posterior',c6:'panturrilha',c7:'core'};
 const grpBase=e=>e.g||(LIBM[e.id]&&LIBM[e.id].g)||PROTO_G[e.id]||(LIBM[String(e.id).replace(/-[a-z0-9]{2,4}$/,'')]||{}).g||null;
 /* exercício do plano com a troca do dia aplicada */
-function swapEx(d,e){const sw=(dayDoc(d).swaps||{})[e.id];if(sw&&LIBM[sw]){const L=LIBM[sw];return Object.assign({},e,{id:sw,nome:L.nome,orig:e.id,g:L.g,nota:''})}return e}
+function swapEx(d,e){const sw=(dayDoc(d).swaps||{})[e.id];const L=sw&&exInfo(sw);if(L){return Object.assign({},e,{id:sw,nome:L.nome,orig:e.id,g:L.g,nota:L.nota||''})}return e}
 const exsDia=(d,td)=>td.T.ex.map(e=>{const x=swapEx(d,e);const sr=srDia(d,x.sr);return sr===x.sr?x:Object.assign({},x,{sr})});
 function swapToday(d,td,origId){const e=td.T.ex.find(x=>x.id===origId);if(!e)return;const g=grpBase(e);if(!g)return;
   const cfg=typeof cfgOf==='function'?cfgOf(td.plan):{local:'academia'};const eq=EQ_LOCAL[cfg.local]||EQ_LOCAL.academia;const pf=PREF[cfg.local]||PREF.academia;
@@ -1213,7 +1356,7 @@ function celebrar(D){const d=fromIso(D);const td=treinoDia(d);const ss=dayDoc(d)
   setTimeout(()=>{const b=document.getElementById('cb-ok');b&&b.focus()},50)}
 function fecharCeleb(){const ov=document.getElementById('celeb');if(!ov)return;ov.classList.remove('in');setTimeout(()=>{ov.hidden=true;ov.innerHTML=''},250);window.scrollTo({top:0,behavior:'smooth'})}
 document.addEventListener('click',e=>{const ov=document.getElementById('celeb');if(!ov||ov.hidden)return;if(e.target===ov||e.target.closest('[data-fechaok]'))fecharCeleb()});
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){const ov=document.getElementById('celeb');if(ov&&!ov.hidden)fecharCeleb()}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){const ov=document.getElementById('celeb');if(ov&&!ov.hidden){fecharCeleb();return}if(pk)pkClose()}});
 
 /* ================= treino inteligente ================= */
 const repRange=sr=>{if(/s\s*$/.test(sr.trim())||/falha/i.test(sr))return null;const m=sr.match(/×\s*(\d+)(?:\s*[–-]\s*(\d+))?/);return m?{lo:+m[1],hi:+(m[2]||m[1])}:null};
@@ -1327,6 +1470,70 @@ async function compartilharSemana(w){
   try{if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:'Minha semana no Na Régua'});return}}catch(e){if(e&&e.name==='AbortError')return}
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=nome;document.body.appendChild(a);a.click();a.remove();toast('Imagem salva','Procure na pasta de downloads')}
 
+/* ================= escolher exercício: abas Selecionar e Escrever ================= */
+const EQN={maq:'Máquina',cabo:'Cabo',barra:'Barra',halter:'Halteres',corpo:'Peso do corpo',elastico:'Elástico'};
+const LVN={1:'iniciante',2:'intermediário',3:'avançado'};
+const meus=()=>((docs.meus||{}).list)||{};
+function exInfo(id){if(LIBM[id])return LIBM[id];const m=meus()[id];return m?Object.assign({id,eq:'',lv:1,no:[],c:false,t:false,meu:true},m):null}
+const normTxt=s=>String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();
+const thumbHtml=(id,nome,cls)=>{const im=exImg(id);return im?`<span class="pthumb ${cls||''}"><img src="${im[0]}" alt="" loading="lazy"><img class="b" src="${im[1]}" alt="" loading="lazy"></span>`:`<span class="pthumb letra ${cls||''}">${esc(inicial(nome))}</span>`};
+let pk=null;
+/* mode: add (editor) · rep (editor, trocar um) · hoje (só no dia, na tela de treino) */
+function pkOpen(spec){const [mode,a,b]=spec.split(':');pk={mode,tab:'sel',q:'',eq:'todos',g:'todos'};
+  if(mode==='add'){pk.l=a;const p=plans().treino.lista[editId];const gs=(p.treinos[a].grupos||[]);const g0=gs.length&&CHIPM[gs[0]]?CHIPM[gs[0]][2][0][0]:'todos';pk.g=g0}
+  if(mode==='rep'){pk.l=a;pk.i=+b;const p=plans().treino.lista[editId];const e=p.treinos[a].ex[+b];pk.g=grpBase(e)||'todos';pk.atual=e}
+  if(mode==='hoje'){pk.orig=a;const td=treinoDia(sel);const e=td&&td.T.ex.find(x=>x.id===a);pk.g=(e&&grpBase(e))||'todos';pk.atual=e}
+  pk.wg=pk.g;render();setTimeout(()=>{const s=document.querySelector('.sheet');s&&s.focus()},30)}
+function pkClose(){pk=null;render()}
+function pkUsados(){if(pk.mode==='hoje'){const td=treinoDia(sel);return new Set(td?exsDia(sel,td).map(x=>x.id):[])}
+  const p=plans().treino.lista[editId];return new Set((p&&p.treinos[pk.l]?p.treinos[pk.l].ex:[]).map(x=>x.id.replace(/-[a-z0-9]{2,4}$/,'')))}
+function pkCfg(){if(pk.mode==='hoje'){const td=treinoDia(sel);return td?cfgOf(td.plan):CFG0()}return cfgOf(plans().treino.lista[editId])}
+function pkItens(){const q=normTxt(pk.q);const cfg=pkCfg();const pf=PREF[cfg.local]||PREF.academia;
+  const todos=[...Object.entries(meus()).map(([id,m])=>Object.assign({id,eq:'',lv:1,no:[],meu:true},m)),...LIB];
+  return todos.filter(e=>(pk.g==='todos'||e.g===pk.g)&&(pk.eq==='todos'||e.eq===pk.eq)&&(!q||normTxt(e.nome).includes(q)||normTxt(GRUPOS[e.g]).includes(q)))
+    .sort((a,b)=>(b.meu?1:0)-(a.meu?1:0)||(pf.includes(b.eq)-pf.includes(a.eq))||(b.c-a.c)||a.nome.localeCompare(b.nome))}
+function pkList(){const it=pkItens();const usados=pkUsados();const inj=pkCfg().lesoes||[];
+  if(!it.length)return `<div class="pk-vazio"><p style="margin:0">Nenhum exercício encontrado.</p><button class="btn ghost" data-pktab="esc">Escrever "${esc(pk.q||'meu exercício')}"</button></div>`;
+  return `<p class="sub pk-count">${it.length} exercício${it.length>1?'s':''}</p>`+it.map(e=>{const u=usados.has(e.id);const cuid=e.no&&e.no.some(x=>inj.includes(x));
+    return `<button class="pk-item${u?' usado':''}" data-pkpick="${e.id}" ${u?'disabled':''}>${thumbHtml(e.id,e.nome)}
+     <span class="pk-txt"><b>${esc(e.nome)}</b><span class="sub">${esc(GRUPOS[e.g]||'')}${e.eq?' · '+EQN[e.eq]:''}${e.meu?' · seu':' · '+LVN[e.lv]}</span>${cuid?'<span class="pk-cuid">cuidado com a sua lesão</span>':''}</span>
+     <span class="pk-add">${u?'no treino':pk.mode==='add'?'+':'⇄'}</span></button>`}).join('')}
+function pkSheet(){if(!pk)return '';const tit=pk.mode==='add'?'Adicionar exercício':pk.mode==='rep'?'Trocar exercício':'Trocar só hoje';
+  const gsel=[['todos','Todos'],...Object.entries(GRUPOS)];const eqs=[['todos','Tudo'],...Object.entries(EQN)];
+  const at=pk.atual;
+  return `<div class="sheet-bg" data-pkclose="1"></div><div class="sheet" role="dialog" aria-modal="true" aria-label="${tit}" tabindex="-1">
+   <div class="sheet-h"><span class="grab"></span><div class="row"><h2>${tit}</h2><button class="pill" data-pkclose="1" style="margin:0">Fechar</button></div>
+    ${at?`<p class="sub" style="margin:0">Atual: <b>${esc(at.nome)}</b></p>`:''}
+    <div class="seg" role="tablist"><button role="tab" aria-selected="${pk.tab==='sel'}" data-pktab="sel">Selecionar</button><button role="tab" aria-selected="${pk.tab==='esc'}" data-pktab="esc">Escrever</button></div></div>
+   ${pk.tab==='sel'?`<div class="sheet-f">
+     <input id="pk-q" class="pk-q" type="search" placeholder="Buscar exercício (ex.: supino, rosca)" value="${esc(pk.q)}" autocomplete="off" aria-label="Buscar exercício">
+     <div class="hscroll">${gsel.map(([k,n])=>`<button class="chipb sm" aria-pressed="${pk.g===k}" data-pkg="${k}">${n}</button>`).join('')}</div>
+     <div class="hscroll">${eqs.map(([k,n])=>`<button class="chipb sm alt" aria-pressed="${pk.eq===k}" data-pkeq="${k}">${n}</button>`).join('')}</div></div>
+    <div class="sheet-b" id="pk-list">${pkList()}</div>`
+   :`<form id="pkF" class="sheet-b gform">
+     <label class="bf"><span class="sub">Nome do exercício *</span><input id="pk-nome" value="${esc(pk.q||(pk.mode!=='add'&&at&&!LIBM[at.id]?at.nome:''))}" placeholder="Ex.: Remada no aparelho da academia" required></label>
+     <label class="bf"><span class="sub">Grupo muscular</span><select id="pk-g">${Object.entries(GRUPOS).map(([k,n])=>`<option value="${k}" ${pk.wg===k?'selected':''}>${n}</option>`).join('')}</select></label>
+     ${pk.mode!=='hoje'?`<label class="bf"><span class="sub">Séries × repetições</span><input id="pk-sr" value="${esc(pk.mode==='rep'&&at?at.sr:'3 × 10–12')}" placeholder="3 × 10–12"></label>`:''}
+     <label class="bf"><span class="sub">Observação (opcional)</span><input id="pk-nota" placeholder="Ex.: banco a 30°, pegada aberta"></label>
+     <p class="sub" style="margin:0">O exercício fica salvo em "seus exercícios" e aparece no topo da aba Selecionar.</p>
+     <button class="btn big-cta" type="submit">${pk.mode==='add'?'Adicionar ao treino':pk.mode==='rep'?'Trocar pelo meu':'Usar hoje'}</button></form>`}
+   </div>`}
+function pkAplicar(id,extra){const info=exInfo(id);if(!info)return;
+  if(pk.mode==='hoje'){const x=clone(dayDoc(sel));x.swaps=x.swaps||{};if(id===pk.orig)delete x.swaps[pk.orig];else x.swaps[pk.orig]=id;const n=info.nome;pk=null;save('day-'+iso(sel),x);toast('Trocado só hoje',n);return}
+  const l=pk.l,i=pk.i,mode=pk.mode;
+  editPlan(p=>{const T=p.treinos[l];const ids=new Set(T.ex.map(x=>x.id));const nid=ids.has(id)?id+'-'+Date.now().toString(36).slice(-3):id;const cfg=cfgOf(p);
+    const sr=(extra&&extra.sr)||(mode==='rep'&&T.ex[i]&&!info.t&&!/s\s*$/.test(T.ex[i].sr)?T.ex[i].sr:seriesFor(info,cfg));
+    const novo={id:nid,nome:info.nome,sr,nota:(extra&&extra.nota)||'',g:info.g};
+    if(mode==='add')T.ex.push(novo);else{novo.rest=T.ex[i]&&T.ex[i].rest;T.ex[i]=novo}});
+  const n=info.nome;pk=null;render();toast(mode==='add'?'Adicionado':'Trocado',n)}
+function pkEscrever(){const nome=document.getElementById('pk-nome').value.trim();if(!nome){document.getElementById('pk-nome').focus();return}
+  const g=document.getElementById('pk-g').value;const srEl=document.getElementById('pk-sr');const nota=document.getElementById('pk-nota').value.trim();
+  /* reaproveita um exercício seu com o mesmo nome */
+  let id=Object.entries(meus()).find(([,m])=>normTxt(m.nome)===normTxt(nome))?.[0];
+  if(!id){id='m'+Date.now().toString(36);const M=clone(docs.meus);M.list=M.list||{};M.list[id]={nome,g,criado:iso(TODAY)};save('meus',M,true)}
+  pkAplicar(id,{sr:srEl&&srEl.value.trim()?srEl.value.trim():null,nota})}
+document.addEventListener('input',e=>{if(e.target.id==='pk-q'&&pk){pk.q=e.target.value;const L=document.getElementById('pk-list');if(L)L.innerHTML=pkList()}});
+
 /* ================= render e eventos ================= */
 const VIEWS={hoje:vHoje,treino:vTreino,dieta:vDieta,compras:vCompras,progresso:vProgresso};
 const SUBS={planos:vPlanos,quiz:vQuiz,editor:vEditor,historico:vHistorico};
@@ -1334,7 +1541,7 @@ const app=document.getElementById('app');
 function render(){
   const act=document.activeElement;if(act&&/INPUT|TEXTAREA|SELECT/.test(act.tagName)&&app.contains(act))return;
   const nav=document.querySelector('.tabs');nav.hidden=!!gate;if(gate){app.innerHTML=`<div class="gate">${GATES[gate]()}</div>`;return}
-  app.innerHTML=sub?SUBS[sub]():VIEWS[tab]();
+  app.innerHTML=(sub?SUBS[sub]():VIEWS[tab]())+(pk?pkSheet():'');document.body.classList.toggle('lock',!!pk);
   document.querySelectorAll('.tabs button').forEach(b=>{if(!sub&&b.dataset.tab===tab)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')});
 }
 function goSub(s){sub=s;window.scrollTo(0,0);render()}
@@ -1342,7 +1549,15 @@ function setTab(t){tab=t;sub=null;planMsg='';pendDel=null;try{localStorage.setIt
 document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>setTab(b.dataset.tab));
 
 app.addEventListener('click',e=>{
+  if(e.target.closest('.sheet-bg')){pkClose();return}
   const b=e.target.closest('button');if(!b||(b.closest('form')&&b.type==='submit')||b.disabled)return;const ds=b.dataset;
+  /* escolher exercício */
+  if(ds.pkopen){pkOpen(ds.pkopen);return}
+  if(ds.pkclose){pkClose();return}
+  if(ds.pktab){const q=document.getElementById('pk-q');if(q)pk.q=q.value;pk.tab=ds.pktab;document.activeElement&&document.activeElement.blur();render();return}
+  if(ds.pkg){pk.g=ds.pkg;if(ds.pkg!=='todos')pk.wg=ds.pkg;document.activeElement&&document.activeElement.blur();render();const L=document.getElementById('pk-list');if(L)L.scrollTop=0;return}
+  if(ds.pkeq){pk.eq=ds.pkeq;document.activeElement&&document.activeElement.blur();render();return}
+  if(ds.pkpick){pkAplicar(ds.pkpick);return}
   /* perfis */
   if(ds.pick){const p=profs().list[ds.pick];if(p&&p.pin){pinFor=ds.pick;pinMsg='';pinReset=false;gate='pin';render();setTimeout(()=>{const i=document.getElementById('pin-in');i&&i.focus()},60)}else enterProfile(ds.pick);return}
   if(ds.pnew){pfEdit=null;pfMsg='';gate='form';window.scrollTo(0,0);render();return}
@@ -1434,6 +1649,7 @@ app.addEventListener('change',e=>{const i=e.target;const ds=i.dataset;
   if(ds.enL){editPlan(p=>{const ex=p.treinos[ds.enL].ex[+ds.i];if(ex)ex[ds.f]=i.value.trim()},true);return}
 });
 app.addEventListener('submit',e=>{e.preventDefault();const f=e.target;
+  if(f.id==='pkF'){pkEscrever();return}
   if(f.id==='pfF'){submitPerfil();return}
   if(f.id==='pinF'){submitPin();return}
   if(f.id==='resetF'){submitReset();return}
