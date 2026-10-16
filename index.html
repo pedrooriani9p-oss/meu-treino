@@ -370,6 +370,8 @@ body.lock{overflow:hidden}
 .exbtn span:last-child{min-width:0;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;font-size:.9rem;font-weight:500}
 .btn.addex{border-style:dashed}
 @media (prefers-reduced-motion:reduce){.sheet,.sheet-bg{animation:none}.pthumb img.b{animation:none;opacity:0}}
+.link.reset{justify-self:center;text-decoration:none;font-size:.85rem;padding:8px 12px}
+.sstats .mono-sm{font-family:var(--mono);font-size:1.5rem}
 [hidden]{display:none!important}
 </style>
 
@@ -859,9 +861,9 @@ function sessCard(d,td){const ss=dayDoc(d).sess;const st=sessStats(d,td);const l
   if(!ss||(!ss.start&&!ss.end)){return +mid(d)===+TODAY?`<section class="card sess"><div><span class="label">Treino ${td.k} de hoje</span><h3>Pronto para começar?</h3><p class="sub" style="margin:0">O cronômetro do treino começa, a tela fica acesa e o app leva você ao primeiro exercício.</p></div><button class="btn big-cta" data-sess="start">Iniciar treino</button></section>`:''}
   if(!ss.end)return `<section class="card sess live"><div class="row"><span class="label">Treino em andamento</span><span class="sub mono">${st.sets}/${st.total} séries</span></div>
     <div class="row" style="align-items:end"><span class="big mono-big" id="sessT">${mmss(Date.now()-ss.start)}</span><button class="btn ghost" data-sess="end">Concluir</button></div>
-    <div class="meter"><i style="width:${st.total?st.sets/st.total*100:0}%"></i></div><p class="sub" id="sessW" data-lim="${lim}" style="margin:0">${Date.now()-ss.start>lim*60000?`Passou de ${lim} min: hora de fechar.`:`Meta: até ${lim} min de treino.`}</p></section>`;
+    <div class="meter"><i style="width:${st.total?st.sets/st.total*100:0}%"></i></div><p class="sub" id="sessW" data-lim="${lim}" style="margin:0">${Date.now()-ss.start>lim*60000?`Passou de ${lim} min: hora de fechar.`:`Meta: até ${lim} min de treino.`}</p>${resetBtn()}</section>`;
   return `<section class="card sess done"><div class="row"><span class="label">Treino concluído</span><button class="btn ghost" data-sess="resume" style="padding:6px 12px">Retomar</button></div>
-    <div class="sstats"><div><span class="big">${ss.start?Math.round((ss.end-ss.start)/60000):'–'}</span><span class="sub">minutos</span></div><div><span class="big">${st.sets}/${st.total}</span><span class="sub">séries</span></div><div><span class="big">${st.vol.toLocaleString('pt-BR')}</span><span class="sub">kg de volume</span></div></div>${prsDoDia(iso(d)).length?`<div class="prs">${prsDoDia(iso(d)).map(id=>`<span class="pr">★ ${esc(exNome(id))}</span>`).join('')}</div>`:''}<button class="btn ghost" data-sub="historico">Ver histórico</button></section>`}
+    <div class="sstats"><div><span class="big mono-sm">${ss.start?mmss(ss.end-ss.start):'–'}</span><span class="sub">tempo total</span></div><div><span class="big">${st.sets}/${st.total}</span><span class="sub">séries</span></div><div><span class="big">${st.vol.toLocaleString('pt-BR')}</span><span class="sub">kg de volume</span></div></div>${prsDoDia(iso(d)).length?`<div class="prs">${prsDoDia(iso(d)).map(id=>`<span class="pr">★ ${esc(exNome(id))}</span>`).join('')}</div>`:''}<button class="btn ghost" data-sub="historico">Ver histórico</button>${resetBtn()}</section>`}
 function scrollNext(){const n=[...document.querySelectorAll('.ex')].find(e=>!e.classList.contains('done'));if(n)n.scrollIntoView({behavior:'smooth',block:'start'})}
 setInterval(()=>{const el=document.getElementById('sessT');if(!el)return;const ss=dayDoc(sel).sess;if(!ss||!ss.start||ss.end)return;const ms=Date.now()-ss.start;el.textContent=mmss(ms);
   const w=document.getElementById('sessW');if(w&&ms>(+w.dataset.lim||60)*60000)w.textContent=`Passou de ${w.dataset.lim} min: hora de fechar.`},1000);
@@ -1182,7 +1184,7 @@ const SKEY='na-regua:sessao';
 const sessGet=()=>{try{return sessionStorage.getItem(SKEY)}catch(e){return null}};
 const sessSet=id=>{try{id?sessionStorage.setItem(SKEY,id):sessionStorage.removeItem(SKEY)}catch(e){}};
 function enterProfile(id){const P=profs();P.last=id;saveProfs(P);PID=id;sessSet(id);loadDocs();plans();gate=null;pinFor=null;pinMsg='';pinReset=false;
-  tab='hoje';sub=null;sel=new Date(TODAY);window.scrollTo(0,0);render();loadPhotos();wake()}
+  tab='hoje';sub=null;sel=new Date(TODAY);fecharEsquecidos();window.scrollTo(0,0);render();loadPhotos();wake()}
 function startGate(){const P=profs();const ids=Object.keys(P.list);
   if(!ids.length){gate='form';pfEdit=null;return}
   /* já entrou nesta abertura do app: continua no mesmo perfil */
@@ -1338,7 +1340,7 @@ function concluirCard(d,td){const ss=dayDoc(d).sess;const st=sessStats(d,td);
   return `<section class="card concluir${tudo?' pronto':''}" id="concluir">
    <div class="row"><span class="label">${tudo?'Todas as séries feitas':'Terminou por hoje?'}</span><span class="sub mono">${st.sets}/${st.total} séries</span></div>
    ${tudo?'<p style="margin:0">Mandou bem. Feche o treino para salvar no histórico.</p>':`<p class="sub" style="margin:0">Faltam ${falta} ${falta===1?'série':'séries'}. Se não der para fazer tudo hoje, pode concluir assim mesmo.</p>`}
-   <button class="btn big-cta" data-sess="end">✓ Concluir treino</button></section>`}
+   <button class="btn big-cta" data-sess="end">✓ Concluir treino</button>${live?'':resetBtn()}</section>`}
 function celebrar(D){const d=fromIso(D);const td=treinoDia(d);const ss=dayDoc(d).sess||{};const st=td?sessStats(d,td):{sets:0,total:0,vol:0};const prs=prsDoDia(D);
   const min=ss.start&&ss.end?Math.max(1,Math.round((ss.end-ss.start)/60000)):null;
   const ov=document.getElementById('celeb');if(!ov)return;
@@ -1357,6 +1359,22 @@ function celebrar(D){const d=fromIso(D);const td=treinoDia(d);const ss=dayDoc(d)
 function fecharCeleb(){const ov=document.getElementById('celeb');if(!ov)return;ov.classList.remove('in');setTimeout(()=>{ov.hidden=true;ov.innerHTML=''},250);window.scrollTo({top:0,behavior:'smooth'})}
 document.addEventListener('click',e=>{const ov=document.getElementById('celeb');if(!ov||ov.hidden)return;if(e.target===ov||e.target.closest('[data-fechaok]'))fecharCeleb()});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){const ov=document.getElementById('celeb');if(ov&&!ov.hidden){fecharCeleb();return}if(pk)pkClose()}});
+
+/* ---------- parar, zerar e fechar treinos esquecidos ---------- */
+let pendReset=false;
+const resetBtn=()=>`<button class="link danger reset" data-reset="1">${pendReset?'Toque de novo para zerar tudo de hoje':'↺ Zerar treino de hoje'}</button>`;
+function pararTudo(){try{clearInterval(tInt);tEl.hidden=true;tEl.classList.remove('end')}catch(e){}try{if(lock){lock.release();lock=null}}catch(e){}
+  const a=document.activeElement;if(a&&a.blur)a.blur()}
+function zerarTreino(d){const D=iso(d);const x=clone(dayDoc(d));
+  Object.keys(x.chk||{}).forEach(k=>{if(k.startsWith('t-')||k==='cardio')delete x.chk[k]});
+  ['sess','swaps','leve','pront','note'].forEach(k=>delete x[k]);
+  const L=clone(docs.lifts);Object.keys(L).forEach(id=>{if(L[id]&&L[id][D])delete L[id][D]});
+  pararTudo();ciOpen=false;save('lifts',L,true);save('day-'+D,x);window.scrollTo({top:0,behavior:'smooth'});toast('Treino zerado','Pode começar de novo quando quiser')}
+/* treino iniciado e não concluído: fecha sozinho na última série marcada (dias anteriores, ou mais de 3 h parado hoje) */
+function fecharEsquecidos(){if(!PID)return;const agora=Date.now();
+  Object.keys(docs).filter(k=>k.startsWith('day-')).forEach(k=>{const x=docs[k];const s=x&&x.sess;if(!s||!s.start||s.end)return;
+    const ult=s.last||s.start;const hoje=k==='day-'+iso(TODAY);
+    if(!hoje||agora-ult>3*3600000){const y=clone(x);y.sess.end=Math.max(ult,s.start+60000);y.sess.auto=true;save(k,y,true)}})}
 
 /* ================= treino inteligente ================= */
 const repRange=sr=>{if(/s\s*$/.test(sr.trim())||/falha/i.test(sr))return null;const m=sr.match(/×\s*(\d+)(?:\s*[–-]\s*(\d+))?/);return m?{lo:+m[1],hi:+(m[2]||m[1])}:null};
@@ -1549,9 +1567,11 @@ function setTab(t){tab=t;sub=null;planMsg='';pendDel=null;try{localStorage.setIt
 document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>setTab(b.dataset.tab));
 
 app.addEventListener('click',e=>{
+  {const ae=document.activeElement;if(ae&&/INPUT|TEXTAREA/.test(ae.tagName)&&app.contains(ae)&&!e.target.closest('input,textarea,select,label'))ae.blur()}
   if(e.target.closest('.sheet-bg')){pkClose();return}
   const b=e.target.closest('button');if(!b||(b.closest('form')&&b.type==='submit')||b.disabled)return;const ds=b.dataset;
   /* escolher exercício */
+  if(ds.reset){if(!pendReset){pendReset=true;render();setTimeout(()=>{if(pendReset){pendReset=false;render()}},5000);return}pendReset=false;zerarTreino(tab==='hoje'?TODAY:sel);return}
   if(ds.pkopen){pkOpen(ds.pkopen);return}
   if(ds.pkclose){pkClose();return}
   if(ds.pktab){const q=document.getElementById('pk-q');if(q)pk.q=q.value;pk.tab=ds.pktab;document.activeElement&&document.activeElement.blur();render();return}
@@ -1614,10 +1634,10 @@ app.addEventListener('click',e=>{
   if(ds.share){compartilharSemana(fromIso(ds.share));return}
   if(ds.sess){const go=ds.sess==='go'||ds.sess==='skip';const D=go?TODAY:sel;const x=clone(dayDoc(D));
     if(go){const tdS=treinoDia(TODAY);if(ds.sess==='go'){const sc=ciScore();x.pront={sono:ci.sono,en:ci.en,dor:ci.dor,score:sc};x.leve=!!(ci.leve&&sc<=2)}ciOpen=false;x.sess={start:Date.now(),end:null,k:tdS&&tdS.k,nome:tdS&&tdS.T.nome};sel=new Date(TODAY);sub=null;if(tab!=='treino'){tab='treino';try{localStorage.setItem('ui:tab','treino')}catch(e){}}save('day-'+iso(D),x);wake();setTimeout(scrollNext,50)}
-    else if(ds.sess==='end'){const tdE=treinoDia(D);x.sess={k:tdE&&tdE.k,nome:tdE&&tdE.T.nome,...(x.sess||{}),end:Date.now()};save('day-'+iso(D),x);clearInterval(tInt);tEl.hidden=true;celebrar(iso(D))}
+    else if(ds.sess==='end'){const tdE=treinoDia(D);x.sess={k:tdE&&tdE.k,nome:tdE&&tdE.T.nome,...(x.sess||{}),end:Date.now()};pararTudo();save('day-'+iso(D),x);celebrar(iso(D))}
     else{x.sess={...(x.sess||{}),end:null};save('day-'+iso(D),x)}return}
   if(ds.wk){sel=addD(monday(sel),7*+ds.wk);if(tab!=='compras'&&+monday(sel)===+monday(TODAY))sel=new Date(TODAY);render();return}
-  if(ds.k){const d=tab==='hoje'?TODAY:sel;const was=on(d,ds.k);toggle(d,ds.k);
+  if(ds.k){const d=tab==='hoje'?TODAY:sel;const was=on(d,ds.k);if(ds.lid&&!was){const xx=clone(dayDoc(d));if(xx.sess&&xx.sess.start&&!xx.sess.end){xx.sess.last=Date.now();save('day-'+iso(d),xx,true)}}toggle(d,ds.k);
     if(ds.lid&&!was){const tdA=treinoDia(d);const ssA=dayDoc(d).sess;if(tdA&&ssA&&ssA.start&&!ssA.end){const stA=sessStats(d,tdA);if(stA.total&&stA.sets===stA.total){setTimeout(()=>{toast('Todas as séries feitas!','Anote a última carga e toque em Concluir treino');const c=document.getElementById('concluir');if(c)c.scrollIntoView({behavior:'smooth',block:'center'})},900)}}}
     /* ao fechar a última série, já deixa anotado o mesmo do último treino (dá para corrigir) */
     if(ds.lid&&!was){const id=ds.lid,n=+ds.n,D=iso(d);let all=true;for(let s=0;s<n;s++)if(!on(d,'t-'+id+'-'+s))all=false;
@@ -1672,9 +1692,9 @@ document.getElementById('tSkip').onclick=()=>{clearInterval(tInt);tEl.hidden=tru
 
 /* ---------- tela acesa durante o treino ---------- */
 let lock=null;async function wake(){try{if(tab==='treino'&&!sub&&!lock&&navigator.wakeLock){lock=await navigator.wakeLock.request('screen');lock.addEventListener('release',()=>lock=null)}else if((tab!=='treino'||sub)&&lock){lock.release();lock=null}}catch(e){}}
-document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){const t=mid(new Date());if(+t!==+TODAY){TODAY=t;sel=new Date(t)}render();wake()}});
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){const t=mid(new Date());if(+t!==+TODAY){TODAY=t;sel=new Date(t)}fecharEsquecidos();render();wake()}});
 
-startGate();render();wake();if(!gate)loadPhotos();
+startGate();if(!gate)fecharEsquecidos();render();wake();if(!gate)loadPhotos();
 
 /* atualização automática: busca versão nova ao abrir e ao voltar para o app, e recarrega sozinho */
 if('serviceWorker' in navigator)window.addEventListener('load',async()=>{try{
