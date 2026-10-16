@@ -762,6 +762,8 @@ function phaseText(d){const p=dietaAtiva();if(!p)return '';const s=iso(d);if(p.i
   const f=faseDieta(d,p);if(!f)return '';const c=cardapioDia(d);
   if(f.ate&&p.inicio){const tot=Math.round((fromIso(f.ate)-fromIso(p.inicio))/864e5)+1;const n=Math.round((mid(d)-fromIso(p.inicio))/864e5)+1;return `${f.nome} · dia ${n} de ${tot}`}
   return `${f.nome}${c?' · '+c.C.nome.toLowerCase():''}`}
+/* tempo do treino descontando as pausas (concluir e retomar) */
+const durSess=s=>s&&s.start?Math.max(0,(s.end||Date.now())-s.start-(s.pausa||0)):0;
 const restS=()=>{const p=treinoAtivo();return (p&&p.descanso&&p.descanso.s)||90};
 
 function dayKeys(d){const td=treinoDia(d);const ks=[];
@@ -880,12 +882,12 @@ function sessCard(d,td){const ss=dayDoc(d).sess;const st=sessStats(d,td);const l
   if((!ss||(!ss.start&&!ss.end))&&ciOpen&&+mid(d)===+TODAY)return ciCard(td);
   if(!ss||(!ss.start&&!ss.end)){return +mid(d)===+TODAY?`<section class="card sess"><div><span class="label">Treino ${td.k} de hoje</span><h3>Pronto para começar?</h3><p class="sub" style="margin:0">O cronômetro do treino começa, a tela fica acesa e o app leva você ao primeiro exercício.</p></div><button class="btn big-cta" data-sess="start">Iniciar treino</button></section>`:''}
   if(!ss.end)return `<section class="card sess live"><div class="row"><span class="label">Treino em andamento</span><span class="sub mono">${st.sets}/${st.total} séries</span></div>
-    <div class="row" style="align-items:end"><span class="big mono-big" id="sessT">${mmss(Date.now()-ss.start)}</span><button class="btn ghost" data-sess="end">Concluir</button></div>
-    <div class="meter"><i style="width:${st.total?st.sets/st.total*100:0}%"></i></div><p class="sub" id="sessW" data-lim="${lim}" style="margin:0">${Date.now()-ss.start>lim*60000?`Passou de ${lim} min: hora de fechar.`:`Meta: até ${lim} min de treino.`}</p>${resetBtn()}</section>`;
+    <div class="row" style="align-items:end"><span class="big mono-big" id="sessT">${mmss(durSess(ss))}</span><button class="btn ghost" data-sess="end">Concluir</button></div>
+    <div class="meter"><i style="width:${st.total?st.sets/st.total*100:0}%"></i></div><p class="sub" id="sessW" data-lim="${lim}" style="margin:0">${durSess(ss)>lim*60000?`Passou de ${lim} min: hora de fechar.`:`Meta: até ${lim} min de treino.`}</p>${resetBtn()}</section>`;
   return `<section class="card sess done"><div class="row"><span class="label">Treino concluído</span><button class="btn ghost" data-sess="resume" style="padding:6px 12px">Retomar</button></div>
-    <div class="sstats"><div><span class="big mono-sm">${ss.start?mmss(ss.end-ss.start):'–'}</span><span class="sub">tempo total</span></div><div><span class="big">${st.sets}/${st.total}</span><span class="sub">séries</span></div><div><span class="big">${st.vol.toLocaleString('pt-BR')}</span><span class="sub">kg de volume</span></div></div>${prsDoDia(iso(d)).length?`<div class="prs">${prsDoDia(iso(d)).map(id=>`<span class="pr">★ ${esc(exNome(id))}</span>`).join('')}</div>`:''}<button class="btn ghost" data-sub="historico">Ver histórico</button>${resetBtn()}</section>`}
+    <div class="sstats"><div><span class="big mono-sm">${ss.start?mmss(durSess(ss)):'–'}</span><span class="sub">tempo total</span></div><div><span class="big">${st.sets}/${st.total}</span><span class="sub">séries</span></div><div><span class="big">${st.vol.toLocaleString('pt-BR')}</span><span class="sub">kg de volume</span></div></div>${prsDoDia(iso(d)).length?`<div class="prs">${prsDoDia(iso(d)).map(id=>`<span class="pr">★ ${esc(exNome(id))}</span>`).join('')}</div>`:''}<button class="btn ghost" data-sub="historico">Ver histórico</button>${resetBtn()}</section>`}
 function scrollNext(){const n=[...document.querySelectorAll('.ex')].find(e=>!e.classList.contains('done'));if(n)n.scrollIntoView({behavior:'smooth',block:'start'})}
-setInterval(()=>{const el=document.getElementById('sessT');if(!el)return;const ss=dayDoc(sel).sess;if(!ss||!ss.start||ss.end)return;const ms=Date.now()-ss.start;el.textContent=mmss(ms);
+setInterval(()=>{const el=document.getElementById('sessT');if(!el)return;const ss=dayDoc(sel).sess;if(!ss||!ss.start||ss.end)return;const ms=durSess(ss);el.textContent=mmss(ms);
   const w=document.getElementById('sessW');if(w&&ms>(+w.dataset.lim||60)*60000)w.textContent=`Passou de ${w.dataset.lim} min: hora de fechar.`},1000);
 
 /* ================= telas ================= */
@@ -1317,7 +1319,7 @@ function sessoes(){return Object.keys(docs).filter(k=>k.startsWith('day-')).map(
   const ids={};ch.forEach(k=>{const m=k.match(/^t-(.+)-(\d+)$/);if(m)ids[m[1]]=(ids[m[1]]||0)+1});
   let vol=0;Object.entries(ids).forEach(([id,n])=>{const c=((lifts()[id]||{})[D]||[]).filter(hasW).pop();if(c&&c.r)vol+=(+c.w)*(+c.r)*n});
   const td=treinoDia(fromIso(D));const k=(x.sess&&x.sess.k)||(td&&td.k)||'';const nome=(x.sess&&x.sess.nome)||(td&&td.T.nome)||'Treino';
-  return {D,k,nome,series:ch.length,vol:Math.round(vol),min:x.sess&&x.sess.start&&x.sess.end?Math.round((x.sess.end-x.sess.start)/60000):null,en:(x.note||{}).en,obs:(x.note||{}).obs,prs:prsDoDia(D)}}).filter(Boolean)}
+  return {D,k,nome,series:ch.length,vol:Math.round(vol),min:x.sess&&x.sess.start&&x.sess.end?Math.round(durSess(x.sess)/60000):null,en:(x.note||{}).en,obs:(x.note||{}).obs,prs:prsDoDia(D)}}).filter(Boolean)}
 function sessCardH(s){return `<div class="hist"><div class="hdate"><span class="dn">${s.D.slice(8)}</span><span class="dw">${DW[fromIso(s.D).getDay()]}</span></div>
   <div style="min-width:0;flex:1"><div class="row" style="justify-content:start;gap:8px">${s.k?`<span class="tag sm">${esc(s.k)}</span>`:''}<b class="hn">${esc(s.nome)}</b></div>
    <div class="hstats">${s.min!=null?`<span>${s.min} min</span>`:''}<span>${s.series} séries</span>${s.vol?`<span>${s.vol.toLocaleString('pt-BR')} kg</span>`:''}${s.en?`<span class="ens">${'●'.repeat(s.en)}${'○'.repeat(5-s.en)}</span>`:''}</div>
@@ -1338,7 +1340,7 @@ function histPreview(){const ss=sessoes().slice(0,3);return `<section class="car
 /* ---------- resumo da semana ---------- */
 const MESES=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
 /* tempo de treino de um dia (treinos iniciados e concluídos) */
-function tempoDia(D){const s=(docs['day-'+D]||{}).sess;return s&&s.start&&s.end?Math.max(0,s.end-s.start):0}
+function tempoDia(D){const s=(docs['day-'+D]||{}).sess;return s&&s.start&&s.end?durSess(s):0}
 function fmtDur(ms){const m=Math.round(ms/60000);if(!m)return '0 min';const h=Math.floor(m/60),r=m%60;return h?(r?`${h}h ${String(r).padStart(2,'0')}min`:`${h}h`):`${m} min`}
 function fmtDurHtml(ms){const m=Math.round(ms/60000);const h=Math.floor(m/60),r=m%60;return h?`${h}<small>h</small>${r?String(r).padStart(2,'0')+'<small>min</small>':''}`:`${m}<small>min</small>`}
 function weekSum(w){const out={plan:0,feitos:0,series:0,vol:0,ref:0,refTot:0,agua:[],prs:0,evo:null,tempo:0,dias:[]};const fim=addD(w,6);
@@ -1371,7 +1373,7 @@ function concluirCard(d,td){const ss=dayDoc(d).sess;const st=sessStats(d,td);
    ${tudo?'<p style="margin:0">Mandou bem. Feche o treino para salvar no histórico.</p>':`<p class="sub" style="margin:0">Faltam ${falta} ${falta===1?'série':'séries'}. Se não der para fazer tudo hoje, pode concluir assim mesmo.</p>`}
    <button class="btn big-cta" data-sess="end">✓ Concluir treino</button>${live?'':resetBtn()}</section>`}
 function celebrar(D){const d=fromIso(D);const td=treinoDia(d);const ss=dayDoc(d).sess||{};const st=td?sessStats(d,td):{sets:0,total:0,vol:0};const prs=prsDoDia(D);
-  const min=ss.start&&ss.end?Math.max(1,Math.round((ss.end-ss.start)/60000)):null;
+  const min=ss.start&&ss.end?Math.max(1,Math.round(durSess(ss)/60000)):null;
   const ov=document.getElementById('celeb');if(!ov)return;
   ov.innerHTML=`<div class="cbox" role="dialog" aria-modal="true" aria-labelledby="cb-t">
    <div class="cring"><svg viewBox="0 0 52 52" aria-hidden="true"><circle cx="26" cy="26" r="24"/><path d="M15 27l7 7 15-16"/></svg></div>
@@ -1689,7 +1691,10 @@ app.addEventListener('click',e=>{
   if(ds.sess){const go=ds.sess==='go'||ds.sess==='skip';const D=go?TODAY:sel;const x=clone(dayDoc(D));
     if(go){const tdS=treinoDia(TODAY);if(ds.sess==='go'){const sc=ciScore();x.pront={sono:ci.sono,en:ci.en,dor:ci.dor,score:sc};x.leve=!!(ci.leve&&sc<=2)}ciOpen=false;x.sess={start:Date.now(),end:null,k:tdS&&tdS.k,nome:tdS&&tdS.T.nome};sel=new Date(TODAY);sub=null;if(tab!=='treino'){tab='treino';try{localStorage.setItem('ui:tab','treino')}catch(e){}}save('day-'+iso(D),x);wake();setTimeout(scrollNext,50)}
     else if(ds.sess==='end'){const tdE=treinoDia(D);x.sess={k:tdE&&tdE.k,nome:tdE&&tdE.T.nome,...(x.sess||{}),end:Date.now()};pararTudo();save('day-'+iso(D),x);celebrar(iso(D))}
-    else{x.sess={...(x.sess||{}),end:null};save('day-'+iso(D),x)}return}
+    else{/* retomar: continua do tempo em que parou (o intervalo parado vira pausa) */
+      const s0=x.sess||{};const agora=Date.now();
+      x.sess=s0.start?{...s0,pausa:(s0.pausa||0)+(s0.end?agora-s0.end:0),end:null,last:agora}:{...s0,start:agora,pausa:0,end:null,last:agora};
+      save('day-'+iso(D),x);wake();toast('Treino retomado','O tempo continua de '+mmss(durSess(x.sess)))}return}
   if(ds.wk){sel=addD(monday(sel),7*+ds.wk);if(tab!=='compras'&&+monday(sel)===+monday(TODAY))sel=new Date(TODAY);render();return}
   if(ds.k){const d=tab==='hoje'?TODAY:sel;const was=on(d,ds.k);if(ds.lid&&!was){const xx=clone(dayDoc(d));if(xx.sess&&xx.sess.start&&!xx.sess.end){xx.sess.last=Date.now();save('day-'+iso(d),xx,true)}}toggle(d,ds.k);
     if(ds.lid&&!was){const tdA=treinoDia(d);const ssA=dayDoc(d).sess;if(tdA&&ssA&&ssA.start&&!ssA.end){const stA=sessStats(d,tdA);if(stA.total&&stA.sets===stA.total){setTimeout(()=>{toast('Todas as séries feitas!','Anote a última carga e toque em Concluir treino');const c=document.getElementById('concluir');if(c)c.scrollIntoView({behavior:'smooth',block:'center'})},900)}}}
