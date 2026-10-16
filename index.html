@@ -392,6 +392,29 @@ body.lock{overflow:hidden}
 .cd.z1{background:color-mix(in srgb,var(--accent) 35%,var(--bg));color:var(--ink);border-color:transparent}
 .cd.z2{background:color-mix(in srgb,var(--accent) 68%,var(--bg));color:var(--ink);border-color:transparent}
 .cd.z3{background:var(--accent);color:var(--accent-ink);border-color:transparent;font-weight:600}
+.avatar{background:var(--avc,var(--accent));color:#fff;overflow:hidden;position:relative}
+.avatar[style*="#c98a0b"]{color:var(--accent-ink)}
+.avatar img{width:100%;height:100%;object-fit:cover;display:block;max-width:100%}
+.avatar svg{width:56%;height:56%;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.avatar.av-foto{background:var(--bg)}
+.avatar.huge{width:116px;height:116px;font-size:3.4rem}
+.av-prev{display:grid;place-items:center;padding:4px 0 2px}
+.avatar.edit{border:0;cursor:pointer}
+.avatar.edit::after{content:"✎";position:absolute;right:0;bottom:0;width:26px;height:26px;border-radius:50%;background:var(--ink);color:var(--bg);font-size:.8rem;display:grid;place-items:center;font-family:var(--body);border:2px solid var(--surface)}
+.avatar.edit{overflow:visible}
+.avatar.edit img{border-radius:50%}
+.seg.tri{grid-template-columns:repeat(3,1fr)}
+.av-body{gap:14px!important;padding-top:14px!important}
+.av-foto{display:grid;gap:12px}
+.av-foto input[type=range]{width:100%;accent-color:var(--accent)}
+.av-icones{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px}
+.av-ic{aspect-ratio:1;border-radius:50%;display:grid;place-items:center;background:var(--bg);border:2px solid var(--line);color:var(--ink)}
+.av-ic svg{width:55%;height:55%;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.av-ic[aria-pressed="true"]{background:var(--avc);border-color:var(--ink);color:#fff}
+.av-cores{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:8px}
+.av-cor{aspect-ratio:1;border-radius:50%;background:var(--avc);border:3px solid var(--surface);box-shadow:0 0 0 1px var(--line)}
+.av-cor[aria-pressed="true"]{box-shadow:0 0 0 3px var(--ink)}
+@media (max-width:380px){.av-icones{grid-template-columns:repeat(4,minmax(0,1fr))}.av-cores{grid-template-columns:repeat(4,minmax(0,1fr))}}
 [hidden]{display:none!important}
 </style>
 
@@ -907,7 +930,7 @@ function vHoje(){
     <h3>${esc(nm[2])}</h3><ul style="margin:0;padding-left:18px;font-size:.9rem">${nm[3].map(itemHtml).join('')}</ul>
     <button class="btn" data-k="m-${nm[0]}">Marcar como feita</button></section>`:(meals(d).length?`<section class="card"><span class="label">Refeições</span><h3>Todas feitas hoje</h3></section>`:'');
   else ref=`<section class="card"><span class="label">Alimentação</span><h3>Orientações gerais</h3><p class="sub" style="margin:0">Você não tem um plano de nutricionista no app. Veja as orientações básicas na aba Dieta.</p><button class="btn ghost" data-go="dieta">Ver orientações</button></section>`;
-  return `<div class="head"><div><p class="eyebrow">Na Régua</p><p class="sub" style="margin:0">${greet}${prof().nome?', '+esc(prof().nome):''} · ${DWL[d.getDay()]}, ${ddmm(d)}</p><h1>Hoje</h1></div><button class="avatar av-btn" data-gate="picker" aria-label="Trocar de perfil">${esc(inicial(prof().nome))}</button></div>
+  return `<div class="head"><div><p class="eyebrow">Na Régua</p><p class="sub" style="margin:0">${greet}${prof().nome?', '+esc(prof().nome):''} · ${DWL[d.getDay()]}, ${ddmm(d)}</p><h1>Hoje</h1></div>${avatarHtml(prof(),'av-btn','button','data-gate="picker" aria-label="Trocar de perfil"')}</div>
   ${ph?`<span class="chip">${esc(ph)}</span>`:''}
   <section class="card hero"><div class="row" style="align-items:end"><div><div class="big">${p.total?Math.round(p.done/p.total*100):0}%</div><span class="sub">${p.done} de ${p.total} itens do dia</span></div>
    <div style="text-align:right"><div class="big" style="font-size:2rem">${st}</div><span class="sub">${st===1?'dia seguido':'dias seguidos'} acima de 80%</span></div></div>
@@ -1227,11 +1250,11 @@ function deleteProfile(id){const pre='p:'+id+':doc:';const ks=[];try{for(let i=0
 const brand=`<div class="brand"><span class="eyebrow">Na Régua</span></div>`;
 function vPicker(){const P=profs();const ids=Object.keys(P.list).sort((a,b)=>(a===P.last?-1:b===P.last?1:P.list[a].nome.localeCompare(P.list[b].nome)));
   return `${brand}<h1 class="gate-h">Quem vai treinar?</h1>
-  <div class="plist">${ids.map(id=>{const p=P.list[id];return `<button class="pcard" data-pick="${id}"><span class="avatar">${esc(inicial(p.nome))}</span><span class="pname">${esc(p.nome)}</span><span class="sub">${p.pin?'com PIN':'sem PIN'}</span></button>`}).join('')}
+  <div class="plist">${ids.map(id=>{const p=P.list[id];return `<button class="pcard" data-pick="${id}">${avatarHtml(p)}<span class="pname">${esc(p.nome)}</span><span class="sub">${p.pin?'com PIN':'sem PIN'}</span></button>`}).join('')}
    <button class="pcard novo" data-pnew="1"><span class="avatar">+</span><span class="pname">Novo perfil</span><span class="sub">para outra pessoa</span></button></div>
   <p class="sub" style="text-align:center;margin:0">Cada perfil tem seus próprios treinos, dieta e registros, guardados só neste celular.</p>`}
 function vPin(){const p=profs().list[pinFor];if(!p){gate='picker';return vPicker()}
-  return `${brand}<div class="gate-card"><span class="avatar big-av">${esc(inicial(p.nome))}</span><h2>${esc(p.nome)}</h2>
+  return `${brand}<div class="gate-card">${avatarHtml(p,'big-av')}<h2>${esc(p.nome)}</h2>
   ${pinReset?`<form id="resetF" class="gform"><p style="margin:0">Para redefinir o PIN, informe a data de nascimento cadastrada no perfil.</p>
      <label class="bf"><span class="sub">Data de nascimento</span><input type="date" id="rs-nasc"></label>
      <button class="btn" type="submit">Redefinir PIN</button></form>`
@@ -1279,8 +1302,9 @@ function submitReset(){const v=document.getElementById('rs-nasc').value;const P=
   if(p&&p.nasc&&v===p.nasc){delete p.pin;saveProfs(P);pinMsg='';const id=pinFor;enterProfile(id);pfEdit=id;gate='form';pfMsg='PIN removido. Se quiser, defina um novo abaixo.';render();return}
   pinMsg=p&&!p.nasc?'Este perfil não tem data de nascimento cadastrada. Para entrar, será preciso excluir e criar o perfil de novo.':'A data não confere.';render()}
 function perfilCard(){const p=prof();const a=idade(p.nasc);
-  return `<section class="card"><div class="row" style="justify-content:start"><span class="avatar">${esc(inicial(p.nome))}</span><div><h3>${esc(p.nome||'Perfil')}</h3>
+  return `<section class="card"><div class="row" style="justify-content:start">${avatarHtml(p,'big-av edit','button','data-avopen="1" aria-label="Personalizar avatar"')}<div><h3>${esc(p.nome||'Perfil')}</h3>
    <span class="sub">${[a?a+' anos':'',p.altura?p.altura+' cm':'',OBJ_NOMES[p.objetivo]||'',NIV_NOMES[p.nivel]||''].filter(Boolean).join(' · ')}</span></div></div>
+   <button class="btn ghost" data-avopen="1">Personalizar avatar</button>
    <div class="duo"><button class="btn ghost" data-pedit="1">Editar perfil</button><button class="btn ghost" data-gate="picker">Trocar de perfil</button></div></section>`}
 const GATES={picker:vPicker,pin:vPin,form:vPerfilForm};
 
@@ -1389,7 +1413,7 @@ function celebrar(D){const d=fromIso(D);const td=treinoDia(d);const ss=dayDoc(d)
   setTimeout(()=>{const b=document.getElementById('cb-ok');b&&b.focus()},50)}
 function fecharCeleb(){const ov=document.getElementById('celeb');if(!ov)return;ov.classList.remove('in');setTimeout(()=>{ov.hidden=true;ov.innerHTML=''},250);window.scrollTo({top:0,behavior:'smooth'})}
 document.addEventListener('click',e=>{const ov=document.getElementById('celeb');if(!ov||ov.hidden)return;if(e.target===ov||e.target.closest('[data-fechaok]'))fecharCeleb()});
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){const ov=document.getElementById('celeb');if(ov&&!ov.hidden){fecharCeleb();return}if(pk)pkClose()}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){const ov=document.getElementById('celeb');if(ov&&!ov.hidden){fecharCeleb();return}if(avEd){avEd=null;render();return}if(pk)pkClose()}});
 
 /* ---------- parar, zerar e fechar treinos esquecidos ---------- */
 let pendReset=false;
@@ -1608,6 +1632,58 @@ function pkEscrever(){const nome=document.getElementById('pk-nome').value.trim()
   pkAplicar(id,{sr:srEl&&srEl.value.trim()?srEl.value.trim():null,nota})}
 document.addEventListener('input',e=>{if(e.target.id==='pk-q'&&pk){pk.q=e.target.value;const L=document.getElementById('pk-list');if(L)L.innerHTML=pkList()}});
 
+/* ================= avatar personalizado ================= */
+const AV_CORES=[['#c98a0b','Dourado'],['#2f7a4c','Verde'],['#1f6f8b','Azul'],['#5b4bb7','Roxo'],['#b8432f','Vermelho'],['#c2577f','Rosa'],['#3a3f38','Grafite'],['#d26a1c','Laranja']];
+/* ícones desenhados em traço, 24×24 */
+const AV_ICONES={
+ halter:'<path d="M6.5 6.5v11M17.5 6.5v11M3 9v6M21 9v6M6.5 12h11"/>',
+ kettle:'<path d="M8 8a4 4 0 0 1 8 0"/><path d="M6.5 10h11l1 8.5a2 2 0 0 1-2 2.5h-9a2 2 0 0 1-2-2.5z"/>',
+ raio:'<path d="M13 2 4.5 13.5H12L11 22l8.5-11.5H12z"/>',
+ chama:'<path d="M12 22c4 0 7-2.7 7-7 0-4-3-6.5-4.5-9.5-.6 2.6-2 3.8-3.5 4.5C11 7 10 4.5 10 2 6.5 5 5 9.5 5 15c0 4.3 3 7 7 7z"/>',
+ coroa:'<path d="M3 8l4.5 4L12 5l4.5 7L21 8l-2 11H5z"/>',
+ trofeu:'<path d="M8 4h8v5a4 4 0 0 1-8 0z"/><path d="M8 6H4.5a3.5 3.5 0 0 0 4 4M16 6h3.5a3.5 3.5 0 0 1-4 4M12 13v4M8 21h8M9.5 17h5"/>',
+ coracao:'<path d="M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7a4.3 4.3 0 0 1 7.5 2.8C19.5 15.4 12 20 12 20z"/><path d="M5 12h3l1.5-2.5 2.5 5 1.5-2.5H19"/>',
+ corrida:'<circle cx="14.5" cy="4.5" r="2"/><path d="M8 21l3-6 3 2.5V22M6 11.5l3.5-3.5 4.5 1 2.5 3.5H20M11 15l2-6"/>',
+ bike:'<circle cx="6" cy="16" r="4"/><circle cx="18" cy="16" r="4"/><path d="M6 16l4-8h5l3 8M10 8h-2M12 16l3-8"/>',
+ montanha:'<path d="M2 20 9 8l4 6 3-4 6 10z"/><path d="M7.5 10.5 9 12l1.5-1.5"/>',
+ lobo:'<path d="M4 3l4 5h8l4-5v9a8 8 0 0 1-16 0z"/><path d="M9 13h.01M15 13h.01M10.5 17h3"/>',
+ alvo:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/>'};
+const AV_INOMES={halter:'Halter',kettle:'Kettlebell',raio:'Raio',chama:'Chama',coroa:'Coroa',trofeu:'Troféu',coracao:'Cardio',corrida:'Corrida',bike:'Bike',montanha:'Montanha',lobo:'Lobo',alvo:'Alvo'};
+const avOf=p=>Object.assign({tipo:'letra',cor:AV_CORES[0][0],icone:'halter'},(p&&p.av)||{});
+function avatarHtml(p,cls,tag,attrs){const a=avOf(p);tag=tag||'span';const nome=(p&&p.nome)||'';
+  const inner=a.tipo==='foto'&&a.foto?`<img src="${a.foto}" alt="">`:a.tipo==='icone'&&AV_ICONES[a.icone]?`<svg viewBox="0 0 24 24" aria-hidden="true">${AV_ICONES[a.icone]}</svg>`:esc(inicial(nome));
+  return `<${tag} class="avatar ${cls||''} av-${a.tipo==='foto'&&a.foto?'foto':a.tipo}" style="--avc:${a.cor}" ${attrs||''}>${inner}</${tag}>`}
+
+/* ---------- editor ---------- */
+let avEd=null;
+function avAbrir(){avEd=Object.assign(avOf(prof()),{zoom:1,orig:null,msg:''});avEd.aba=avEd.tipo;render()}
+function avSheet(){if(!avEd)return '';const a=avEd;const prev={nome:prof().nome,av:{tipo:a.aba==='foto'&&!a.foto?'letra':a.aba,cor:a.cor,icone:a.icone,foto:a.foto}};
+  return `<div class="sheet-bg" data-avclose="1"></div><div class="sheet" role="dialog" aria-modal="true" aria-label="Personalizar avatar" tabindex="-1">
+   <div class="sheet-h"><span class="grab"></span><div class="row"><h2>Seu avatar</h2><button class="pill" data-avclose="1" style="margin:0">Fechar</button></div>
+    <div class="av-prev">${avatarHtml(prev,'huge')}</div>
+    <div class="seg tri" role="tablist">${[['foto','Foto'],['icone','Ícone'],['letra','Iniciais']].map(([k,n])=>`<button role="tab" aria-selected="${a.aba===k}" data-avtab="${k}">${n}</button>`).join('')}</div></div>
+   <div class="sheet-b av-body">
+    ${a.aba==='foto'?`<div class="av-foto">
+       <label class="btn" for="av-in" style="cursor:pointer">${a.foto?'Escolher outra foto':'Escolher foto'}</label><input type="file" id="av-in" accept="image/*" hidden>
+       ${a.orig?`<label class="bf"><span class="sub">Zoom</span><input type="range" id="av-zoom" min="1" max="3" step="0.05" value="${a.zoom}"></label>`:''}
+       <p class="sub" style="margin:0">A foto fica guardada só neste celular, recortada em círculo.</p>
+       ${a.foto?'<button class="link danger" data-avfotox="1" style="justify-self:start">Remover foto</button>':''}</div>`
+    :a.aba==='icone'?`<div class="av-icones">${Object.keys(AV_ICONES).map(k=>`<button class="av-ic" aria-pressed="${a.icone===k}" data-avic="${k}" aria-label="${AV_INOMES[k]}" style="--avc:${a.cor}"><svg viewBox="0 0 24 24" aria-hidden="true">${AV_ICONES[k]}</svg></button>`).join('')}</div>`
+    :`<p class="sub" style="margin:0">Mostra a primeira letra do seu nome.</p>`}
+    ${a.aba!=='foto'?`<span class="label">Cor</span><div class="av-cores">${AV_CORES.map(([c,n])=>`<button class="av-cor" aria-pressed="${a.cor===c}" data-avcor="${c}" aria-label="${n}" style="--avc:${c}"></button>`).join('')}</div>`:''}
+    ${a.msg?`<p class="msg">${esc(a.msg)}</p>`:''}
+    <button class="btn big-cta" data-avsalvar="1" ${a.aba==='foto'&&!a.foto?'disabled':''}>Salvar avatar</button></div></div>`}
+/* recorte quadrado central com zoom, 240 px */
+function avRecortar(){const im=avEd.orig;if(!im)return;const S=240,c=document.createElement('canvas');c.width=c.height=S;const x=c.getContext('2d');
+  const lado=Math.min(im.width,im.height)/avEd.zoom;x.drawImage(im,(im.width-lado)/2,(im.height-lado)/2,lado,lado,0,0,S,S);avEd.foto=c.toDataURL('image/jpeg',.82)}
+function avCarregar(file){const u=URL.createObjectURL(file);const im=new Image();
+  im.onload=()=>{avEd.orig=im;avEd.zoom=1;avRecortar();avEd.msg='';render()};im.onerror=()=>{avEd.msg='Não consegui abrir essa imagem.';render()};im.src=u}
+function avSalvar(){const P=profs();const p=P.list[PID];if(!p)return;const a=avEd;
+  p.av={tipo:a.aba,cor:a.cor,icone:a.icone};if(a.aba==='foto')p.av.foto=a.foto;else if(p.av.foto)delete p.av.foto;
+  try{saveProfs(P)}catch(e){}if(JSON.stringify(profs().list[PID].av)!==JSON.stringify(p.av)){avEd.msg='Sem espaço para salvar a foto. Tente outra imagem.';render();return}
+  avEd=null;render();toast('Avatar atualizado')}
+document.addEventListener('input',e=>{if(e.target.id==='av-zoom'&&avEd){avEd.zoom=+e.target.value;avRecortar();const pv=document.querySelector('.av-prev img');if(pv)pv.src=avEd.foto}});
+
 /* ================= render e eventos ================= */
 const VIEWS={hoje:vHoje,treino:vTreino,dieta:vDieta,compras:vCompras,progresso:vProgresso};
 const SUBS={planos:vPlanos,quiz:vQuiz,editor:vEditor,historico:vHistorico};
@@ -1615,7 +1691,7 @@ const app=document.getElementById('app');
 function render(){
   const act=document.activeElement;if(act&&/INPUT|TEXTAREA|SELECT/.test(act.tagName)&&app.contains(act))return;
   const nav=document.querySelector('.tabs');nav.hidden=!!gate;if(gate){app.innerHTML=`<div class="gate">${GATES[gate]()}</div>`;return}
-  app.innerHTML=(sub?SUBS[sub]():VIEWS[tab]())+(pk?pkSheet():'');document.body.classList.toggle('lock',!!pk);
+  app.innerHTML=(sub?SUBS[sub]():VIEWS[tab]())+(pk?pkSheet():'')+(avEd?avSheet():'');document.body.classList.toggle('lock',!!(pk||avEd));
   document.querySelectorAll('.tabs button').forEach(b=>{if(!sub&&b.dataset.tab===tab)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')});
 }
 function goSub(s){sub=s;window.scrollTo(0,0);render()}
@@ -1624,10 +1700,17 @@ document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>setTab(b.data
 
 app.addEventListener('click',e=>{
   {const ae=document.activeElement;if(ae&&/INPUT|TEXTAREA/.test(ae.tagName)&&app.contains(ae)&&!e.target.closest('input,textarea,select,label'))ae.blur()}
-  if(e.target.closest('.sheet-bg')){pkClose();return}
+  if(e.target.closest('.sheet-bg')){if(avEd){avEd=null;render();return}pkClose();return}
   const b=e.target.closest('button');if(!b||(b.closest('form')&&b.type==='submit')||b.disabled)return;const ds=b.dataset;
   /* escolher exercício */
   if(ds.reset){if(!pendReset){pendReset=true;render();setTimeout(()=>{if(pendReset){pendReset=false;render()}},5000);return}pendReset=false;zerarTreino(tab==='hoje'?TODAY:sel);return}
+  if(ds.avopen){avAbrir();return}
+  if(ds.avclose){avEd=null;render();return}
+  if(ds.avtab){avEd.aba=ds.avtab;avEd.msg='';render();return}
+  if(ds.avcor){avEd.cor=ds.avcor;render();return}
+  if(ds.avic){avEd.icone=ds.avic;render();return}
+  if(ds.avfotox){avEd.foto=null;avEd.orig=null;render();return}
+  if(ds.avsalvar){avSalvar();return}
   if(ds.pkopen){pkOpen(ds.pkopen);return}
   if(ds.pkclose){pkClose();return}
   if(ds.pktab){const q=document.getElementById('pk-q');if(q)pk.q=q.value;pk.tab=ds.pktab;document.activeElement&&document.activeElement.blur();render();return}
@@ -1719,6 +1802,7 @@ app.addEventListener('click',e=>{
 app.addEventListener('change',e=>{const i=e.target;const ds=i.dataset;
   if(ds.lw){const id=ds.lw,D=iso(sel);const L=clone(docs.lifts);L[id]=L[id]||{};const old=(L[id][D]||[]);const c=Object.assign({},old[old.length-1]||{});c[ds.f]=num(i.value);L[id][D]=[c];save('lifts',L,true);if(ds.f==='w'||ds.f==='r'){const cc=L[id][D][0];if(hasW(cc)&&isPR(id,D))toast('Novo recorde pessoal!',exNome(id)+' · '+fmtKg(cc.w)+' kg'+(cc.r?' × '+cc.r:''))}return}
   if(i.id==='obs'){const x=clone(dayDoc(sel));x.note=x.note||{};x.note.obs=i.value.trim();save('day-'+iso(sel),x,true);return}
+  if(i.id==='av-in'&&i.files&&i.files[0]){avCarregar(i.files[0]);i.value='';return}
   if(i.id==='photoIn'&&i.files&&i.files[0]){addPhoto(i.files[0]);i.value='';return}
   if(i.id==='restoreIn'&&i.files&&i.files[0]){importBackup(i.files[0]);i.value='';return}
   if(i.id==='impIn'&&i.files&&i.files[0]){importPlan(i.files[0]);i.value='';return}
