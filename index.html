@@ -372,6 +372,26 @@ body.lock{overflow:hidden}
 @media (prefers-reduced-motion:reduce){.sheet,.sheet-bg{animation:none}.pthumb img.b{animation:none;opacity:0}}
 .link.reset{justify-self:center;text-decoration:none;font-size:.85rem;padding:8px 12px}
 .sstats .mono-sm{font-family:var(--mono);font-size:1.5rem}
+.tempo{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;padding:14px;border-radius:14px;background:var(--ink);color:var(--bg)}
+.tempo>div:first-child{display:grid;gap:3px;min-width:0}
+.tempo .wl{color:var(--bg);opacity:.7}
+.tempo .sub{color:var(--bg);opacity:.7}
+.tv{font-family:var(--display);font-weight:700;font-size:2.6rem;line-height:1;color:var(--accent)}
+.tv small{font-size:1rem;color:var(--bg);opacity:.75;margin:0 4px 0 1px;font-family:var(--body);font-weight:500}
+.tbars{flex:none;display:grid;grid-template-columns:repeat(7,12px);gap:5px;height:64px;align-items:end}
+.tbars div{display:grid;grid-template-rows:1fr auto;gap:3px;height:100%;align-items:end;justify-items:center}
+.tbars i{display:block;width:100%;border-radius:4px 4px 2px 2px;background:var(--accent)}
+.tbars i.z{height:3px!important;background:color-mix(in srgb,var(--bg) 25%,transparent)}
+.tbars span{font-size:.58rem;font-family:var(--mono);opacity:.6}
+.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}
+.cal .cw{font-size:.62rem;text-align:center;color:var(--muted);font-family:var(--mono)}
+.cd{aspect-ratio:1;display:grid;place-items:center;border-radius:9px;font-size:.78rem;font-family:var(--mono);background:var(--bg);border:1px solid var(--line);color:var(--muted)}
+.cd.vazio{background:none;border:0}
+.cd.fut{opacity:.4}
+.cd.hoje{border:2px solid var(--ink);color:var(--ink);font-weight:600}
+.cd.z1{background:color-mix(in srgb,var(--accent) 35%,var(--bg));color:var(--ink);border-color:transparent}
+.cd.z2{background:color-mix(in srgb,var(--accent) 68%,var(--bg));color:var(--ink);border-color:transparent}
+.cd.z3{background:var(--accent);color:var(--accent-ink);border-color:transparent;font-weight:600}
 [hidden]{display:none!important}
 </style>
 
@@ -891,6 +911,7 @@ function vHoje(){
    <div style="text-align:right"><div class="big" style="font-size:2rem">${st}</div><span class="sub">${st===1?'dia seguido':'dias seguidos'} acima de 80%</span></div></div>
    <div class="meter"><i style="width:${p.total?p.done/p.total*100:0}%"></i></div></section>
   ${TODAY.getDay()===0?weekCard(monday(TODAY),'Sua semana até aqui'):TODAY.getDay()===1?weekCard(addD(monday(TODAY),-7),'Como foi sua semana'):''}
+  ${addD(TODAY,1).getDate()===1?monthCard(TODAY.getFullYear(),TODAY.getMonth(),'Seu mês até aqui'):TODAY.getDate()<=3?(()=>{const p=new Date(TODAY.getFullYear(),TODAY.getMonth()-1,1);return monthCard(p.getFullYear(),p.getMonth(),'Como foi '+MESES[p.getMonth()])})():''}
   ${ref}${tr}
   <section class="card"><div class="row"><span class="label">Água</span><span class="sub mono">${(w*0.25).toFixed(2).replace('.',',')} de ${(goal*0.25).toFixed(1).replace('.',',')} L</span></div>
    <div class="cups">${Array.from({length:Math.max(goal,w)},(_,i)=>`<span class="cup${i<w?' full':''}"></span>`).join('')}</div>
@@ -1003,7 +1024,7 @@ function vProgresso(){
   const first=f=>{const ds=Object.keys(E).filter(d=>E[d][f]!=null&&E[d][f]!=='').sort();return ds.length?+E[ds[0]][f]:null};
   const P=((docs.photos||{}).items||[]).slice().sort((a,b)=>a.d<b.d?-1:1);
   const img=p=>photoURL[p.id]||'';
-  return head('Progresso')+perfilCard()+weekCard(addD(monday(TODAY),7*wsOff),wsOff?'Resumo da semana':'Esta semana',true)+mapaCard(addD(monday(TODAY),7*wsOff))+histPreview()+`
+  return head('Progresso')+perfilCard()+weekCard(addD(monday(TODAY),7*wsOff),wsOff?'Resumo da semana':'Esta semana',true)+(()=>{const mm=new Date(TODAY.getFullYear(),TODAY.getMonth()+msOff,1);return monthCard(mm.getFullYear(),mm.getMonth(),msOff?'Resumo do mês':'Este mês',true)})()+mapaCard(addD(monday(TODAY),7*wsOff))+histPreview()+`
   <section class="card"><div class="row"><span class="label">Corpo</span><span class="sub">peso 1–2× por semana, medidas a cada 15 dias</span></div>
    ${lineChart(pesoPts)}
    <div class="bodygrid">${BODY.map(([f,l,u])=>{const lb=latestBody(f);const f0=first(f);const dl=lb&&f0!=null?+(lb.v-f0).toFixed(1):null;
@@ -1315,7 +1336,13 @@ function histPreview(){const ss=sessoes().slice(0,3);return `<section class="car
   ${ss.length?`<div>${ss.map(sessCardH).join('')}</div>`:'<p class="sub" style="margin:0">Seus treinos e recordes aparecem aqui.</p>'}</section>`}
 
 /* ---------- resumo da semana ---------- */
-function weekSum(w){const out={plan:0,feitos:0,series:0,vol:0,ref:0,refTot:0,agua:[],prs:0,evo:null};const fim=addD(w,6);
+const MESES=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+/* tempo de treino de um dia (treinos iniciados e concluídos) */
+function tempoDia(D){const s=(docs['day-'+D]||{}).sess;return s&&s.start&&s.end?Math.max(0,s.end-s.start):0}
+function fmtDur(ms){const m=Math.round(ms/60000);if(!m)return '0 min';const h=Math.floor(m/60),r=m%60;return h?(r?`${h}h ${String(r).padStart(2,'0')}min`:`${h}h`):`${m} min`}
+function fmtDurHtml(ms){const m=Math.round(ms/60000);const h=Math.floor(m/60),r=m%60;return h?`${h}<small>h</small>${r?String(r).padStart(2,'0')+'<small>min</small>':''}`:`${m}<small>min</small>`}
+function weekSum(w){const out={plan:0,feitos:0,series:0,vol:0,ref:0,refTot:0,agua:[],prs:0,evo:null,tempo:0,dias:[]};const fim=addD(w,6);
+  for(let i=0;i<7;i++){const t=tempoDia(iso(addD(w,i)));out.dias.push(t);out.tempo+=t}
   for(let i=0;i<7;i++){const d=addD(w,i);if(d>TODAY)break;const D=iso(d);const x=dayDoc(d);const td=treinoDia(d);
     if(td)out.plan++;const ch=Object.keys(x.chk||{}).filter(k=>k.startsWith('t-'));if(ch.length||(x.sess&&x.sess.end))out.feitos++;out.series+=ch.length;
     const ms=meals(d);out.refTot+=ms.length;out.ref+=ms.filter(m=>on(d,'m-'+m[0])).length;if(x.water)out.agua.push(x.water);out.prs+=prsDoDia(D).length}
@@ -1327,6 +1354,8 @@ function weekSum(w){const out={plan:0,feitos:0,series:0,vol:0,ref:0,refTot:0,agu
 function weekCard(w,titulo,nav){const s=weekSum(w);const fim=addD(w,6);const agua=s.agua.length?(s.agua.reduce((a,b)=>a+b,0)/s.agua.length*0.25).toFixed(1).replace('.',','):null;
   const tile=(v,l,cls)=>`<div class="wt${cls?' '+cls:''}"><span class="wv">${v}</span><span class="wl">${l}</span></div>`;
   return `<section class="card week"><div class="row">${nav?'<button class="pill" data-ws="-1" aria-label="Semana anterior" style="margin:0">‹</button>':''}<div style="flex:1;${nav?'text-align:center':''}"><span class="label">${titulo}</span><div class="sub mono">${ddmm(w)} a ${ddmm(fim)}</div></div>${nav?'<button class="pill" data-ws="1" aria-label="Próxima semana" style="margin:0">›</button>':''}</div>
+   <div class="tempo"><div><span class="wl">Tempo de treino</span><span class="tv">${s.tempo?fmtDurHtml(s.tempo):'–'}</span>${s.tempo&&s.feitos?`<span class="sub">média de ${fmtDur(s.tempo/Math.max(1,s.dias.filter(Boolean).length))} por treino</span>`:'<span class="sub">conta os treinos iniciados e concluídos</span>'}</div>
+    <div class="tbars" aria-hidden="true">${s.dias.map((t,i)=>{const mx=Math.max(...s.dias,45*60000);return `<div><i style="height:${t?Math.max(8,t/mx*100):0}%" class="${t?'':'z'}"></i><span>${'STQQSSD'[i]}</span></div>`}).join('')}</div></div>
    <div class="wgrid">${tile(`${s.feitos}<small>/${s.plan||'–'}</small>`,'treinos')}${tile(s.vol?s.vol.toLocaleString('pt-BR'):'–',s.vol?'kg de volume':'volume')}
     ${tile(s.refTot?Math.round(s.ref/s.refTot*100)+'<small>%</small>':'–','refeições')}${tile(s.peso?(s.peso.base?(s.peso.dl>0?'+':'')+fmtKg(s.peso.dl):fmtKg(s.peso.b))+'<small>kg</small>':'–',s.peso&&s.peso.base?'peso':'peso atual',s.peso&&s.peso.base?(s.peso.dl<0?'down':s.peso.dl>0?'upw':''):'')}</div>
    <div class="wlines">${s.prs?`<div>★ <b>${s.prs}</b> ${s.prs>1?'recordes pessoais':'recorde pessoal'}</div>`:''}${s.evo?`<div>▲ Maior evolução: <b>${esc(s.evo.nome)}</b> +${fmtKg(s.evo.dl)} kg</div>`:''}${agua?`<div>Água: média de <b>${agua} L</b> por dia</div>`:''}${s.series?`<div>${s.series} séries no total</div>`:''}</div>${s.feitos?`<button class="btn share" data-share="${iso(w)}">↗ Compartilhar minha semana</button>`:''}</section>`}
@@ -1375,6 +1404,31 @@ function fecharEsquecidos(){if(!PID)return;const agora=Date.now();
   Object.keys(docs).filter(k=>k.startsWith('day-')).forEach(k=>{const x=docs[k];const s=x&&x.sess;if(!s||!s.start||s.end)return;
     const ult=s.last||s.start;const hoje=k==='day-'+iso(TODAY);
     if(!hoje||agora-ult>3*3600000){const y=clone(x);y.sess.end=Math.max(ult,s.start+60000);y.sess.auto=true;save(k,y,true)}})}
+
+/* ---------- resumo do mês ---------- */
+let msOff=0;
+function monthSum(y,m){const ini=new Date(y,m,1),fim=new Date(y,m+1,0);const out={tempo:0,feitos:0,series:0,vol:0,prs:0,ref:0,refTot:0,dias:{},plan:0};
+  for(let d=new Date(ini);d<=fim&&d<=TODAY;d=addD(d,1)){const D=iso(d);const x=dayDoc(d);const ch=Object.keys(x.chk||{}).filter(k=>k.startsWith('t-'));const t=tempoDia(D);
+    if(treinoDia(d))out.plan++;if(ch.length||(x.sess&&x.sess.end)){out.feitos++;out.dias[d.getDate()]=t||1}out.tempo+=t;out.series+=ch.length;out.prs+=prsDoDia(D).length;
+    const ms=meals(d);out.refTot+=ms.length;out.ref+=ms.filter(mm=>on(d,'m-'+mm[0])).length}
+  out.vol=sessoes().filter(s=>s.D>=iso(ini)&&s.D<=iso(fim)).reduce((a,s)=>a+s.vol,0);
+  const E=bodyE();const pd=Object.keys(E).filter(d=>E[d].peso!=null&&E[d].peso!==''&&d<=iso(fim)).sort();const inM=pd.filter(d=>d>=iso(ini));
+  if(inM.length){const bef=pd.filter(d=>d<iso(ini));const a=bef.length?+E[bef[bef.length-1]].peso:+E[inM[0]].peso;const b=+E[inM[inM.length-1]].peso;if(bef.length||inM.length>1)out.peso=+(b-a).toFixed(1)}
+  /* maior sequência de dias com treino feito */
+  let seq=0,best=0;for(let i=1;i<=fim.getDate();i++){const d=new Date(y,m,i);if(d>TODAY)break;if(out.dias[i])best=Math.max(best,++seq);else if(treinoDia(d))seq=0}out.seq=best;
+  return out}
+function monthCard(y,m,titulo,nav){const s=monthSum(y,m);const p=new Date(y,m-1,1);const sp=monthSum(p.getFullYear(),p.getMonth());
+  const dif=s.tempo-sp.tempo;const ini=new Date(y,m,1);const nd=new Date(y,m+1,0).getDate();const off=(ini.getDay()+6)%7;
+  const tile=(v,l,cls)=>`<div class="wt${cls?' '+cls:''}"><span class="wv">${v}</span><span class="wl">${l}</span></div>`;
+  let cal='';for(let i=0;i<off;i++)cal+='<span class="cd vazio"></span>';
+  for(let i=1;i<=nd;i++){const d=new Date(y,m,i);const t=s.dias[i];const hoje=+d===+TODAY;const fut=d>TODAY;
+    const z=!t?'':t<30*60000?'z1':t<60*60000?'z2':'z3';cal+=`<span class="cd ${z}${hoje?' hoje':''}${fut?' fut':''}" title="${i}/${m+1}${t>1?': '+fmtDur(t):''}">${i}</span>`}
+  return `<section class="card week month"><div class="row">${nav?'<button class="pill" data-ms="-1" aria-label="Mês anterior" style="margin:0">‹</button>':''}<div style="flex:1;${nav?'text-align:center':''}"><span class="label">${titulo}</span><div class="sub mono">${MESES[m]} de ${y}</div></div>${nav?'<button class="pill" data-ms="1" aria-label="Próximo mês" style="margin:0">›</button>':''}</div>
+   <div class="tempo"><div><span class="wl">Tempo de treino no mês</span><span class="tv">${s.tempo?fmtDurHtml(s.tempo):'–'}</span>
+    <span class="sub">${s.tempo&&sp.tempo?`${dif>=0?'+':'−'}${fmtDur(Math.abs(dif))} em relação a ${MESES[p.getMonth()]}`:s.tempo&&s.feitos?`média de ${fmtDur(s.tempo/Math.max(1,Object.values(s.dias).filter(t=>t>1).length))} por treino`:'conta os treinos iniciados e concluídos'}</span></div></div>
+   <div class="cal"><span class="cw">S</span><span class="cw">T</span><span class="cw">Q</span><span class="cw">Q</span><span class="cw">S</span><span class="cw">S</span><span class="cw">D</span>${cal}</div>
+   <div class="wgrid">${tile(`${s.feitos}<small>/${s.plan||'–'}</small>`,'treinos')}${tile(s.vol?s.vol.toLocaleString('pt-BR'):'–',s.vol?'kg de volume':'volume')}${tile(`${s.prs}`,s.prs===1?'recorde':'recordes')}${tile(s.peso!=null?(s.peso>0?'+':'')+fmtKg(s.peso)+'<small>kg</small>':'–','peso',s.peso<0?'down':s.peso>0?'upw':'')}</div>
+   <div class="wlines">${s.seq>1?`<div>Maior sequência: <b>${s.seq} treinos</b> sem falhar</div>`:''}${s.series?`<div>${s.series} séries no total</div>`:''}${s.refTot?`<div>Dieta: <b>${Math.round(s.ref/s.refTot*100)}%</b> das refeições cumpridas</div>`:''}</div></section>`}
 
 /* ================= treino inteligente ================= */
 const repRange=sr=>{if(/s\s*$/.test(sr.trim())||/falha/i.test(sr))return null;const m=sr.match(/×\s*(\d+)(?:\s*[–-]\s*(\d+))?/);return m?{lo:+m[1],hi:+(m[2]||m[1])}:null};
@@ -1468,9 +1522,9 @@ async function cartaoSemana(w){
   const B=(t,px,X,Y,col,al,wgt)=>{x.font=`${wgt||500} ${px}px "IBM Plex Sans",system-ui,sans-serif`;x.fillStyle=col;x.textAlign=al||'left';x.fillText(t,X,Y)};
   D('NA RÉGUA',40,80,110,C.acc);B(`${(prof().nome||'').toUpperCase()}`,30,W-80,108,C.mut,'right',600);
   D('MINHA SEMANA',120,80,250,C.ink);B(`${ddmm(w)} a ${ddmm(fim)}`,40,80,310,C.mut);
-  const tiles=[[`${s.feitos}`,`/${s.plan||'–'}`,'TREINOS'],[s.vol?s.vol.toLocaleString('pt-BR'):'–','kg','VOLUME'],[`${s.prs}`,'','RECORDES'],[s.refTot?Math.round(s.ref/s.refTot*100)+'':'–',s.refTot?'%':'','DIETA']];
+  const tm=Math.round(s.tempo/60000);const tiles=[[`${s.feitos}`,`/${s.plan||'–'}`,'TREINOS'],[tm>=60?`${Math.floor(tm/60)}h${tm%60?String(tm%60).padStart(2,'0'):''}`:`${tm||'–'}`,tm>=60?'':tm?'min':'','TEMPO DE TREINO'],[s.vol?s.vol.toLocaleString('pt-BR'):'–',s.vol?'kg':'','VOLUME'],[`${s.prs}`,'','RECORDES']];
   tiles.forEach(([a,b,l],i)=>{const X=80+(i%2)*470,Y=370+Math.floor(i/2)*250;x.fillStyle=C.card;x.beginPath();x.roundRect(X,Y,450,220,28);x.fill();
-    D(a,120,X+36,Y+140,i===2&&s.prs?C.acc:C.ink);const aw=(x.measureText(a).width);B(b,40,X+40+aw,Y+140,C.mut);B(l,28,X+38,Y+190,C.mut,'left',600)});
+    D(a,120,X+36,Y+140,i===3&&s.prs?C.acc:C.ink);const aw=(x.measureText(a).width);B(b,40,X+40+aw,Y+140,C.mut);B(l,28,X+38,Y+190,C.mut,'left',600)});
   let Y=880;const extra=[];
   if(s.evo)extra.push(['MAIOR EVOLUÇÃO',`${s.evo.nome.length>22?s.evo.nome.slice(0,21)+'…':s.evo.nome}`,`+${fmtKg(s.evo.dl)} kg`,C.acc]);
   if(s.peso&&s.peso.base)extra.push(['PESO NA SEMANA','',`${s.peso.dl>0?'+':''}${fmtKg(s.peso.dl)} kg`,s.peso.dl<0?C.ok:C.ink]);
@@ -1649,6 +1703,7 @@ app.addEventListener('click',e=>{
   if(ds.swaptoday){const td=treinoDia(sel);if(td)swapToday(sel,td,ds.swaptoday);return}
   if(ds.unswap){unswap(sel,ds.unswap);return}
   if(ds.restex){const td=treinoDia(sel);if(td)cycleRest(td,ds.restex);return}
+  if(ds.ms){msOff=Math.min(0,msOff+ +ds.ms);render();return}
   if(ds.ws){wsOff=Math.min(0,wsOff+ +ds.ws);render();return}
   if(ds.zoom){b.classList.toggle('big');return}
   if(b.classList.contains('day')){sel=fromIso(ds.day);render();return}
