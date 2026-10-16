@@ -309,6 +309,28 @@ select,.edt,.erow input,.bf input{font:inherit;font-size:16px;color:var(--ink);b
 .mbar i.z1{background:color-mix(in srgb,var(--accent) 35%,var(--bg))}.mbar i.z2{background:color-mix(in srgb,var(--accent) 68%,var(--bg))}.mbar i.z3{background:var(--accent)}
 .mlist .mono{text-align:right}
 .btn.share{background:var(--ink);color:var(--bg)}
+.concluir{border:2px dashed var(--line);background:var(--surface)}
+.concluir.pronto{border:2px solid var(--ok);background:var(--ok-soft)}
+.concluir.pronto .label{color:var(--ok)}
+.celeb{position:fixed;inset:0;z-index:40;display:grid;place-items:center;background:rgba(10,12,10,.62);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
+  padding:calc(16px + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) calc(16px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));opacity:0;transition:opacity .25s}
+.celeb.in{opacity:1}
+.cbox{width:min(100%,420px);background:var(--surface);border-radius:24px;padding:28px 20px 20px;display:grid;gap:14px;justify-items:center;text-align:center;border-top:6px solid var(--ok);transform:translateY(24px) scale(.96);transition:transform .35s cubic-bezier(.2,.9,.3,1.25)}
+.celeb.in .cbox{transform:none}
+.cbox h2{font-size:2.1rem;color:var(--ok)}
+.cbox .btn{width:100%}
+.cring{width:84px;height:84px}
+.cring svg{width:100%;height:100%;fill:none;stroke-width:3.5;stroke-linecap:round;stroke-linejoin:round}
+.cring circle{stroke:var(--ok);stroke-dasharray:151;stroke-dashoffset:151}
+.cring path{stroke:var(--ok);stroke-dasharray:40;stroke-dashoffset:40}
+.celeb.in .cring circle{animation:draw .6s ease-out forwards}
+.celeb.in .cring path{animation:draw .35s .5s ease-out forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+.cstats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;width:100%}
+.cstats div{display:grid;gap:2px;padding:12px 4px;border-radius:14px;background:var(--bg);border:1px solid var(--line)}
+.cstats b{font-family:var(--display);font-size:1.8rem;line-height:1}
+.cstats span{font-size:.68rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}
+@media (prefers-reduced-motion:reduce){.celeb,.cbox{transition:none}.cring circle,.cring path{animation:none!important;stroke-dashoffset:0}}
 [hidden]{display:none!important}
 </style>
 
@@ -323,6 +345,8 @@ select,.edt,.erow input,.bf input{font:inherit;font-size:16px;color:var(--ink);b
 </div>
 
 <div id="toast" class="toast" hidden role="status" aria-live="polite"></div>
+
+<div id="celeb" class="celeb" hidden></div>
 
 <nav class="tabs" aria-label="Seções">
   <button data-tab="hoje"><svg viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v9a1 1 0 0 1-1 1h-5v-6h-4v6H5a1 1 0 0 1-1-1z"/></svg>Hoje</button>
@@ -688,13 +712,13 @@ const mmss=ms=>{const t=Math.max(0,Math.floor(ms/1000));const h=Math.floor(t/360
 function sessStats(d,td){const D=iso(d);let sets=0,vol=0,total=0;exsDia(d,td).forEach(e=>{const n=nSets(e.sr);total+=n;const cur=(lifts()[e.id]||{})[D]||[];
   for(let s=0;s<n;s++){if(on(d,'t-'+e.id+'-'+s)){sets++;const c=cur[s]||cur[cur.length-1];if(hasW(c)&&c.r)vol+=(+c.w)*(+c.r)}}});return {sets,total,vol:Math.round(vol)}}
 function sessCard(d,td){const ss=dayDoc(d).sess;const st=sessStats(d,td);const lim=td.plan.limite||60;
-  if((!ss||!ss.start)&&ciOpen&&+mid(d)===+TODAY)return ciCard(td);
-  if(!ss||!ss.start){return +mid(d)===+TODAY?`<section class="card sess"><div><span class="label">Treino ${td.k} de hoje</span><h3>Pronto para começar?</h3><p class="sub" style="margin:0">O cronômetro do treino começa, a tela fica acesa e o app leva você ao primeiro exercício.</p></div><button class="btn big-cta" data-sess="start">Iniciar treino</button></section>`:''}
+  if((!ss||(!ss.start&&!ss.end))&&ciOpen&&+mid(d)===+TODAY)return ciCard(td);
+  if(!ss||(!ss.start&&!ss.end)){return +mid(d)===+TODAY?`<section class="card sess"><div><span class="label">Treino ${td.k} de hoje</span><h3>Pronto para começar?</h3><p class="sub" style="margin:0">O cronômetro do treino começa, a tela fica acesa e o app leva você ao primeiro exercício.</p></div><button class="btn big-cta" data-sess="start">Iniciar treino</button></section>`:''}
   if(!ss.end)return `<section class="card sess live"><div class="row"><span class="label">Treino em andamento</span><span class="sub mono">${st.sets}/${st.total} séries</span></div>
-    <div class="row" style="align-items:end"><span class="big mono-big" id="sessT">${mmss(Date.now()-ss.start)}</span><button class="btn ghost" data-sess="end">Finalizar treino</button></div>
+    <div class="row" style="align-items:end"><span class="big mono-big" id="sessT">${mmss(Date.now()-ss.start)}</span><button class="btn ghost" data-sess="end">Concluir</button></div>
     <div class="meter"><i style="width:${st.total?st.sets/st.total*100:0}%"></i></div><p class="sub" id="sessW" data-lim="${lim}" style="margin:0">${Date.now()-ss.start>lim*60000?`Passou de ${lim} min: hora de fechar.`:`Meta: até ${lim} min de treino.`}</p></section>`;
   return `<section class="card sess done"><div class="row"><span class="label">Treino concluído</span><button class="btn ghost" data-sess="resume" style="padding:6px 12px">Retomar</button></div>
-    <div class="sstats"><div><span class="big">${Math.round((ss.end-ss.start)/60000)}</span><span class="sub">minutos</span></div><div><span class="big">${st.sets}/${st.total}</span><span class="sub">séries</span></div><div><span class="big">${st.vol.toLocaleString('pt-BR')}</span><span class="sub">kg de volume</span></div></div>${prsDoDia(iso(d)).length?`<div class="prs">${prsDoDia(iso(d)).map(id=>`<span class="pr">★ ${esc(exNome(id))}</span>`).join('')}</div>`:''}<button class="btn ghost" data-sub="historico">Ver histórico</button></section>`}
+    <div class="sstats"><div><span class="big">${ss.start?Math.round((ss.end-ss.start)/60000):'–'}</span><span class="sub">minutos</span></div><div><span class="big">${st.sets}/${st.total}</span><span class="sub">séries</span></div><div><span class="big">${st.vol.toLocaleString('pt-BR')}</span><span class="sub">kg de volume</span></div></div>${prsDoDia(iso(d)).length?`<div class="prs">${prsDoDia(iso(d)).map(id=>`<span class="pr">★ ${esc(exNome(id))}</span>`).join('')}</div>`:''}<button class="btn ghost" data-sub="historico">Ver histórico</button></section>`}
 function scrollNext(){const n=[...document.querySelectorAll('.ex')].find(e=>!e.classList.contains('done'));if(n)n.scrollIntoView({behavior:'smooth',block:'start'})}
 setInterval(()=>{const el=document.getElementById('sessT');if(!el)return;const ss=dayDoc(sel).sess;if(!ss||!ss.start||ss.end)return;const ms=Date.now()-ss.start;el.textContent=mmss(ms);
   const w=document.getElementById('sessW');if(w&&ms>(+w.dataset.lim||60)*60000)w.textContent=`Passou de ${w.dataset.lim} min: hora de fechar.`},1000);
@@ -765,6 +789,7 @@ function vTreino(){
   <section class="card"><span class="label">Como foi o treino?</span>
    <div class="row" style="justify-content:start;gap:6px"><span class="sub" style="width:64px">Energia</span>${[1,2,3,4,5].map(n=>`<button class="en" aria-pressed="${note.en===n}" data-en="${n}" aria-label="Energia ${n} de 5">${n}</button>`).join('')}</div>
    <textarea id="obs" rows="2" placeholder="Dor, cansaço, algo diferente? (opcional)">${esc(note.obs||'')}</textarea></section>`;
+  h+=concluirCard(d,td);
   return h}
 
 const GUIA=[
@@ -1010,11 +1035,16 @@ async function hashPin(id,pin){const txt='na-regua:'+id+':'+pin;
   try{const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(txt));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
   catch(e){return 'h'+hash(txt)}}
 function saveProfs(P){lsSet('profiles',P)}
-function enterProfile(id){const P=profs();P.last=id;saveProfs(P);PID=id;loadDocs();plans();gate=null;pinFor=null;pinMsg='';pinReset=false;
+const SKEY='na-regua:sessao';
+const sessGet=()=>{try{return sessionStorage.getItem(SKEY)}catch(e){return null}};
+const sessSet=id=>{try{id?sessionStorage.setItem(SKEY,id):sessionStorage.removeItem(SKEY)}catch(e){}};
+function enterProfile(id){const P=profs();P.last=id;saveProfs(P);PID=id;sessSet(id);loadDocs();plans();gate=null;pinFor=null;pinMsg='';pinReset=false;
   tab='hoje';sub=null;sel=new Date(TODAY);window.scrollTo(0,0);render();loadPhotos();wake()}
 function startGate(){const P=profs();const ids=Object.keys(P.list);
   if(!ids.length){gate='form';pfEdit=null;return}
-  if(ids.length===1&&!P.list[ids[0]].pin){PID=ids[0];loadDocs();plans();gate=null;return}
+  /* já entrou nesta abertura do app: continua no mesmo perfil */
+  const s=sessGet();if(s&&P.list[s]){PID=s;loadDocs();plans();gate=null;return}
+  if(ids.length===1&&!P.list[ids[0]].pin){PID=ids[0];sessSet(PID);loadDocs();plans();gate=null;return}
   gate='picker'}
 /* move os dados antigos (de antes dos perfis) para o primeiro perfil */
 function migrarLegado(){const moved=[];try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('doc:'))moved.push(k)}}catch(e){}
@@ -1023,7 +1053,7 @@ function migrarLegado(){const moved=[];try{for(let i=0;i<localStorage.length;i++
   if(!temPlanos)lsSet(K('plans'),{treino:{ativo:SEED_TREINO.id,lista:{[SEED_TREINO.id]:clone(SEED_TREINO)}},dieta:{ativo:SEED_DIETA.id,lista:{[SEED_DIETA.id]:clone(SEED_DIETA)}}});
   return true}
 function deleteProfile(id){const pre='p:'+id+':doc:';const ks=[];try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith(pre))ks.push(k)}}catch(e){}
-  ks.forEach(k=>{try{localStorage.removeItem(k)}catch(e){}});const P=profs();delete P.list[id];if(P.last===id)P.last=null;saveProfs(P)}
+  ks.forEach(k=>{try{localStorage.removeItem(k)}catch(e){}});if(sessGet()===id)sessSet(null);const P=profs();delete P.list[id];if(P.last===id)P.last=null;saveProfs(P)}
 
 /* ---------- telas ---------- */
 const brand=`<div class="brand"><span class="eyebrow">Na Régua</span></div>`;
@@ -1157,6 +1187,34 @@ function weekCard(w,titulo,nav){const s=weekSum(w);const fim=addD(w,6);const agu
    <div class="wlines">${s.prs?`<div>★ <b>${s.prs}</b> ${s.prs>1?'recordes pessoais':'recorde pessoal'}</div>`:''}${s.evo?`<div>▲ Maior evolução: <b>${esc(s.evo.nome)}</b> +${fmtKg(s.evo.dl)} kg</div>`:''}${agua?`<div>Água: média de <b>${agua} L</b> por dia</div>`:''}${s.series?`<div>${s.series} séries no total</div>`:''}</div>${s.feitos?`<button class="btn share" data-share="${iso(w)}">↗ Compartilhar minha semana</button>`:''}</section>`}
 let wsOff=0;
 
+/* ---------- concluir treino ---------- */
+function concluirCard(d,td){const ss=dayDoc(d).sess;const st=sessStats(d,td);
+  if(ss&&ss.end)return '';
+  const live=ss&&ss.start;if(!live&&!st.sets)return '';
+  const tudo=st.total&&st.sets===st.total;const falta=st.total-st.sets;
+  return `<section class="card concluir${tudo?' pronto':''}" id="concluir">
+   <div class="row"><span class="label">${tudo?'Todas as séries feitas':'Terminou por hoje?'}</span><span class="sub mono">${st.sets}/${st.total} séries</span></div>
+   ${tudo?'<p style="margin:0">Mandou bem. Feche o treino para salvar no histórico.</p>':`<p class="sub" style="margin:0">Faltam ${falta} ${falta===1?'série':'séries'}. Se não der para fazer tudo hoje, pode concluir assim mesmo.</p>`}
+   <button class="btn big-cta" data-sess="end">✓ Concluir treino</button></section>`}
+function celebrar(D){const d=fromIso(D);const td=treinoDia(d);const ss=dayDoc(d).sess||{};const st=td?sessStats(d,td):{sets:0,total:0,vol:0};const prs=prsDoDia(D);
+  const min=ss.start&&ss.end?Math.max(1,Math.round((ss.end-ss.start)/60000)):null;
+  const ov=document.getElementById('celeb');if(!ov)return;
+  ov.innerHTML=`<div class="cbox" role="dialog" aria-modal="true" aria-labelledby="cb-t">
+   <div class="cring"><svg viewBox="0 0 52 52" aria-hidden="true"><circle cx="26" cy="26" r="24"/><path d="M15 27l7 7 15-16"/></svg></div>
+   <h2 id="cb-t">Treino concluído!</h2>
+   <p class="sub" style="margin:0">${td?`Treino ${esc(td.k)} · ${esc(td.T.nome)}`:''}${prof().nome?` · boa, ${esc(prof().nome)}!`:''}</p>
+   <div class="cstats"><div><b>${min??'–'}</b><span>minutos</span></div><div><b>${st.sets}/${st.total}</b><span>séries</span></div><div><b>${st.vol?st.vol.toLocaleString('pt-BR'):'–'}</b><span>kg de volume</span></div></div>
+   ${prs.length?`<div class="prs" style="justify-content:center">${prs.map(id=>`<span class="pr">★ Recorde: ${esc(exNome(id))}</span>`).join('')}</div>`:''}
+   <p class="sub" style="margin:0">${streak()>1?`${streak()} dias seguidos na régua.`:'Salvo no seu histórico.'}</p>
+   <button class="btn big-cta" data-fechaok="1" id="cb-ok">Fechar</button></div>`;
+  ov.hidden=false;requestAnimationFrame(()=>ov.classList.add('in'));
+  try{navigator.vibrate&&navigator.vibrate([60,60,60,60,160])}catch(e){}
+  try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();[0,.12,.24].forEach((o,i)=>{const g=actx.createGain(),os=actx.createOscillator();os.frequency.value=[660,880,1320][i];os.connect(g);g.connect(actx.destination);g.gain.setValueAtTime(.18,actx.currentTime+o);g.gain.exponentialRampToValueAtTime(.001,actx.currentTime+o+.25);os.start(actx.currentTime+o);os.stop(actx.currentTime+o+.25)})}catch(e){}
+  setTimeout(()=>{const b=document.getElementById('cb-ok');b&&b.focus()},50)}
+function fecharCeleb(){const ov=document.getElementById('celeb');if(!ov)return;ov.classList.remove('in');setTimeout(()=>{ov.hidden=true;ov.innerHTML=''},250);window.scrollTo({top:0,behavior:'smooth'})}
+document.addEventListener('click',e=>{const ov=document.getElementById('celeb');if(!ov||ov.hidden)return;if(e.target===ov||e.target.closest('[data-fechaok]'))fecharCeleb()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){const ov=document.getElementById('celeb');if(ov&&!ov.hidden)fecharCeleb()}});
+
 /* ================= treino inteligente ================= */
 const repRange=sr=>{if(/s\s*$/.test(sr.trim())||/falha/i.test(sr))return null;const m=sr.match(/×\s*(\d+)(?:\s*[–-]\s*(\d+))?/);return m?{lo:+m[1],hi:+(m[2]||m[1])}:null};
 const passo=w=>w<10?1:w<30?2:w<60?2.5:5;
@@ -1288,7 +1346,7 @@ app.addEventListener('click',e=>{
   /* perfis */
   if(ds.pick){const p=profs().list[ds.pick];if(p&&p.pin){pinFor=ds.pick;pinMsg='';pinReset=false;gate='pin';render();setTimeout(()=>{const i=document.getElementById('pin-in');i&&i.focus()},60)}else enterProfile(ds.pick);return}
   if(ds.pnew){pfEdit=null;pfMsg='';gate='form';window.scrollTo(0,0);render();return}
-  if(ds.gate){if(ds.gate==='back'){pfEdit=null;pfDel=false;gate=null;render();return}gate=ds.gate;pfDel=false;pinMsg='';window.scrollTo(0,0);render();return}
+  if(ds.gate){if(ds.gate==='back'){pfEdit=null;pfDel=false;gate=null;render();return}if(ds.gate==='picker'){sessSet(null);ciOpen=false}gate=ds.gate;pfDel=false;pinMsg='';window.scrollTo(0,0);render();return}
   if(ds.pinreset){pinReset=true;pinMsg='';render();return}
   if(ds.pedit){pfEdit=PID;pfMsg='';pfDel=false;gate='form';window.scrollTo(0,0);render();return}
   if(ds.pinoff){const P=profs();delete P.list[pfEdit].pin;saveProfs(P);pfMsg='PIN removido.';render();return}
@@ -1341,10 +1399,11 @@ app.addEventListener('click',e=>{
   if(ds.share){compartilharSemana(fromIso(ds.share));return}
   if(ds.sess){const go=ds.sess==='go'||ds.sess==='skip';const D=go?TODAY:sel;const x=clone(dayDoc(D));
     if(go){const tdS=treinoDia(TODAY);if(ds.sess==='go'){const sc=ciScore();x.pront={sono:ci.sono,en:ci.en,dor:ci.dor,score:sc};x.leve=!!(ci.leve&&sc<=2)}ciOpen=false;x.sess={start:Date.now(),end:null,k:tdS&&tdS.k,nome:tdS&&tdS.T.nome};sel=new Date(TODAY);sub=null;if(tab!=='treino'){tab='treino';try{localStorage.setItem('ui:tab','treino')}catch(e){}}save('day-'+iso(D),x);wake();setTimeout(scrollNext,50)}
-    else if(ds.sess==='end'){x.sess={...(x.sess||{}),end:Date.now()};save('day-'+iso(D),x)}
+    else if(ds.sess==='end'){const tdE=treinoDia(D);x.sess={k:tdE&&tdE.k,nome:tdE&&tdE.T.nome,...(x.sess||{}),end:Date.now()};save('day-'+iso(D),x);clearInterval(tInt);tEl.hidden=true;celebrar(iso(D))}
     else{x.sess={...(x.sess||{}),end:null};save('day-'+iso(D),x)}return}
   if(ds.wk){sel=addD(monday(sel),7*+ds.wk);if(tab!=='compras'&&+monday(sel)===+monday(TODAY))sel=new Date(TODAY);render();return}
   if(ds.k){const d=tab==='hoje'?TODAY:sel;const was=on(d,ds.k);toggle(d,ds.k);
+    if(ds.lid&&!was){const tdA=treinoDia(d);const ssA=dayDoc(d).sess;if(tdA&&ssA&&ssA.start&&!ssA.end){const stA=sessStats(d,tdA);if(stA.total&&stA.sets===stA.total){setTimeout(()=>{toast('Todas as séries feitas!','Anote a última carga e toque em Concluir treino');const c=document.getElementById('concluir');if(c)c.scrollIntoView({behavior:'smooth',block:'center'})},900)}}}
     /* ao fechar a última série, já deixa anotado o mesmo do último treino (dá para corrigir) */
     if(ds.lid&&!was){const id=ds.lid,n=+ds.n,D=iso(d);let all=true;for(let s=0;s<n;s++)if(!on(d,'t-'+id+'-'+s))all=false;
       const cur=(lifts()[id]||{})[D]||[];if(all&&!cur.some(hasW)){const tdx=treinoDia(d);const exx=tdx&&exsDia(d,tdx).find(x=>x.id===id);const mt=exx&&metaDia(id,exx.sr,d);
