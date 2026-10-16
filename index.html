@@ -419,37 +419,40 @@ body.lock{overflow:hidden}
 @media (max-width:380px){.av-icones{grid-template-columns:repeat(4,minmax(0,1fr))}.av-cores{grid-template-columns:repeat(4,minmax(0,1fr))}}
 [hidden]{display:none!important}
 
-/* ---------- abertura ---------- */
+/* ---------- abertura: régua se desenha, raio cai, nome aparece ---------- */
 .intro{position:fixed;inset:0;z-index:100;background:#141714;display:grid;place-items:center;overflow:hidden;cursor:pointer;
-  animation:intro-out .5s 2.35s cubic-bezier(.6,0,.4,1) forwards}
+  animation:intro-out .45s 2.75s cubic-bezier(.6,0,.4,1) forwards}
 .sem-intro .intro{display:none}
-.intro-in{display:grid;justify-items:center;gap:22px;animation:intro-zoom 2.85s cubic-bezier(.5,0,.2,1) forwards}
-.intro-ic{width:96px;height:96px;fill:none;stroke:#e2a83a;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
-.intro-ic path{stroke-dasharray:60;stroke-dashoffset:60;animation:draw .55s ease-out forwards}
-.intro-ic path:nth-child(2){animation-delay:.12s}.intro-ic path:nth-child(3){animation-delay:.24s}.intro-ic path:nth-child(4){animation-delay:.36s}.intro-ic path:nth-child(5){animation-delay:.5s}
+.intro-flash{position:absolute;inset:0;background:#fff4d6;opacity:0;pointer-events:none;animation:flash .35s 1s ease-out forwards}
+.intro-in{display:grid;justify-items:center;gap:6px;animation:intro-zoom 3.2s cubic-bezier(.5,0,.2,1) forwards}
+.intro-mark{width:min(62vw,250px);height:auto;overflow:visible}
+.intro-mark .bar{fill:#eef0ec;transform-box:fill-box;transform-origin:center;transform:scaleX(0);animation:barra .55s .15s cubic-bezier(.6,0,.2,1) forwards}
+.intro-mark .tk{stroke:#eef0ec;stroke-width:1.5;opacity:0;animation:tick .18s forwards}
+.intro-mark .bolt{fill:#e2a83a;stroke:#141714;stroke-width:5;stroke-linejoin:round;paint-order:stroke;opacity:0;transform-box:fill-box;transform-origin:50% 0;
+  animation:raio .2s .85s cubic-bezier(.7,0,1,1) forwards,brilho 1.2s 1.05s ease-out}
 .intro-nome{display:flex;gap:.04em;font-family:var(--display);font-weight:700;font-size:clamp(3rem,15vw,5.2rem);line-height:1;letter-spacing:.06em;color:#eef0ec;text-transform:uppercase}
 .intro-nome span{display:inline-block;opacity:0;transform:translateY(40%);animation:letra .45s cubic-bezier(.2,.9,.3,1.2) forwards}
 .intro-nome .esp{width:.28em}
-.intro-regua{position:relative;width:min(78vw,340px);height:22px;overflow:hidden}
-.intro-regua i{position:absolute;left:0;top:0;height:3px;width:100%;background:#e2a83a;border-radius:2px;transform:scaleX(0);transform-origin:left;animation:regua .7s 1.05s cubic-bezier(.6,0,.2,1) forwards}
-.intro-regua b{position:absolute;top:3px;width:2px;height:8px;background:#e2a83a;opacity:0;animation:tick .2s forwards}
-.intro-regua b.g{height:14px}
+.intro-nome .ac{color:#e2a83a}
+@keyframes barra{to{transform:scaleX(1)}}
+@keyframes tick{to{opacity:1}}
+@keyframes raio{0%{opacity:0;transform:translateY(-55%) scaleY(1.25)}60%{opacity:1}100%{opacity:1;transform:none}}
+@keyframes brilho{0%{filter:drop-shadow(0 0 0 rgba(226,168,58,0))}25%{filter:drop-shadow(0 0 14px rgba(226,168,58,.95))}100%{filter:drop-shadow(0 0 4px rgba(226,168,58,.35))}}
+@keyframes flash{0%{opacity:0}25%{opacity:.6}100%{opacity:0}}
 @keyframes letra{to{opacity:1;transform:none}}
-@keyframes regua{to{transform:scaleX(1)}}
-@keyframes tick{to{opacity:.85}}
-@keyframes intro-zoom{0%{transform:scale(.94)}75%{transform:scale(1)}100%{transform:scale(1.18)}}
+@keyframes intro-zoom{0%{transform:scale(.95)}32%{transform:scale(1)}33.5%{transform:translate(-4px,3px)}35%{transform:translate(4px,-2px)}36.5%{transform:translate(-2px,1px)}38%{transform:none}82%{transform:scale(1.02)}100%{transform:scale(1.2)}}
 @keyframes intro-out{to{opacity:0;visibility:hidden}}
-@media (prefers-reduced-motion:reduce){.intro{animation:intro-out .3s .6s forwards}.intro-in{animation:none}.intro-ic path,.intro-nome span,.intro-regua i,.intro-regua b{animation:none;opacity:1;transform:none;stroke-dashoffset:0}}
+@media (prefers-reduced-motion:reduce){.intro{animation:intro-out .3s .7s forwards}.intro-in,.intro-flash{animation:none}.intro-mark .bar,.intro-mark .tk,.intro-mark .bolt,.intro-nome span{animation:none;opacity:1;transform:none}}
 </style>
 
 
 </head>
 <body>
 <div class="intro" id="intro" aria-hidden="true">
+ <div class="intro-flash"></div>
  <div class="intro-in">
-  <svg class="intro-ic" viewBox="0 0 24 24"><path d="M6.5 12h11"/><path d="M6.5 6.5v11"/><path d="M17.5 6.5v11"/><path d="M3 9v6"/><path d="M21 9v6"/></svg>
-  <div class="intro-nome"><span style="animation-delay:0.45s">N</span><span style="animation-delay:0.51s">A</span><span class="esp"></span><span style="animation-delay:0.63s">R</span><span style="animation-delay:0.69s">É</span><span style="animation-delay:0.75s">G</span><span style="animation-delay:0.81s">U</span><span style="animation-delay:0.87s">A</span></div>
-  <div class="intro-regua"><i></i><b class="g" style="left:0.0%;animation-delay:1.150s"></b><b class="" style="left:5.0%;animation-delay:1.175s"></b><b class="" style="left:10.0%;animation-delay:1.200s"></b><b class="" style="left:15.0%;animation-delay:1.225s"></b><b class="" style="left:20.0%;animation-delay:1.250s"></b><b class="g" style="left:25.0%;animation-delay:1.275s"></b><b class="" style="left:30.0%;animation-delay:1.300s"></b><b class="" style="left:35.0%;animation-delay:1.325s"></b><b class="" style="left:40.0%;animation-delay:1.350s"></b><b class="" style="left:45.0%;animation-delay:1.375s"></b><b class="g" style="left:50.0%;animation-delay:1.400s"></b><b class="" style="left:55.0%;animation-delay:1.425s"></b><b class="" style="left:60.0%;animation-delay:1.450s"></b><b class="" style="left:65.0%;animation-delay:1.475s"></b><b class="" style="left:70.0%;animation-delay:1.500s"></b><b class="g" style="left:75.0%;animation-delay:1.525s"></b><b class="" style="left:80.0%;animation-delay:1.550s"></b><b class="" style="left:85.0%;animation-delay:1.575s"></b><b class="" style="left:90.0%;animation-delay:1.600s"></b><b class="" style="left:95.0%;animation-delay:1.625s"></b><b class="g" style="left:100.0%;animation-delay:1.650s"></b></div>
+  <svg class="intro-mark" viewBox="0 0 100 100"><rect class="bar" x="12" y="55.5" width="76" height="3.6" rx="1.8"/><path class="tk" d="M16 59v6" style="animation-delay:0.45s"/><path class="tk" d="M22 59v3.5" style="animation-delay:0.48s"/><path class="tk" d="M28 59v6" style="animation-delay:0.51s"/><path class="tk" d="M34 59v3.5" style="animation-delay:0.54s"/><path class="tk" d="M40 59v6" style="animation-delay:0.57s"/><path class="tk" d="M46 59v3.5" style="animation-delay:0.60s"/><path class="tk" d="M52 59v6" style="animation-delay:0.63s"/><path class="tk" d="M58 59v3.5" style="animation-delay:0.66s"/><path class="tk" d="M64 59v6" style="animation-delay:0.69s"/><path class="tk" d="M70 59v3.5" style="animation-delay:0.72s"/><path class="tk" d="M76 59v6" style="animation-delay:0.75s"/><path class="tk" d="M82 59v3.5" style="animation-delay:0.78s"/><polygon class="bolt" points="59,12 33,54 48,54 40,88 70,44 55,44 65,12"/></svg>
+  <div class="intro-nome"><span style="animation-delay:1.25s">N</span><span style="animation-delay:1.31s">A</span><span class="esp"></span><span style="animation-delay:1.43s">R</span><span style="animation-delay:1.49s">É</span><span style="animation-delay:1.55s">G</span><span style="animation-delay:1.61s">U</span><span style="animation-delay:1.67s">A</span></div>
  </div>
 </div>
 <main id="app"></main>
@@ -1871,7 +1874,7 @@ document.addEventListener('visibilitychange',()=>{if(document.visibilityState===
 
 startGate();if(!gate)fecharEsquecidos();render();
 (function(){const el=document.getElementById('intro');if(!el)return;const fimIntro=()=>{if(el.parentNode){el.style.transition='opacity .25s';el.style.opacity='0';setTimeout(()=>el.remove(),260)}};
-  if(document.documentElement.classList.contains('sem-intro')){el.remove();return}el.addEventListener('animationend',e=>{if(e.target===el)el.remove()});el.addEventListener('click',fimIntro);setTimeout(()=>{if(el.parentNode)el.remove()},3400)})();wake();if(!gate)loadPhotos();
+  if(document.documentElement.classList.contains('sem-intro')){el.remove();return}el.addEventListener('animationend',e=>{if(e.target===el)el.remove()});el.addEventListener('click',fimIntro);setTimeout(()=>{if(el.parentNode)el.remove()},3700)})();wake();if(!gate)loadPhotos();
 
 /* atualização automática: busca versão nova ao abrir e ao voltar para o app, e recarrega sozinho */
 if('serviceWorker' in navigator)window.addEventListener('load',async()=>{try{
