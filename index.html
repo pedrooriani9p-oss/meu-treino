@@ -7,6 +7,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Na Régua">
+<script>/* abertura: só quando o app é aberto (não em recarregamentos durante o uso) */
+try{if(sessionStorage.getItem('na-regua:aberto'))document.documentElement.classList.add('sem-intro');sessionStorage.setItem('na-regua:aberto','1')}catch(e){}</script>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-180.png">
@@ -416,11 +418,40 @@ body.lock{overflow:hidden}
 .av-cor[aria-pressed="true"]{box-shadow:0 0 0 3px var(--ink)}
 @media (max-width:380px){.av-icones{grid-template-columns:repeat(4,minmax(0,1fr))}.av-cores{grid-template-columns:repeat(4,minmax(0,1fr))}}
 [hidden]{display:none!important}
+
+/* ---------- abertura ---------- */
+.intro{position:fixed;inset:0;z-index:100;background:#141714;display:grid;place-items:center;overflow:hidden;cursor:pointer;
+  animation:intro-out .5s 2.35s cubic-bezier(.6,0,.4,1) forwards}
+.sem-intro .intro{display:none}
+.intro-in{display:grid;justify-items:center;gap:22px;animation:intro-zoom 2.85s cubic-bezier(.5,0,.2,1) forwards}
+.intro-ic{width:96px;height:96px;fill:none;stroke:#e2a83a;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.intro-ic path{stroke-dasharray:60;stroke-dashoffset:60;animation:draw .55s ease-out forwards}
+.intro-ic path:nth-child(2){animation-delay:.12s}.intro-ic path:nth-child(3){animation-delay:.24s}.intro-ic path:nth-child(4){animation-delay:.36s}.intro-ic path:nth-child(5){animation-delay:.5s}
+.intro-nome{display:flex;gap:.04em;font-family:var(--display);font-weight:700;font-size:clamp(3rem,15vw,5.2rem);line-height:1;letter-spacing:.06em;color:#eef0ec;text-transform:uppercase}
+.intro-nome span{display:inline-block;opacity:0;transform:translateY(40%);animation:letra .45s cubic-bezier(.2,.9,.3,1.2) forwards}
+.intro-nome .esp{width:.28em}
+.intro-regua{position:relative;width:min(78vw,340px);height:22px;overflow:hidden}
+.intro-regua i{position:absolute;left:0;top:0;height:3px;width:100%;background:#e2a83a;border-radius:2px;transform:scaleX(0);transform-origin:left;animation:regua .7s 1.05s cubic-bezier(.6,0,.2,1) forwards}
+.intro-regua b{position:absolute;top:3px;width:2px;height:8px;background:#e2a83a;opacity:0;animation:tick .2s forwards}
+.intro-regua b.g{height:14px}
+@keyframes letra{to{opacity:1;transform:none}}
+@keyframes regua{to{transform:scaleX(1)}}
+@keyframes tick{to{opacity:.85}}
+@keyframes intro-zoom{0%{transform:scale(.94)}75%{transform:scale(1)}100%{transform:scale(1.18)}}
+@keyframes intro-out{to{opacity:0;visibility:hidden}}
+@media (prefers-reduced-motion:reduce){.intro{animation:intro-out .3s .6s forwards}.intro-in{animation:none}.intro-ic path,.intro-nome span,.intro-regua i,.intro-regua b{animation:none;opacity:1;transform:none;stroke-dashoffset:0}}
 </style>
 
 
 </head>
 <body>
+<div class="intro" id="intro" aria-hidden="true">
+ <div class="intro-in">
+  <svg class="intro-ic" viewBox="0 0 24 24"><path d="M6.5 12h11"/><path d="M6.5 6.5v11"/><path d="M17.5 6.5v11"/><path d="M3 9v6"/><path d="M21 9v6"/></svg>
+  <div class="intro-nome"><span style="animation-delay:0.45s">N</span><span style="animation-delay:0.51s">A</span><span class="esp"></span><span style="animation-delay:0.63s">R</span><span style="animation-delay:0.69s">É</span><span style="animation-delay:0.75s">G</span><span style="animation-delay:0.81s">U</span><span style="animation-delay:0.87s">A</span></div>
+  <div class="intro-regua"><i></i><b class="g" style="left:0.0%;animation-delay:1.150s"></b><b class="" style="left:5.0%;animation-delay:1.175s"></b><b class="" style="left:10.0%;animation-delay:1.200s"></b><b class="" style="left:15.0%;animation-delay:1.225s"></b><b class="" style="left:20.0%;animation-delay:1.250s"></b><b class="g" style="left:25.0%;animation-delay:1.275s"></b><b class="" style="left:30.0%;animation-delay:1.300s"></b><b class="" style="left:35.0%;animation-delay:1.325s"></b><b class="" style="left:40.0%;animation-delay:1.350s"></b><b class="" style="left:45.0%;animation-delay:1.375s"></b><b class="g" style="left:50.0%;animation-delay:1.400s"></b><b class="" style="left:55.0%;animation-delay:1.425s"></b><b class="" style="left:60.0%;animation-delay:1.450s"></b><b class="" style="left:65.0%;animation-delay:1.475s"></b><b class="" style="left:70.0%;animation-delay:1.500s"></b><b class="g" style="left:75.0%;animation-delay:1.525s"></b><b class="" style="left:80.0%;animation-delay:1.550s"></b><b class="" style="left:85.0%;animation-delay:1.575s"></b><b class="" style="left:90.0%;animation-delay:1.600s"></b><b class="" style="left:95.0%;animation-delay:1.625s"></b><b class="g" style="left:100.0%;animation-delay:1.650s"></b></div>
+ </div>
+</div>
 <main id="app"></main>
 
 <div class="timer" id="timer" hidden>
@@ -1838,7 +1869,9 @@ document.getElementById('tSkip').onclick=()=>{clearInterval(tInt);tEl.hidden=tru
 let lock=null;async function wake(){try{if(tab==='treino'&&!sub&&!lock&&navigator.wakeLock){lock=await navigator.wakeLock.request('screen');lock.addEventListener('release',()=>lock=null)}else if((tab!=='treino'||sub)&&lock){lock.release();lock=null}}catch(e){}}
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){const t=mid(new Date());if(+t!==+TODAY){TODAY=t;sel=new Date(t)}fecharEsquecidos();render();wake()}});
 
-startGate();if(!gate)fecharEsquecidos();render();wake();if(!gate)loadPhotos();
+startGate();if(!gate)fecharEsquecidos();render();
+(function(){const el=document.getElementById('intro');if(!el)return;const fimIntro=()=>{if(el.parentNode){el.style.transition='opacity .25s';el.style.opacity='0';setTimeout(()=>el.remove(),260)}};
+  if(document.documentElement.classList.contains('sem-intro')){el.remove();return}el.addEventListener('animationend',e=>{if(e.target===el)el.remove()});el.addEventListener('click',fimIntro);setTimeout(()=>{if(el.parentNode)el.remove()},3400)})();wake();if(!gate)loadPhotos();
 
 /* atualização automática: busca versão nova ao abrir e ao voltar para o app, e recarrega sozinho */
 if('serviceWorker' in navigator)window.addEventListener('load',async()=>{try{
