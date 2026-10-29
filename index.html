@@ -509,6 +509,10 @@ body.lock{overflow:hidden}
 .addrow{display:flex;gap:8px;align-items:end}
 .addrow .bf{flex:1;min-width:0}
 .addrow .btn{height:44px;padding:0 14px}
+.plist.rm .pcard{position:relative;border-color:var(--warn);border-style:dashed}
+.rm-x{position:absolute;top:8px;right:8px;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:var(--warn);color:#fff;font-weight:700;font-size:1.05rem;line-height:1}
+.btn.danger{background:var(--warn);color:#fff}
+.rm-card{border-color:var(--warn)}
 </style>
 
 
@@ -1220,6 +1224,7 @@ function vProgresso(){
 function shrink(file){return new Promise((res,rej)=>{const im=new Image();const u=URL.createObjectURL(file);im.onload=()=>{const s=Math.min(1,1400/Math.max(im.width,im.height));const c=document.createElement('canvas');c.width=Math.round(im.width*s);c.height=Math.round(im.height*s);c.getContext('2d').drawImage(im,0,0,c.width,c.height);URL.revokeObjectURL(u);c.toBlob(b=>b?res(b):rej(new Error('blob')),'image/jpeg',.82)};im.onerror=()=>rej(new Error('img'));im.src=u})}
 const IDB={db:null,open(){return this.db||(this.db=new Promise((res,rej)=>{const r=indexedDB.open('meu-treino',1);r.onupgradeneeded=()=>r.result.createObjectStore('photos');r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)}))},
   async put(k,v){const db=await this.open();return new Promise((res,rej)=>{const t=db.transaction('photos','readwrite');t.objectStore('photos').put(v,k);t.oncomplete=res;t.onerror=()=>rej(t.error)})},
+  async del(k){const db=await this.open();return new Promise((res,rej)=>{const t=db.transaction('photos','readwrite');t.objectStore('photos').delete(k);t.oncomplete=res;t.onerror=()=>rej(t.error)})},
   async get(k){const db=await this.open();return new Promise((res,rej)=>{const r=db.transaction('photos').objectStore('photos').get(k);r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)})}};
 const photoURL={};
 async function loadPhotos(){for(const p of ((docs.photos||{}).items||[])){if(photoURL[p.id])continue;try{const b=await IDB.get(p.id);if(b)photoURL[p.id]=URL.createObjectURL(b)}catch(e){}}render()}
@@ -1359,7 +1364,7 @@ function vEditor(){const P=plans();const p=P.treino.lista[editId];if(!p){sub='pl
 function editPlan(fn,quiet){const P=plans();const p=P.treino.lista[editId];if(!p)return;fn(p);if(p.origem==='gerado'||p.origem==='professor')p.editado=true;savePlans(P,quiet)}
 
 /* ================= perfis ================= */
-let pinFor=null,pinMsg='',pinReset=false,pfEdit=null,pfMsg='',pfDel=false;
+let pinFor=null,pinMsg='',pinReset=false,pfEdit=null,pfMsg='',pfDel=false,rmModo=false,rmFor=null,rmMsg='',rmOk='';
 const OBJ_NOMES={hipertrofia:'Ganhar massa',forca:'Ganhar força',emagrecimento:'Emagrecer',saude:'Saúde e condicionamento'};
 const NIV_NOMES={iniciante:'Iniciante',intermediario:'Intermediário',avancado:'Avançado'};
 const LOC_NOMES={academia:'Academia',halteres:'Só halteres',casa:'Em casa'};
@@ -1373,7 +1378,7 @@ function saveProfs(P){lsSet('profiles',P)}
 const SKEY='na-regua:sessao';
 const sessGet=()=>{try{return sessionStorage.getItem(SKEY)}catch(e){return null}};
 const sessSet=id=>{try{id?sessionStorage.setItem(SKEY,id):sessionStorage.removeItem(SKEY)}catch(e){}};
-function enterProfile(id){const P=profs();P.last=id;saveProfs(P);PID=id;sessSet(id);loadDocs();plans();gate=null;pinFor=null;pinMsg='';pinReset=false;
+function enterProfile(id){rmModo=false;rmFor=null;rmOk='';const P=profs();P.last=id;saveProfs(P);PID=id;sessSet(id);loadDocs();plans();gate=null;pinFor=null;pinMsg='';pinReset=false;
   tab='hoje';sub=null;sel=new Date(TODAY);fecharEsquecidos();window.scrollTo(0,0);render();loadPhotos();wake()}
 function startGate(){const P=profs();const ids=Object.keys(P.list);
   if(!ids.length){gate='form';pfEdit=null;return}
@@ -1387,16 +1392,31 @@ function migrarLegado(){const moved=[];try{for(let i=0;i<localStorage.length;i++
   moved.forEach(k=>{const v=lsGet(k);const n=k.slice(4);if(n==='plans')temPlanos=true;lsSet(K(n),v)});moved.forEach(k=>{try{localStorage.removeItem(k)}catch(e){}});
   if(!temPlanos)lsSet(K('plans'),{treino:{ativo:SEED_TREINO.id,lista:{[SEED_TREINO.id]:clone(SEED_TREINO)}},dieta:{ativo:SEED_DIETA.id,lista:{[SEED_DIETA.id]:clone(SEED_DIETA)}}});
   return true}
-function deleteProfile(id){const pre='p:'+id+':doc:';const ks=[];try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith(pre))ks.push(k)}}catch(e){}
+function deleteProfile(id){const pre='p:'+id+':doc:';const ks=[];const fotos=((lsGet(pre+'photos')||{}).items||[]).map(x=>x.id);fotos.forEach(f=>{try{IDB.del(f).catch(()=>{})}catch(e){}});try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith(pre))ks.push(k)}}catch(e){}
   ks.forEach(k=>{try{localStorage.removeItem(k)}catch(e){}});if(sessGet()===id)sessSet(null);const P=profs();delete P.list[id];if(P.last===id)P.last=null;saveProfs(P)}
 
 /* ---------- telas ---------- */
 const brand=`<div class="brand"><span class="eyebrow">Na Régua</span></div>`;
 function vPicker(){const P=profs();const ids=Object.keys(P.list).sort((a,b)=>(a===P.last?-1:b===P.last?1:P.list[a].nome.localeCompare(P.list[b].nome)));
-  return `${brand}<h1 class="gate-h">Quem vai treinar?</h1>
-  <div class="plist">${ids.map(id=>{const p=P.list[id];return `<button class="pcard" data-pick="${id}">${avatarHtml(p)}<span class="pname">${esc(p.nome)}</span><span class="sub">${p.pin?'com PIN':'sem PIN'}</span></button>`}).join('')}
-   <button class="pcard novo" data-pnew="1"><span class="avatar">+</span><span class="pname">Novo perfil</span><span class="sub">para outra pessoa</span></button></div>
-  <p class="sub" style="text-align:center;margin:0">Cada perfil tem seus próprios treinos, dieta e registros, guardados só neste celular.</p>`}
+  if(rmFor&&P.list[rmFor]){const p=P.list[rmFor];
+    return `${brand}<div class="gate-card rm-card">${avatarHtml(p,'big-av')}<h2>Remover ${esc(p.nome)}?</h2>
+     <p style="margin:0;text-align:center">Apaga o perfil e tudo dele neste celular: treinos, dieta, missão, registros e fotos. <b>Não dá para desfazer.</b></p>
+     <p class="sub" style="margin:0;text-align:center">Se quiser guardar uma cópia, entre no perfil e use Progresso → Baixar backup antes.</p>
+     <form id="rmF" class="gform">${p.pin?`<label class="bf"><span class="sub">PIN de ${esc(p.nome)} para confirmar</span><input id="rm-pin" class="pin-in" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off" aria-label="PIN de 4 dígitos"></label>`:''}
+      <button class="btn danger" type="submit">Apagar perfil</button></form>
+     ${rmMsg?`<p class="msg">${esc(rmMsg)}</p>`:''}
+     <button class="link" data-rm="cancelar">Cancelar</button></div>`}
+  return `${brand}<h1 class="gate-h">${rmModo?'Qual perfil remover?':'Quem vai treinar?'}</h1>
+  ${rmOk?`<div class="note ok" style="text-align:center">${esc(rmOk)}</div>`:''}
+  <div class="plist${rmModo?' rm':''}">${ids.map(id=>{const p=P.list[id];return `<button class="pcard" ${rmModo?`data-rm="${id}" aria-label="Remover ${esc(p.nome)}"`:`data-pick="${id}"`}>${rmModo?'<span class="rm-x" aria-hidden="true">×</span>':''}${avatarHtml(p)}<span class="pname">${esc(p.nome)}</span><span class="sub">${rmModo?'tocar para remover':p.pin?'com PIN':'sem PIN'}</span></button>`}).join('')}
+   ${rmModo?'':`<button class="pcard novo" data-pnew="1"><span class="avatar">+</span><span class="pname">Novo perfil</span><span class="sub">para outra pessoa</span></button>`}</div>
+  ${rmModo?`<button class="btn ghost" data-rm="sair">Pronto</button>`:`<p class="sub" style="text-align:center;margin:0">Cada perfil tem seus próprios treinos, dieta e registros, guardados só neste celular.</p>
+  ${ids.length?`<button class="link" data-rm="modo" style="justify-self:center">Remover um perfil</button>`:''}`}`}
+async function submitRm(){const P=profs();const p=P.list[rmFor];if(!p){rmFor=null;render();return}
+  if(p.pin){const v=(document.getElementById('rm-pin')||{}).value||'';if(p.pin!==await hashPin(rmFor,v.trim())){rmMsg='PIN incorreto.';render();setTimeout(()=>{const i=document.getElementById('rm-pin');i&&i.focus()},50);return}}
+  const nome=p.nome;const era=PID===rmFor;deleteProfile(rmFor);rmFor=null;rmMsg='';if(era){PID=null;loadDocs()}
+  const resta=Object.keys(profs().list).length;rmModo=resta>0;rmOk=`Perfil de ${nome} removido.`;
+  if(!resta){rmModo=false;rmOk='';pfEdit=null;gate='form'}render()}
 function vPin(){const p=profs().list[pinFor];if(!p){gate='picker';return vPicker()}
   return `${brand}<div class="gate-card">${avatarHtml(p,'big-av')}<h2>${esc(p.nome)}</h2>
   ${pinReset?`<form id="resetF" class="gform"><p style="margin:0">Para redefinir o PIN, informe a data de nascimento cadastrada no perfil.</p>
@@ -2122,9 +2142,11 @@ app.addEventListener('click',e=>{
   if(ds.misdia){misSel=ds.misdia;render();return}
   if(ds.mis){misAcao(ds.mis);return}
   /* perfis */
+  if(ds.rm){if(ds.rm==='modo'){rmModo=true;rmOk='';render();return}if(ds.rm==='sair'){rmModo=false;rmOk='';render();return}if(ds.rm==='cancelar'){rmFor=null;rmMsg='';render();return}
+    rmFor=ds.rm;rmMsg='';rmOk='';window.scrollTo(0,0);render();setTimeout(()=>{const i=document.getElementById('rm-pin');i&&i.focus()},60);return}
   if(ds.pick){const p=profs().list[ds.pick];if(p&&p.pin){pinFor=ds.pick;pinMsg='';pinReset=false;gate='pin';render();setTimeout(()=>{const i=document.getElementById('pin-in');i&&i.focus()},60)}else enterProfile(ds.pick);return}
   if(ds.pnew){pfEdit=null;pfMsg='';gate='form';window.scrollTo(0,0);render();return}
-  if(ds.gate){if(ds.gate==='back'){pfEdit=null;pfDel=false;gate=null;render();return}if(ds.gate==='picker'){sessSet(null);ciOpen=false}gate=ds.gate;pfDel=false;pinMsg='';window.scrollTo(0,0);render();return}
+  if(ds.gate){if(ds.gate==='back'){pfEdit=null;pfDel=false;gate=null;render();return}if(ds.gate==='picker'){sessSet(null);ciOpen=false;rmModo=false;rmFor=null;rmOk=''}gate=ds.gate;pfDel=false;pinMsg='';window.scrollTo(0,0);render();return}
   if(ds.pinreset){pinReset=true;pinMsg='';render();return}
   if(ds.pedit){pfEdit=PID;pfMsg='';pfDel=false;gate='form';window.scrollTo(0,0);render();return}
   if(ds.pinoff){const P=profs();delete P.list[pfEdit].pin;saveProfs(P);pfMsg='PIN removido.';render();return}
@@ -2223,6 +2245,7 @@ app.addEventListener('submit',e=>{e.preventDefault();const f=e.target;
   if(f.id==='misF'){misSalvar();return}
   if(f.id==='pfF'){submitPerfil();return}
   if(f.id==='pinF'){submitPin();return}
+  if(f.id==='rmF'){submitRm();return}
   if(f.id==='resetF'){submitReset();return}
   if(f.id==='bodyF'){const B=clone(docs.body);B.e=B.e||{};const ent={};BODY.forEach(([k])=>{const v=num(document.getElementById('b-'+k).value);if(v!=='')ent[k]=v});
     document.activeElement&&document.activeElement.blur();if(Object.keys(ent).length)B.e[iso(TODAY)]=ent;else delete B.e[iso(TODAY)];save('body',B);return}
