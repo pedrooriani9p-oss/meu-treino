@@ -1,8 +1,8 @@
-# Na Régua
+# Ferrato
 
 *by Pedro Oriani*
 
-App de treino e dieta para o celular, feito para uso pessoal e entre amigos. Funciona offline e pode ser instalado na tela inicial.
+App de treino e dieta (ferro e prato) para o celular, feito para uso pessoal e entre amigos. Funciona offline e pode ser instalado na tela inicial.
 
 ## Instalar no celular
 

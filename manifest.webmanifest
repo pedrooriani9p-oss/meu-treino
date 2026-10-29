@@ -1,14 +1,14 @@
 {
- "name": "Na Régua",
- "short_name": "Na Régua",
- "description": "Treino e dieta na régua: treinos, cardápio, compras e progresso.",
+ "name": "Ferrato",
+ "short_name": "Ferrato",
+ "description": "Ferro e prato: treino, dieta, missão e progresso.",
  "lang": "pt-BR",
  "start_url": "./",
  "scope": "./",
  "display": "standalone",
  "orientation": "portrait",
- "background_color": "#141714",
- "theme_color": "#1d211c",
+ "background_color": "#0a0b0a",
+ "theme_color": "#0a0b0a",
  "icons": [
   {
    "src": "icon-192.png",

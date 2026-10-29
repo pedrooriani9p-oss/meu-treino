@@ -3,16 +3,16 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#1d211c">
+<meta name="theme-color" content="#0a0b0a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Na Régua">
+<meta name="apple-mobile-web-app-title" content="Ferrato">
 <script>/* abertura: só quando o app é aberto (não em recarregamentos durante o uso) */
-try{if(sessionStorage.getItem('na-regua:aberto'))document.documentElement.classList.add('sem-intro');sessionStorage.setItem('na-regua:aberto','1')}catch(e){}</script>
+try{document.documentElement.classList.add(sessionStorage.getItem('na-regua:aberto')?'sem-intro':'com-intro');sessionStorage.setItem('na-regua:aberto','1')}catch(e){}</script>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-180.png">
-<title>Na Régua</title>
+<title>Ferrato</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
 <style>
 /* Layout: app de uma coluna com barra de abas fixa embaixo; cronômetro de descanso flutua acima dela */
@@ -419,46 +419,57 @@ body.lock{overflow:hidden}
 @media (max-width:380px){.av-icones{grid-template-columns:repeat(4,minmax(0,1fr))}.av-cores{grid-template-columns:repeat(4,minmax(0,1fr))}}
 [hidden]{display:none!important}
 
-/* ---------- abertura: NR se enche como uma meta (0→100%), brilha e se abre como porta na haste do meio ---------- */
+/* ---------- abertura Ferrato: disco (anilha + prato) com F itálico que se enche de ferro derretido, esfria para dourado e abre como porta ---------- */
 .intro{position:fixed;inset:0;z-index:100;overflow:hidden;cursor:pointer}
-.intro.sai{transition:opacity .25s ease;opacity:0}
 .sem-intro .intro{display:none}
+.intro.sai{transition:opacity .25s ease;opacity:0}
 .porta{position:absolute;inset:0;background:#0a0b0a;display:grid;place-items:center;animation:.55s 1.7s cubic-bezier(.75,0,.25,1) both}
-.porta.e{clip-path:inset(0 50% 0 0);animation-name:abre-e}.porta.d{clip-path:inset(0 0 0 50%);animation-name:abre-d}
-.nr-box{display:grid;justify-items:center;gap:20px;transform:translateY(-4%)}
-.nr{width:min(54vw,220px);height:auto;overflow:visible;display:block;animation:pulsa .5s 1.12s ease-out both}
-.nr .contorno{fill:none;stroke:#e2a83a;stroke-width:1.6;stroke-dasharray:1;stroke-dashoffset:1;animation:traco .55s .1s cubic-bezier(.6,0,.3,1) both}
-.nr .vazio{fill:#161915}
-.nr .enche{animation:enche .85s .45s cubic-bezier(.55,.05,.35,1) both}
-.nr .borda{fill:#fff4d0}
-.nr .luz{opacity:0;animation:luz .55s 1.15s ease-in-out both}
-.nr-regua{position:relative;width:min(64vw,260px);height:12px}
-.nr-regua i{position:absolute;left:0;right:0;top:0;height:3px;border-radius:2px;background:#2a2f29}
-.nr-regua i::after{content:"";position:absolute;inset:0;border-radius:2px;background:#e2a83a;transform:scaleX(0);transform-origin:left;animation:regua .85s .45s cubic-bezier(.55,.05,.35,1) both}
-.nr-regua b{position:absolute;top:3px;width:1.5px;height:5px;background:#3d433a}
-.nr-regua b.g{height:9px}
-.nr-txt{position:relative;height:1.6rem;display:grid;place-items:center}
-.nr-by{font-family:var(--body);font-size:.82rem;letter-spacing:.14em;color:#8d9488;opacity:0;margin-top:-10px;animation:by-in .5s 1.32s ease both}
-.nr-by b{font-weight:600;color:#e2a83a;letter-spacing:.1em}
-@keyframes by-in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-.nr-nome{position:absolute;font-family:var(--display);font-weight:700;font-size:clamp(1.15rem,5.2vw,1.55rem);letter-spacing:.5em;margin-right:-.5em;color:#eef0ec;text-transform:uppercase;white-space:nowrap;opacity:0;animation:nome-in .45s 1.12s ease both}
-.fenda{position:absolute;top:0;bottom:0;left:50%;width:2px;margin-left:-1px;background:#fff4d0;box-shadow:0 0 18px 6px rgba(240,192,96,.7);opacity:0;transform:scaleY(0);animation:fenda .5s 1.55s ease both;z-index:2}
+.porta.e{clip-path:inset(0 calc(50% - 1px) 0 0);animation-name:abre-e}.porta.d{clip-path:inset(0 0 0 50%);animation-name:abre-d}
+.f-box{display:grid;justify-items:center;gap:22px;transform:translateY(-4%)}
+.f-marca{position:relative;width:min(56vw,220px);aspect-ratio:1;animation:chega .7s cubic-bezier(.2,.9,.3,1.15) both}
+.calor-bg{position:absolute;left:50%;top:50%;width:190%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(closest-side,rgba(255,110,30,.55),rgba(255,110,30,.18) 45%,transparent 72%);opacity:0;animation:respira 1.6s .4s ease-in-out both;pointer-events:none}
+.onda-v{fill:none}
+.fm .onda{animation:onda .55s linear infinite}
+.fm .onda.tras{animation:onda-t .8s linear infinite}
+.fm .borda{fill:none;stroke:#fff3c9;stroke-width:2}
+.fm .brilho{fill:none;stroke:#ffb347;stroke-width:9;opacity:.4}
+.choque{position:absolute;inset:0;border-radius:50%;border:1.5px solid #f3c25a;opacity:0;animation:choque .8s 1.22s cubic-bezier(.1,.6,.3,1) both;pointer-events:none}
+.ascua{position:absolute;bottom:-4%;width:var(--s);height:var(--s);border-radius:50%;background:#ffb04a;box-shadow:0 0 6px 1px rgba(255,140,40,.8);opacity:0;animation:sobe var(--d) var(--t) linear both}
+.f-nome span{display:inline-block;opacity:0;animation:letra .5s cubic-bezier(.2,.8,.2,1) both}
+.fm{width:100%;height:100%;display:block;overflow:visible;animation:calor 1.35s .42s ease-in-out both}
+.fm .vazio{fill:#161915}
+.fm .contorno{fill:none;stroke:#e2a83a;stroke-width:1.4;stroke-dasharray:1;stroke-dashoffset:1;animation:traco .6s .08s cubic-bezier(.6,0,.3,1) both}
+.fm .aro{fill:none;stroke:#e2a83a;stroke-width:.8;opacity:0;animation:aro .5s 1.2s ease both}
+.fm .enche{animation:enche .9s .42s cubic-bezier(.55,.05,.35,1) both}
+.fm .quente{animation:esfria .7s .95s ease-in both}
+.fa{position:absolute;left:var(--l);top:var(--tp);width:var(--s,4px);height:var(--s,4px);margin:-2px;border-radius:50%;background:#ffd27a;box-shadow:0 0 8px 2px rgba(255,150,50,.85);opacity:0;animation:faisca var(--d,.7s) var(--t) cubic-bezier(.15,.7,.3,1) both}
+.f-nome{font-family:var(--display);font-weight:700;font-size:clamp(1.2rem,7vw,1.6rem);letter-spacing:.5em;margin-right:-.5em;color:#eef0ec;text-transform:uppercase;white-space:nowrap}
+.f-by{font-family:var(--body);font-size:.8rem;letter-spacing:.14em;color:#8d9488;opacity:0;margin-top:-12px;animation:by-in .5s 1.32s ease both}
+.f-by b{font-weight:600;color:#e2a83a;letter-spacing:.1em}
+.fenda{position:absolute;top:0;bottom:0;left:50%;width:2px;margin-left:-1px;background:rgba(226,168,58,.55);opacity:0;transform:scaleY(0);animation:fenda .45s 1.5s ease both;z-index:2}
 @keyframes traco{to{stroke-dashoffset:0}}
-@keyframes enche{from{transform:translateY(176px)}to{transform:none}}
-@keyframes regua{to{transform:scaleX(1)}}
-@keyframes luz{0%{opacity:0;transform:translateX(-90px)}40%{opacity:.9}100%{opacity:0;transform:translateX(130px)}}
-@keyframes pulsa{0%{filter:drop-shadow(0 0 0 rgba(226,168,58,0));transform:scale(1)}40%{filter:drop-shadow(0 0 20px rgba(240,192,96,.7));transform:scale(1.04)}100%{filter:drop-shadow(0 0 6px rgba(226,168,58,.3));transform:scale(1)}}
-@keyframes some{to{opacity:0}}
+@keyframes enche{from{transform:translateY(192px)}to{transform:translateY(-10px)}}
+@keyframes esfria{to{opacity:0}}
+@keyframes aro{to{opacity:.55}}
+@keyframes calor{0%{filter:drop-shadow(0 0 0 rgba(255,120,30,0))}55%{filter:drop-shadow(0 0 14px rgba(255,130,40,.5))}100%{filter:drop-shadow(0 0 5px rgba(226,168,58,.28))}}
+@keyframes faisca{0%{opacity:0;transform:translate(0,0) scale(1)}12%{opacity:1}100%{opacity:0;transform:translate(var(--x),var(--y)) scale(.2)}}
+@keyframes chega{from{transform:scale(.86);opacity:0}to{transform:none;opacity:1}}
+@keyframes respira{0%{opacity:0}55%{opacity:.85}100%{opacity:.32}}
+@keyframes onda{to{transform:translateX(-50px)}}
+@keyframes onda-t{from{transform:translateX(-50px)}to{transform:none}}
+@keyframes choque{0%{opacity:0;transform:scale(1)}15%{opacity:.8}100%{opacity:0;transform:scale(1.45)}}
+@keyframes sobe{0%{opacity:0;transform:translate(0,0)}15%{opacity:var(--o)}80%{opacity:var(--o)}100%{opacity:0;transform:translate(var(--x),calc(-1 * var(--h)))}}
+@keyframes letra{0%{opacity:0;transform:translateY(12px);filter:blur(4px);color:#ff8a2a}60%{opacity:1;filter:blur(0);color:#ffc35a}100%{opacity:1;transform:none;color:#eef0ec}}
 @keyframes nome-in{from{opacity:0;letter-spacing:.9em;margin-right:-.9em}to{opacity:1;letter-spacing:.5em;margin-right:-.5em}}
-@keyframes fenda{0%{opacity:0;transform:scaleY(0)}45%{opacity:1;transform:scaleY(1)}100%{opacity:0;transform:scaleY(1)}}
+@keyframes by-in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@keyframes fenda{0%{opacity:0;transform:scaleY(0)}50%{opacity:1;transform:scaleY(1)}100%{opacity:0;transform:scaleY(1)}}
 @keyframes abre-e{to{transform:translateX(-52%)}}
 @keyframes abre-d{to{transform:translateX(52%)}}
-/* entrada do app depois da abertura */
-.entra #app>*{animation:entra-app .5s cubic-bezier(.2,.8,.2,1) both}
-.entra #app>*:nth-child(2){animation-delay:.06s}.entra #app>*:nth-child(3){animation-delay:.12s}.entra #app>*:nth-child(n+4){animation-delay:.18s}
-.entra .pcard{animation:entra-app .5s cubic-bezier(.2,.8,.2,1) both}.entra .pcard:nth-child(2){animation-delay:.08s}.entra .pcard:nth-child(3){animation-delay:.16s}
-@keyframes entra-app{from{opacity:0;transform:scale(.97)}to{opacity:1;transform:none}}
-@media (prefers-reduced-motion:reduce){.porta,.nr,.nr .contorno,.nr .enche,.nr .luz,.nr-regua i::after,.nr-nome,.nr-by,.fenda{animation:none}.nr .contorno{stroke-dashoffset:0}.nr-nome,.nr-by{opacity:1}.nr-regua i::after{transform:none}.fenda{display:none}.entra #app>*,.entra .pcard{animation:none}}
+
+/* o app cresce atrás da porta enquanto ela abre, no mesmo tempo: um movimento só, sem sumir e voltar */
+.com-intro #app{animation:entra-app .55s 1.7s cubic-bezier(.75,0,.25,1) both}
+@keyframes entra-app{from{transform:scale(.94)}to{transform:none}}
+@media (prefers-reduced-motion:reduce){.intro *{animation:none!important}.fm .contorno{stroke-dashoffset:0}.fm .quente,.fa,.ascua,.choque,.fenda{display:none}.f-nome span,.f-by,.f-marca{opacity:1}.calor-bg{opacity:.3}.com-intro #app{animation:none}}
 .eic{width:22px;height:22px;flex:none;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .eic.big{width:44px;height:44px;padding:9px;border-radius:14px;background:var(--accent-soft);color:var(--ink);stroke-width:1.6}
 .eic.mini{width:18px;height:18px;stroke-width:2}
@@ -518,46 +529,39 @@ body.lock{overflow:hidden}
 
 </head>
 <body>
-<div class="intro" id="intro" aria-hidden="true">
- <div class="porta e"><div class="nr-box">
-   <svg class="nr" viewBox="20 0 180 200">
-    <defs>
-     <clipPath id="nr-c"><path d="M28 188V12H56L97 124V12H146A48 48 0 0 1 157 106.7L190 188H161L131 108H123V188H97L54 76V188Z M123 36H146A24 24 0 0 1 146 84H123Z" clip-rule="evenodd"/></clipPath>
-     <linearGradient id="nr-ouro" gradientUnits="userSpaceOnUse" x1="0" y1="188" x2="0" y2="12"><stop offset="0" stop-color="#b47a14"/><stop offset=".55" stop-color="#e2a83a"/><stop offset="1" stop-color="#f6cf72"/></linearGradient>
-     <linearGradient id="nr-luz" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".8"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
-    </defs>
-    <path class="vazio" d="M28 188V12H56L97 124V12H146A48 48 0 0 1 157 106.7L190 188H161L131 108H123V188H97L54 76V188Z M123 36H146A24 24 0 0 1 146 84H123Z" fill-rule="evenodd"/>
-    <g clip-path="url(#nr-c)"><g class="enche"><rect x="20" y="12" width="180" height="190" fill="url(#nr-ouro)"/><rect class="borda" x="20" y="11" width="180" height="2.5"/></g>
-     <rect class="luz" x="40" y="0" width="56" height="200" fill="url(#nr-luz)" transform="skewX(-16)"/></g>
-    <path class="contorno" pathLength="1" d="M28 188V12H56L97 124V12H146A48 48 0 0 1 157 106.7L190 188H161L131 108H123V188H97L54 76V188Z M123 36H146A24 24 0 0 1 146 84H123Z"/>
-   </svg>
-   <div class="nr-regua"><i></i><b class="g" style="left:calc(0% - .75px)"></b><b class="" style="left:calc(5% - .75px)"></b><b class="" style="left:calc(10% - .75px)"></b><b class="" style="left:calc(15% - .75px)"></b><b class="" style="left:calc(20% - .75px)"></b><b class="g" style="left:calc(25% - .75px)"></b><b class="" style="left:calc(30% - .75px)"></b><b class="" style="left:calc(35% - .75px)"></b><b class="" style="left:calc(40% - .75px)"></b><b class="" style="left:calc(45% - .75px)"></b><b class="g" style="left:calc(50% - .75px)"></b><b class="" style="left:calc(55% - .75px)"></b><b class="" style="left:calc(60% - .75px)"></b><b class="" style="left:calc(65% - .75px)"></b><b class="" style="left:calc(70% - .75px)"></b><b class="g" style="left:calc(75% - .75px)"></b><b class="" style="left:calc(80% - .75px)"></b><b class="" style="left:calc(85% - .75px)"></b><b class="" style="left:calc(90% - .75px)"></b><b class="" style="left:calc(95% - .75px)"></b><b class="g" style="left:calc(100% - .75px)"></b></div>
-   <div class="nr-txt"><span class="nr-nome">Na Régua</span></div>
-   <div class="nr-by">by <b>Pedro Oriani</b></div>
-  </div></div>
- <div class="porta d"><div class="nr-box">
-   <svg class="nr" viewBox="20 0 180 200">
-    <defs>
-     <clipPath id="nr-c-d"><path d="M28 188V12H56L97 124V12H146A48 48 0 0 1 157 106.7L190 188H161L131 108H123V188H97L54 76V188Z M123 36H146A24 24 0 0 1 146 84H123Z" clip-rule="evenodd"/></clipPath>
-     <linearGradient id="nr-ouro-d" gradientUnits="userSpaceOnUse" x1="0" y1="188" x2="0" y2="12"><stop offset="0" stop-color="#b47a14"/><stop offset=".55" stop-color="#e2a83a"/><stop offset="1" stop-color="#f6cf72"/></linearGradient>
-     <linearGradient id="nr-luz-d" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".8"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
-    </defs>
-    <path class="vazio" d="M28 188V12H56L97 124V12H146A48 48 0 0 1 157 106.7L190 188H161L131 108H123V188H97L54 76V188Z M123 36H146A24 24 0 0 1 146 84H123Z" fill-rule="evenodd"/>
-    <g clip-path="url(#nr-c-d)"><g class="enche"><rect x="20" y="12" width="180" height="190" fill="url(#nr-ouro-d)"/><rect class="borda" x="20" y="11" width="180" height="2.5"/></g>
-     <rect class="luz" x="40" y="0" width="56" height="200" fill="url(#nr-luz-d)" transform="skewX(-16)"/></g>
-    <path class="contorno" pathLength="1" d="M28 188V12H56L97 124V12H146A48 48 0 0 1 157 106.7L190 188H161L131 108H123V188H97L54 76V188Z M123 36H146A24 24 0 0 1 146 84H123Z"/>
-   </svg>
-   <div class="nr-regua"><i></i><b class="g" style="left:calc(0% - .75px)"></b><b class="" style="left:calc(5% - .75px)"></b><b class="" style="left:calc(10% - .75px)"></b><b class="" style="left:calc(15% - .75px)"></b><b class="" style="left:calc(20% - .75px)"></b><b class="g" style="left:calc(25% - .75px)"></b><b class="" style="left:calc(30% - .75px)"></b><b class="" style="left:calc(35% - .75px)"></b><b class="" style="left:calc(40% - .75px)"></b><b class="" style="left:calc(45% - .75px)"></b><b class="g" style="left:calc(50% - .75px)"></b><b class="" style="left:calc(55% - .75px)"></b><b class="" style="left:calc(60% - .75px)"></b><b class="" style="left:calc(65% - .75px)"></b><b class="" style="left:calc(70% - .75px)"></b><b class="g" style="left:calc(75% - .75px)"></b><b class="" style="left:calc(80% - .75px)"></b><b class="" style="left:calc(85% - .75px)"></b><b class="" style="left:calc(90% - .75px)"></b><b class="" style="left:calc(95% - .75px)"></b><b class="g" style="left:calc(100% - .75px)"></b></div>
-   <div class="nr-txt"><span class="nr-nome">Na Régua</span></div>
-   <div class="nr-by">by <b>Pedro Oriani</b></div>
-  </div></div>
- <div class="fenda"></div>
-</div>
+<div class="intro" id="intro" aria-hidden="true"><div class="porta e"><i class="ascua" style="left:45.2%;--s:3.6px;--t:0.19s;--d:1.80s;--h:47vh;--x:-19px;--o:0.64"></i><i class="ascua" style="left:56.5%;--s:4.2px;--t:0.88s;--d:1.69s;--h:47vh;--x:-3px;--o:0.62"></i><i class="ascua" style="left:31.1%;--s:3.4px;--t:0.28s;--d:2.11s;--h:73vh;--x:-2px;--o:0.66"></i><i class="ascua" style="left:43.8%;--s:3.3px;--t:0.04s;--d:1.44s;--h:41vh;--x:12px;--o:0.74"></i><i class="ascua" style="left:32.9%;--s:3.2px;--t:0.60s;--d:2.22s;--h:64vh;--x:1px;--o:0.74"></i><i class="ascua" style="left:35.6%;--s:4.4px;--t:0.15s;--d:1.76s;--h:57vh;--x:14px;--o:0.74"></i><i class="ascua" style="left:24.4%;--s:3.0px;--t:0.56s;--d:2.30s;--h:51vh;--x:9px;--o:0.66"></i><i class="ascua" style="left:80.7%;--s:3.7px;--t:0.37s;--d:1.95s;--h:80vh;--x:-17px;--o:0.66"></i><i class="ascua" style="left:78.2%;--s:2.6px;--t:0.05s;--d:2.23s;--h:54vh;--x:7px;--o:0.44"></i><i class="ascua" style="left:71.2%;--s:2.3px;--t:0.79s;--d:2.29s;--h:74vh;--x:9px;--o:0.36"></i><i class="ascua" style="left:8.2%;--s:2.9px;--t:0.10s;--d:1.78s;--h:48vh;--x:-19px;--o:0.35"></i><i class="ascua" style="left:59.3%;--s:2.8px;--t:0.80s;--d:1.45s;--h:62vh;--x:15px;--o:0.73"></i><i class="ascua" style="left:84.6%;--s:3.5px;--t:0.63s;--d:2.33s;--h:61vh;--x:9px;--o:0.29"></i><i class="ascua" style="left:83.7%;--s:3.1px;--t:0.64s;--d:1.64s;--h:53vh;--x:-9px;--o:0.25"></i><i class="ascua" style="left:63.2%;--s:2.4px;--t:0.52s;--d:2.34s;--h:75vh;--x:-5px;--o:0.55"></i><i class="ascua" style="left:56.8%;--s:4.0px;--t:0.03s;--d:2.35s;--h:52vh;--x:6px;--o:0.41"></i><div class="f-box"><div class="f-marca"><div class="calor-bg"></div><svg class="fm" viewBox="0 0 200 200" aria-hidden="true"><defs>
+ <clipPath id="fc1"><path d="M80.3 46H142.3L137.3 70H101.3L97.1 90H125.1L120.5 112H92.5L83.7 154H57.7Z M6 100A94 94 0 1 0 194 100A94 94 0 1 0 6 100Z M20 100A80 80 0 1 1 180 100A80 80 0 1 1 20 100Z" clip-rule="evenodd"/></clipPath>
+ <linearGradient id="ouro1" gradientUnits="userSpaceOnUse" x1="0" y1="194" x2="0" y2="6"><stop offset="0" stop-color="#a86d0e"/><stop offset=".5" stop-color="#e2a83a"/><stop offset="1" stop-color="#f8d57e"/></linearGradient>
+ <linearGradient id="quente1" gradientUnits="userSpaceOnUse" x1="0" y1="194" x2="0" y2="6"><stop offset="0" stop-color="#b3260c"/><stop offset=".5" stop-color="#ff5a14"/><stop offset="1" stop-color="#ffb02e"/></linearGradient>
+ <linearGradient id="luz1" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".8"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient></defs>
+ <path class="vazio" d="M80.3 46H142.3L137.3 70H101.3L97.1 90H125.1L120.5 112H92.5L83.7 154H57.7Z M6 100A94 94 0 1 0 194 100A94 94 0 1 0 6 100Z M20 100A80 80 0 1 1 180 100A80 80 0 1 1 20 100Z" fill-rule="evenodd"/>
+ <g clip-path="url(#fc1)"><g class="enche">
+  <g class="onda tras"><path d="M-100 2 q12.5 -7 25 0 t25 0 q12.5 -7 25 0 t25 0 q12.5 -7 25 0 t25 0 q12.5 -7 25 0 t25 0 q12.5 -7 25 0 t25 0 q12.5 -7 25 0 t25 0 q12.5 -7 25 0 t25 0 q12.5 -7 25 0 t25 0 V260 H-100 Z" fill="#7a3a0c"/></g>
+  <g class="onda"><path d="M-100 7 q12.5 -7 25 0 t25 0 q12.5 -7 25 0 t25 0 q12.5 -7 25 0 t25 0 q12.5 -7 25 0 t25 0 q12.5 -7 25 0 t25 0 q12.5 -7 25 0 t25 0 q12.5 -7 25 0 t25 0 q12.5 -7 25 0 t25 0 V260 H-100 Z" fill="url(#ouro1)"/><path class="quente" d="M-100 7 q12.5 -7 25 0 t25 0 q12.5 -7 25 0 t25 0 q12.5 -7 25 0 t25 0 q12.5 -7 25 0 t25 0 q12.5 -7 25 0 t25 0 q12.5 -7 25 0 t25 0 q12.5 -7 25 0 t25 0 q12.5 -7 25 0 t25 0 V260 H-100 Z" fill="url(#quente1)"/><path class="brilho" d="M-100 7 q12.5 -7 25 0 t25 0 q12.5 -7 25 0 t25 0 q12.5 -7 25 0 t25 0 q12.5 -7 25 0 t25 0 q12.5 -7 25 0 t25 0 q12.5 -7 25 0 t25 0 q12.5 -7 25 0 t25 0 q12.5 -7 25 0 t25 0"/><path class="borda" d="M-100 7 q12.5 -7 25 0 t25 0 q12.5 -7 25 0 t25 0 q12.5 -7 25 0 t25 0 q12.5 -7 25 0 t25 0 q12.5 -7 25 0 t25 0 q12.5 -7 25 0 t25 0 q12.5 -7 25 0 t25 0 q12.5 -7 25 0 t25 0"/></g></g>
+  </g>
+ <circle class="aro" cx="100" cy="100" r="73"/>
+ <path class="contorno" pathLength="1" d="M80.3 46H142.3L137.3 70H101.3L97.1 90H125.1L120.5 112H92.5L83.7 154H57.7Z M6 100A94 94 0 1 0 194 100A94 94 0 1 0 6 100Z M20 100A80 80 0 1 1 180 100A80 80 0 1 1 20 100Z"/></svg><div class="choque"></div><i class="fa" style="--l:53.4%;--tp:94.9%;--t:0.57s;--d:0.54s;--s:3.2px;--x:-3px;--y:-75px"></i><i class="fa" style="--l:71.2%;--tp:92.4%;--t:0.60s;--d:0.71s;--s:3.7px;--x:-13px;--y:-95px"></i><i class="fa" style="--l:26.3%;--tp:85.1%;--t:0.68s;--d:0.67s;--s:3.2px;--x:10px;--y:-51px"></i><i class="fa" style="--l:49.3%;--tp:79.2%;--t:0.72s;--d:0.56s;--s:2.7px;--x:26px;--y:-108px"></i><i class="fa" style="--l:46.9%;--tp:74.5%;--t:0.75s;--d:0.83s;--s:3.1px;--x:-5px;--y:-79px"></i><i class="fa" style="--l:37.7%;--tp:62.4%;--t:0.83s;--d:0.56s;--s:5.5px;--x:-3px;--y:-56px"></i><i class="fa" style="--l:40.5%;--tp:53.6%;--t:0.87s;--d:0.55s;--s:4.8px;--x:-9px;--y:-65px"></i><i class="fa" style="--l:73.9%;--tp:47.5%;--t:0.90s;--d:0.58s;--s:5.2px;--x:-2px;--y:-57px"></i><i class="fa" style="--l:44.5%;--tp:35.2%;--t:0.97s;--d:0.77s;--s:4.5px;--x:-22px;--y:-56px"></i><i class="fa" style="--l:27.1%;--tp:28.7%;--t:1.02s;--d:0.52s;--s:3.7px;--x:11px;--y:-85px"></i><i class="fa" style="--l:40.2%;--tp:20.2%;--t:1.09s;--d:0.65s;--s:4.0px;--x:-4px;--y:-99px"></i><i class="fa" style="--l:46.6%;--tp:17.3%;--t:1.12s;--d:0.59s;--s:3.2px;--x:15px;--y:-49px"></i><i class="fa" style="--l:64.9%;--tp:13.8%;--t:1.16s;--d:0.80s;--s:5.4px;--x:26px;--y:-100px"></i><i class="fa" style="--l:57.9%;--tp:9.8%;--t:1.23s;--d:0.69s;--s:2.6px;--x:-11px;--y:-65px"></i><i class="fa" style="--l:44.0%;--tp:8.9%;--t:1.26s;--d:0.74s;--s:4.7px;--x:-14px;--y:-107px"></i><i class="fa" style="--l:42.1%;--tp:8.1%;--t:1.30s;--d:0.71s;--s:3.8px;--x:-25px;--y:-109px"></i></div>
+ <div class="f-nome"><span style="animation-delay:1.100s">F</span><span style="animation-delay:1.145s">e</span><span style="animation-delay:1.190s">r</span><span style="animation-delay:1.235s">r</span><span style="animation-delay:1.280s">a</span><span style="animation-delay:1.325s">t</span><span style="animation-delay:1.370s">o</span></div><div class="f-by">by <b>Pedro Oriani</b></div></div></div><div class="porta d"><i class="ascua" style="left:45.2%;--s:3.6px;--t:0.19s;--d:1.80s;--h:47vh;--x:-19px;--o:0.64"></i><i class="ascua" style="left:56.5%;--s:4.2px;--t:0.88s;--d:1.69s;--h:47vh;--x:-3px;--o:0.62"></i><i class="ascua" style="left:31.1%;--s:3.4px;--t:0.28s;--d:2.11s;--h:73vh;--x:-2px;--o:0.66"></i><i class="ascua" style="left:43.8%;--s:3.3px;--t:0.04s;--d:1.44s;--h:41vh;--x:12px;--o:0.74"></i><i class="ascua" style="left:32.9%;--s:3.2px;--t:0.60s;--d:2.22s;--h:64vh;--x:1px;--o:0.74"></i><i class="ascua" style="left:35.6%;--s:4.4px;--t:0.15s;--d:1.76s;--h:57vh;--x:14px;--o:0.74"></i><i class="ascua" style="left:24.4%;--s:3.0px;--t:0.56s;--d:2.30s;--h:51vh;--x:9px;--o:0.66"></i><i class="ascua" style="left:80.7%;--s:3.7px;--t:0.37s;--d:1.95s;--h:80vh;--x:-17px;--o:0.66"></i><i class="ascua" style="left:78.2%;--s:2.6px;--t:0.05s;--d:2.23s;--h:54vh;--x:7px;--o:0.44"></i><i class="ascua" style="left:71.2%;--s:2.3px;--t:0.79s;--d:2.29s;--h:74vh;--x:9px;--o:0.36"></i><i class="ascua" style="left:8.2%;--s:2.9px;--t:0.10s;--d:1.78s;--h:48vh;--x:-19px;--o:0.35"></i><i class="ascua" style="left:59.3%;--s:2.8px;--t:0.80s;--d:1.45s;--h:62vh;--x:15px;--o:0.73"></i><i class="ascua" style="left:84.6%;--s:3.5px;--t:0.63s;--d:2.33s;--h:61vh;--x:9px;--o:0.29"></i><i class="ascua" style="left:83.7%;--s:3.1px;--t:0.64s;--d:1.64s;--h:53vh;--x:-9px;--o:0.25"></i><i class="ascua" style="left:63.2%;--s:2.4px;--t:0.52s;--d:2.34s;--h:75vh;--x:-5px;--o:0.55"></i><i class="ascua" style="left:56.8%;--s:4.0px;--t:0.03s;--d:2.35s;--h:52vh;--x:6px;--o:0.41"></i><div class="f-box"><div class="f-marca"><div class="calor-bg"></div><svg class="fm" viewBox="0 0 200 200" aria-hidden="true"><defs>
+ <clipPath id="fc2"><path d="M80.3 46H142.3L137.3 70H101.3L97.1 90H125.1L120.5 112H92.5L83.7 154H57.7Z M6 100A94 94 0 1 0 194 100A94 94 0 1 0 6 100Z M20 100A80 80 0 1 1 180 100A80 80 0 1 1 20 100Z" clip-rule="evenodd"/></clipPath>
+ <linearGradient id="ouro2" gradientUnits="userSpaceOnUse" x1="0" y1="194" x2="0" y2="6"><stop offset="0" stop-color="#a86d0e"/><stop offset=".5" stop-color="#e2a83a"/><stop offset="1" stop-color="#f8d57e"/></linearGradient>
+ <linearGradient id="quente2" gradientUnits="userSpaceOnUse" x1="0" y1="194" x2="0" y2="6"><stop offset="0" stop-color="#b3260c"/><stop offset=".5" stop-color="#ff5a14"/><stop offset="1" stop-color="#ffb02e"/></linearGradient>
+ <linearGradient id="luz2" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".8"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient></defs>
+ <path class="vazio" d="M80.3 46H142.3L137.3 70H101.3L97.1 90H125.1L120.5 112H92.5L83.7 154H57.7Z M6 100A94 94 0 1 0 194 100A94 94 0 1 0 6 100Z M20 100A80 80 0 1 1 180 100A80 80 0 1 1 20 100Z" fill-rule="evenodd"/>
+ <g clip-path="url(#fc2)"><g class="enche">
+  <g class="onda tras"><path d="M-100 2 q12.5 -7 25 0 t25 0 q12.5 -7 25 0 t25 0 q12.5 -7 25 0 t25 0 q12.5 -7 25 0 t25 0 q12.5 -7 25 0 t25 0 q12.5 -7 25 0 t25 0 q12.5 -7 25 0 t25 0 q12.5 -7 25 0 t25 0 V260 H-100 Z" fill="#7a3a0c"/></g>
+  <g class="onda"><path d="M-100 7 q12.5 -7 25 0 t25 0 q12.5 -7 25 0 t25 0 q12.5 -7 25 0 t25 0 q12.5 -7 25 0 t25 0 q12.5 -7 25 0 t25 0 q12.5 -7 25 0 t25 0 q12.5 -7 25 0 t25 0 q12.5 -7 25 0 t25 0 V260 H-100 Z" fill="url(#ouro2)"/><path class="quente" d="M-100 7 q12.5 -7 25 0 t25 0 q12.5 -7 25 0 t25 0 q12.5 -7 25 0 t25 0 q12.5 -7 25 0 t25 0 q12.5 -7 25 0 t25 0 q12.5 -7 25 0 t25 0 q12.5 -7 25 0 t25 0 q12.5 -7 25 0 t25 0 V260 H-100 Z" fill="url(#quente2)"/><path class="brilho" d="M-100 7 q12.5 -7 25 0 t25 0 q12.5 -7 25 0 t25 0 q12.5 -7 25 0 t25 0 q12.5 -7 25 0 t25 0 q12.5 -7 25 0 t25 0 q12.5 -7 25 0 t25 0 q12.5 -7 25 0 t25 0 q12.5 -7 25 0 t25 0"/><path class="borda" d="M-100 7 q12.5 -7 25 0 t25 0 q12.5 -7 25 0 t25 0 q12.5 -7 25 0 t25 0 q12.5 -7 25 0 t25 0 q12.5 -7 25 0 t25 0 q12.5 -7 25 0 t25 0 q12.5 -7 25 0 t25 0 q12.5 -7 25 0 t25 0"/></g></g>
+  </g>
+ <circle class="aro" cx="100" cy="100" r="73"/>
+ <path class="contorno" pathLength="1" d="M80.3 46H142.3L137.3 70H101.3L97.1 90H125.1L120.5 112H92.5L83.7 154H57.7Z M6 100A94 94 0 1 0 194 100A94 94 0 1 0 6 100Z M20 100A80 80 0 1 1 180 100A80 80 0 1 1 20 100Z"/></svg><div class="choque"></div><i class="fa" style="--l:53.4%;--tp:94.9%;--t:0.57s;--d:0.54s;--s:3.2px;--x:-3px;--y:-75px"></i><i class="fa" style="--l:71.2%;--tp:92.4%;--t:0.60s;--d:0.71s;--s:3.7px;--x:-13px;--y:-95px"></i><i class="fa" style="--l:26.3%;--tp:85.1%;--t:0.68s;--d:0.67s;--s:3.2px;--x:10px;--y:-51px"></i><i class="fa" style="--l:49.3%;--tp:79.2%;--t:0.72s;--d:0.56s;--s:2.7px;--x:26px;--y:-108px"></i><i class="fa" style="--l:46.9%;--tp:74.5%;--t:0.75s;--d:0.83s;--s:3.1px;--x:-5px;--y:-79px"></i><i class="fa" style="--l:37.7%;--tp:62.4%;--t:0.83s;--d:0.56s;--s:5.5px;--x:-3px;--y:-56px"></i><i class="fa" style="--l:40.5%;--tp:53.6%;--t:0.87s;--d:0.55s;--s:4.8px;--x:-9px;--y:-65px"></i><i class="fa" style="--l:73.9%;--tp:47.5%;--t:0.90s;--d:0.58s;--s:5.2px;--x:-2px;--y:-57px"></i><i class="fa" style="--l:44.5%;--tp:35.2%;--t:0.97s;--d:0.77s;--s:4.5px;--x:-22px;--y:-56px"></i><i class="fa" style="--l:27.1%;--tp:28.7%;--t:1.02s;--d:0.52s;--s:3.7px;--x:11px;--y:-85px"></i><i class="fa" style="--l:40.2%;--tp:20.2%;--t:1.09s;--d:0.65s;--s:4.0px;--x:-4px;--y:-99px"></i><i class="fa" style="--l:46.6%;--tp:17.3%;--t:1.12s;--d:0.59s;--s:3.2px;--x:15px;--y:-49px"></i><i class="fa" style="--l:64.9%;--tp:13.8%;--t:1.16s;--d:0.80s;--s:5.4px;--x:26px;--y:-100px"></i><i class="fa" style="--l:57.9%;--tp:9.8%;--t:1.23s;--d:0.69s;--s:2.6px;--x:-11px;--y:-65px"></i><i class="fa" style="--l:44.0%;--tp:8.9%;--t:1.26s;--d:0.74s;--s:4.7px;--x:-14px;--y:-107px"></i><i class="fa" style="--l:42.1%;--tp:8.1%;--t:1.30s;--d:0.71s;--s:3.8px;--x:-25px;--y:-109px"></i></div>
+ <div class="f-nome"><span style="animation-delay:1.100s">F</span><span style="animation-delay:1.145s">e</span><span style="animation-delay:1.190s">r</span><span style="animation-delay:1.235s">r</span><span style="animation-delay:1.280s">a</span><span style="animation-delay:1.325s">t</span><span style="animation-delay:1.370s">o</span></div><div class="f-by">by <b>Pedro Oriani</b></div></div></div><div class="fenda"></div></div>
 <script>
-(function(){const el=document.getElementById('intro');if(!el||document.documentElement.classList.contains('sem-intro'))return;
- const reduz=matchMedia('(prefers-reduced-motion: reduce)').matches;let fim=false;const R=document.documentElement;
- function sair(){if(fim)return;fim=true;R.classList.add('entra');el.classList.add('sai');setTimeout(()=>el.remove(),260);setTimeout(()=>R.classList.remove('entra'),1000)}
- el.addEventListener('click',sair);setTimeout(sair,reduz?1000:2250)})();
+/* abertura: no fim natural a porta já saiu da tela, então só remove (sem esmaecer); um toque pula */
+(function(){const el=document.getElementById('intro');const R=document.documentElement;if(!el||R.classList.contains('sem-intro'))return;
+ const reduz=matchMedia('(prefers-reduced-motion: reduce)').matches;let fim=false;
+ const limpa=()=>{el.remove();R.classList.remove('com-intro')};
+ function acabou(){if(fim)return;fim=true;limpa()}
+ function pular(){if(fim)return;fim=true;const a=document.getElementById('app');try{a&&a.getAnimations&&a.getAnimations().forEach(x=>x.finish())}catch(e){}el.classList.add('sai');setTimeout(limpa,260)}
+ el.addEventListener('click',pular);setTimeout(reduz?pular:acabou,reduz?900:2300)})();
 </script>
 <main id="app"></main>
 
@@ -582,7 +586,7 @@ body.lock{overflow:hidden}
 /* imagens: Free Exercise DB (github.com/yuhonas/free-exercise-db), domínio público (Unlicense) */
 const IMG={"supino_reto_barra":"Barbell_Bench_Press_-_Medium_Grip","supino_reto_h":"Dumbbell_Bench_Press","supino_incl_h":"Incline_Dumbbell_Press","supino_maq":"Machine_Bench_Press","crucifixo_h":"Dumbbell_Flyes","crossover":"Cable_Crossover","peck_deck":"Butterfly","flexao":"Pushups","flexao_incl":"Incline_Push-Up","supino_elast":"Bench_Press_-_With_Bands","crucifixo_elast":"Cross_Over_-_With_Bands","puxada_frente":"Wide-Grip_Lat_Pulldown","remada_baixa":"Seated_Cable_Rows","remada_unil":"One-Arm_Dumbbell_Row","remada_curv_barra":"Bent_Over_Barbell_Row","remada_curv_h":"Bent_Over_Two-Dumbbell_Row","barra_fixa":"Pullups","pulldown":"Straight-Arm_Pulldown","remada_elast":"Seated_Cable_Rows","remada_invert":"Inverted_Row","pullover_h":"Bent-Arm_Dumbbell_Pullover","remada_maq":"Leverage_Iso_Row","desenv_h":"Dumbbell_Shoulder_Press","desenv_maq":"Machine_Shoulder_Military_Press","desenv_elast":"Shoulder_Press_-_With_Bands","desenv_arnold":"Arnold_Dumbbell_Press","elev_lat_h":"Side_Lateral_Raise","elev_lat_cabo":"Cable_Seated_Lateral_Raise","elev_lat_elast":"Lateral_Raise_-_With_Bands","elev_lat_maq":"Side_Lateral_Raise","crucifixo_inv_h":"Reverse_Flyes","face_pull":"Face_Pull","voador_inv":"Reverse_Machine_Flyes","face_pull_elast":"Band_Pull_Apart","y_solo":"Lying_Rear_Delt_Raise","rosca_barra":"Barbell_Curl","rosca_alt":"Dumbbell_Alternate_Bicep_Curl","rosca_martelo":"Hammer_Curls","rosca_conc":"Concentration_Curls","rosca_cabo":"Standing_Biceps_Cable_Curl","rosca_elast":"Close-Grip_EZ-Bar_Curl_with_Band","triceps_pulley":"Triceps_Pushdown","triceps_testa":"Decline_Dumbbell_Triceps_Extension","triceps_frances":"Dumbbell_One-Arm_Triceps_Extension","triceps_banco":"Bench_Dips","triceps_elast":"Band_Skull_Crusher","flexao_fechada":"Push-Ups_-_Close_Triceps_Position","triceps_coice":"Tricep_Dumbbell_Kickback","agach_barra":"Barbell_Squat","agach_goblet":"Goblet_Squat","agach_sumo":"Plie_Dumbbell_Squat","leg_press":"Leg_Press","hack":"Hack_Squat","extensora":"Leg_Extensions","afundo_h":"Dumbbell_Lunges","bulgaro":"Split_Squat_with_Dumbbells","agach_corpo":"Bodyweight_Squat","afundo_corpo":"Bodyweight_Walking_Lunge","agach_elast":"Box_Squat_with_Bands","step_up":"Dumbbell_Step_Ups","stiff_h":"Stiff-Legged_Dumbbell_Deadlift","stiff_barra":"Stiff-Legged_Barbell_Deadlift","mesa_flex":"Lying_Leg_Curls","cadeira_flex":"Seated_Leg_Curl","romeno_elast":"Band_Good_Morning_Pull_Through","flexora_toalha":"Ball_Leg_Curl","bom_dia":"Good_Morning","flexora_elast":"Lying_Leg_Curls","elev_pelv_barra":"Barbell_Hip_Thrust","elev_pelv_h":"Barbell_Glute_Bridge","ponte":"Butt_Lift_Bridge","ponte_unil":"Single_Leg_Glute_Bridge","abdutora":"Thigh_Abductor","gluteo_cabo":"One-Legged_Cable_Kickback","pant_maq":"Standing_Calf_Raises","pant_h":"Calf_Raise_On_A_Dumbbell","pant_degrau":"Rocking_Standing_Calf_Raise","pant_sentado":"Seated_Calf_Raise","prancha":"Plank","prancha_lat":"Push_Up_to_Side_Plank","crunch":"Crunches","dead_bug":"Dead_Bug","elev_pernas":"Flat_Bench_Lying_Leg_Raise","pallof":"Pallof_Press","pallof_elast":"Pallof_Press","rosca_punho":"Seated_Dumbbell_Palms-Up_Wrist_Curl","rosca_punho_inv":"Seated_Dumbbell_Palms-Down_Wrist_Curl","rosca_inv_barra":"Reverse_Barbell_Curl","rosca_inv_cabo":"Reverse_Cable_Curl","farmer":"Farmers_Walk","rosca_punho_elast":"Seated_Dumbbell_Palms-Up_Wrist_Curl","pendurar":"One_Handed_Hang","rolo_punho":"Wrist_Roller","encolh_h":"Dumbbell_Shrug","encolh_barra":"Barbell_Shrug","encolh_maq":"Leverage_Shrug","encolh_elast":"Dumbbell_Shrug","remada_alta_cabo":"Standing_Dumbbell_Upright_Row","a1":"Dumbbell_Bench_Press","a2":"Incline_Dumbbell_Press","a3":"Dumbbell_Flyes","a4":"Dumbbell_Shoulder_Press","a5":"Side_Lateral_Raise","a6":"Decline_Dumbbell_Triceps_Extension","a7":"Bench_Dips","b1":"Wide-Grip_Lat_Pulldown","b2":"One-Arm_Dumbbell_Row","b3":"Straight-Arm_Pulldown","b4":"Reverse_Flyes","b5":"Dumbbell_Alternate_Bicep_Curl","b6":"Hammer_Curls","b7":"Concentration_Curls","c1":"Plie_Dumbbell_Squat","c2":"Leg_Press","c3":"Dumbbell_Lunges","c4":"Stiff-Legged_Dumbbell_Deadlift","c5":"Lying_Leg_Curls","c6":"Standing_Calf_Raises","c7":"Plank","supino_incl_barra":"Barbell_Incline_Bench_Press_-_Medium_Grip","supino_decl_barra":"Decline_Barbell_Bench_Press","supino_decl_h":"Decline_Dumbbell_Bench_Press","supino_neutro_h":"Dumbbell_Bench_Press_with_Neutral_Grip","crucifixo_incl_h":"Incline_Dumbbell_Flyes","crossover_baixo":"Low_Cable_Crossover","supino_smith":"Smith_Machine_Bench_Press","supino_incl_maq":"Leverage_Incline_Chest_Press","supino_articulado":"Leverage_Chest_Press","mergulho_peito":"Dips_-_Chest_Version","flexao_decl":"Decline_Push-Up","flexao_aberta":"Push-Up_Wide","puxada_fechada":"Close-Grip_Front_Lat_Pulldown","puxada_triangulo":"V-Bar_Pulldown","puxada_unil":"One_Arm_Lat_Pulldown","remada_cavalinho":"T-Bar_Row_with_Handle","remada_smith":"Smith_Machine_Bent_Over_Row","remada_alta_maq":"Leverage_High_Row","remada_unil_cabo":"Seated_One-arm_Cable_Pulley_Rows","pulldown_corda":"Rope_Straight-Arm_Pulldown","barra_assistida":"Band_Assisted_Pull-Up","barra_supinada":"Chin-Up","hiperextensao":"Hyperextensions_Back_Extensions","superman":"Superman","desenv_barra":"Standing_Military_Press","desenv_sent_h":"Seated_Dumbbell_Press","desenv_smith":"Smith_Machine_Overhead_Shoulder_Press","elev_frontal_h":"Front_Dumbbell_Raise","elev_frontal_anilha":"Front_Plate_Raise","elev_frontal_cabo":"Front_Cable_Raise","elev_lat_unil":"One-Arm_Side_Laterals","crucifixo_inv_cabo":"Cable_Rear_Delt_Fly","rosca_direta_h":"Dumbbell_Bicep_Curl","rosca_w":"EZ-Bar_Curl","rosca_scott":"Preacher_Curl","rosca_scott_maq":"Machine_Preacher_Curls","rosca_scott_unil":"One_Arm_Dumbbell_Preacher_Curl","rosca_incl":"Incline_Dumbbell_Curl","rosca_martelo_corda":"Cable_Hammer_Curls_-_Rope_Attachment","rosca_spider":"Spider_Curl","rosca_maq":"Machine_Bicep_Curl","rosca_zottman":"Zottman_Curl","triceps_corda":"Triceps_Pushdown_-_Rope_Attachment","triceps_inv":"Reverse_Grip_Triceps_Pushdown","triceps_testa_barra":"EZ-Bar_Skullcrusher","triceps_frances_corda":"Cable_Rope_Overhead_Triceps_Extension","triceps_sent_h":"Seated_Triceps_Press","supino_fechado":"Close-Grip_Barbell_Bench_Press","mergulho_triceps":"Dips_-_Triceps_Version","triceps_maq":"Machine_Triceps_Extension","agach_frontal":"Front_Barbell_Squat_To_A_Bench","agach_smith":"Smith_Machine_Squat","agach_aberto":"Wide_Stance_Barbell_Squat","agach_banco_h":"Dumbbell_Squat_To_A_Bench","agach_cadeira":"Chair_Squat","leg_press_fechado":"Narrow_Stance_Leg_Press","afundo_barra":"Barbell_Lunge","passada":"Barbell_Walking_Lunge","afundo_reverso":"Dumbbell_Rear_Lunge","step_up_barra":"Barbell_Step_Ups","extensora_unil":"Single-Leg_Leg_Extension","terra_romeno":"Romanian_Deadlift","terra":"Barbell_Deadlift","terra_sumo":"Sumo_Deadlift","bom_dia_barra":"Good_Morning","flexora_em_pe":"Standing_Leg_Curl","nordico":"Floor_Glute-Ham_Raise","ponte_barra":"Barbell_Glute_Bridge","elev_pelv_smith":"Smith_Machine_Hip_Raise","coice_4apoios":"Glute_Kickback","pull_through":"Pull_Through","adutora":"Thigh_Adductor","adutor_cabo":"Cable_Hip_Adduction","monster_walk":"Monster_Walk","ponte_elast":"Hip_Lift_with_Band","pant_leg_press":"Calf_Press_On_The_Leg_Press_Machine","pant_smith":"Smith_Machine_Calf_Raise","pant_burrinho":"Donkey_Calf_Raises","pant_barra":"Standing_Barbell_Calf_Raise","pant_sent_h":"Dumbbell_Seated_One-Leg_Calf_Raise","pant_elast":"Calf_Raises_-_With_Bands","abd_polia":"Cable_Crunch","abd_maq":"Ab_Crunch_Machine","elev_pernas_barra":"Hanging_Leg_Raise","elev_joelhos_paralela":"Knee_Hip_Raise_On_Parallel_Bars","abd_bicicleta":"Air_Bike","abd_obliquo":"Cross-Body_Crunch","russian_twist":"Russian_Twist","abd_infra":"Reverse_Crunch","roda_abd":"Ab_Roller","escalador":"Mountain_Climbers","canivete":"Jackknife_Sit-Up","abd_declinado":"Decline_Crunch","abd_tesoura":"Flutter_Kicks","abd_remador":"Sit-Up","abd_calcanhar":"Alternate_Heel_Touchers","russian_cabo":"Cable_Russian_Twists","rosca_punho_barra":"Seated_Palm-Up_Barbell_Wrist_Curl","rosca_punho_costas":"Standing_Palms-Up_Barbell_Behind_The_Back_Wrist_Curl","pinca_anilha":"Plate_Pinch","encolh_cabo":"Cable_Shrugs","encolh_smith":"Smith_Machine_Behind_the_Back_Shrug","remada_alta_h":"Standing_Dumbbell_Upright_Row","remada_alta_barra":"Upright_Barbell_Row"};
 
-/* ================= Na Régua · dados ================= */
+/* ================= Ferrato · dados ================= */
 const DW=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
 const DWL=['domingo','segunda','terça','quarta','quinta','sexta','sábado'];
 
@@ -1074,7 +1078,7 @@ function vHoje(){
     <h3>${esc(nm[2])}</h3><ul style="margin:0;padding-left:18px;font-size:.9rem">${nm[3].map(itemHtml).join('')}</ul>
     <button class="btn" data-k="m-${nm[0]}">Marcar como feita</button></section>`:(meals(d).length?`<section class="card"><span class="label">Refeições</span><h3>Todas feitas hoje</h3></section>`:'');
   else ref=`<section class="card"><span class="label">Alimentação</span><h3>Orientações gerais</h3><p class="sub" style="margin:0">Você não tem um plano de nutricionista no app. Veja as orientações básicas na aba Dieta.</p><button class="btn ghost" data-go="dieta">Ver orientações</button></section>`;
-  return `<div class="head"><div><p class="eyebrow">Na Régua</p><p class="sub" style="margin:0">${greet}${prof().nome?', '+esc(prof().nome):''} · ${DWL[d.getDay()]}, ${ddmm(d)}</p><h1>Hoje</h1></div>${avatarHtml(prof(),'av-btn','button','data-gate="picker" aria-label="Trocar de perfil"')}</div>
+  return `<div class="head"><div><p class="eyebrow">Ferrato</p><p class="sub" style="margin:0">${greet}${prof().nome?', '+esc(prof().nome):''} · ${DWL[d.getDay()]}, ${ddmm(d)}</p><h1>Hoje</h1></div>${avatarHtml(prof(),'av-btn','button','data-gate="picker" aria-label="Trocar de perfil"')}</div>
   ${ph?`<span class="chip">${esc(ph)}</span>`:''}
   <section class="card hero"><div class="row" style="align-items:end"><div><div class="big">${p.total?Math.round(p.done/p.total*100):0}%</div><span class="sub">${p.done} de ${p.total} itens do dia</span></div>
    <div style="text-align:right"><div class="big" style="font-size:2rem">${st}</div><span class="sub">${st===1?'dia seguido':'dias seguidos'} acima de 80%</span></div></div>
@@ -1233,7 +1237,7 @@ async function addPhoto(file){photoMsg='Salvando foto...';render();
     const P=clone(docs.photos);P.items=(P.items||[]).concat({id,d:iso(TODAY)});photoMsg='Foto salva neste celular.';save('photos',P)}
   catch(e){photoMsg='Não consegui salvar a foto. Tente de novo.';render()}}
 function baixar(nome,obj){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(obj,null,1)],{type:'application/json'}));a.download=nome;document.body.appendChild(a);a.click();a.remove()}
-function exportBackup(){plans();baixar('na-regua-backup-'+iso(TODAY)+'.json',{app:'na-regua',v:2,em:new Date().toISOString(),docs})}
+function exportBackup(){plans();baixar('ferrato-backup-'+iso(TODAY)+'.json',{app:'ferrato',v:2,em:new Date().toISOString(),docs})}
 async function importBackup(file){try{const j=JSON.parse(await file.text());if(!j||!j.docs)throw 0;
   for(const [k,v] of Object.entries(j.docs)){docs[k]=v;lsSet(K(k),v)}backupMsg='Backup restaurado ('+Object.keys(j.docs).length+' registros).';render()}catch(e){backupMsg='Esse arquivo não é um backup válido do app.';render()}}
 
@@ -1260,7 +1264,7 @@ function vPlanos(){const P=plans();
    <div>${ld.map(p=>planRow('dieta',p,P.dieta.ativo===p.id)).join('')||'<p class="sub">Nenhum plano alimentar.</p>'}</div>
    ${P.dieta.ativo?`<button class="btn ghost" data-semdieta="1">Usar só orientações gerais</button>`:'<p class="sub" style="margin:0">Usando orientações gerais (sem plano de nutricionista).</p>'}</section>
   <section class="card"><span class="label">Importar plano</span>
-   <p style="margin:0">Recebeu um arquivo de plano do Na Régua? Abra por aqui.</p>
+   <p style="margin:0">Recebeu um arquivo de plano do Ferrato? Abra por aqui.</p>
    <label class="btn" for="impIn" style="cursor:pointer">Abrir arquivo de plano</label><input type="file" id="impIn" accept="application/json,.json" hidden>
    <p class="sub" style="margin:0">Tem o treino do professor ou a dieta do nutricionista em PDF, print ou foto? Mande para quem te passou o app: com a ajuda do Claude, ele vira um arquivo de plano para abrir aqui.</p></section>`}
 
@@ -1270,7 +1274,7 @@ function validPlan(p){if(!p||typeof p!=='object')return null;
 async function importPlan(file){try{const j=JSON.parse(await file.text());const p=j.plano||j;const tipo=validPlan(p);if(!tipo)throw 0;
   const P=plans();let id=p.id||(tipo[0]+'-'+Date.now().toString(36));if(P[tipo].lista[id])id=id+'-'+Date.now().toString(36).slice(-4);
   p.id=id;p.criado=p.criado||iso(TODAY);p.origem=p.origem||'importado';P[tipo].lista[id]=p;P[tipo].ativo=id;planMsg=`Plano "${p.nome||'sem nome'}" importado e ativado.`;savePlans(P)}
-  catch(e){planMsg='Esse arquivo não é um plano válido do Na Régua.';render()}}
+  catch(e){planMsg='Esse arquivo não é um plano válido do Ferrato.';render()}}
 
 /* ---------- questionário ---------- */
 const chips=(campo,opts,multi)=>`<div class="chips">${opts.map(([v,l])=>{const sel=multi?(qz[campo]||[]).map(String).includes(String(v)):String(qz[campo])===String(v);
@@ -1396,7 +1400,7 @@ function deleteProfile(id){const pre='p:'+id+':doc:';const ks=[];const fotos=((l
   ks.forEach(k=>{try{localStorage.removeItem(k)}catch(e){}});if(sessGet()===id)sessSet(null);const P=profs();delete P.list[id];if(P.last===id)P.last=null;saveProfs(P)}
 
 /* ---------- telas ---------- */
-const brand=`<div class="brand"><span class="eyebrow">Na Régua</span></div>`;
+const brand=`<div class="brand"><span class="eyebrow">Ferrato</span></div>`;
 function vPicker(){const P=profs();const ids=Object.keys(P.list).sort((a,b)=>(a===P.last?-1:b===P.last?1:P.list[a].nome.localeCompare(P.list[b].nome)));
   if(rmFor&&P.list[rmFor]){const p=P.list[rmFor];
     return `${brand}<div class="gate-card rm-card">${avatarHtml(p,'big-av')}<h2>Remover ${esc(p.nome)}?</h2>
@@ -1570,7 +1574,7 @@ function celebrar(D){const d=fromIso(D);const td=treinoDia(d);const ss=dayDoc(d)
    <p class="sub" style="margin:0">${td?`Treino ${esc(td.k)} · ${esc(td.T.nome)}`:''}${prof().nome?` · boa, ${esc(prof().nome)}!`:''}</p>
    <div class="cstats"><div><b>${min??'–'}</b><span>minutos</span></div><div><b>${st.sets}/${st.total}</b><span>séries</span></div><div><b>${st.vol?st.vol.toLocaleString('pt-BR'):'–'}</b><span>kg de volume</span></div></div>
    ${prs.length?`<div class="prs" style="justify-content:center">${prs.map(id=>`<span class="pr">★ Recorde: ${esc(exNome(id))}</span>`).join('')}</div>`:''}
-   <p class="sub" style="margin:0">${streak()>1?`${streak()} dias seguidos na régua.`:'Salvo no seu histórico.'}</p>
+   <p class="sub" style="margin:0">${streak()>1?`${streak()} dias seguidos sem falhar.`:'Salvo no seu histórico.'}</p>
    <button class="btn big-cta" data-fechaok="1" id="cb-ok">Fechar</button></div>`;
   ov.hidden=false;requestAnimationFrame(()=>ov.classList.add('in'));
   try{navigator.vibrate&&navigator.vibrate([60,60,60,60,160])}catch(e){}
@@ -1711,7 +1715,7 @@ async function cartaoSemana(w){
   x.fillStyle=C.acc;x.fillRect(0,0,W,14);
   const D=(t,px,X,Y,col,al,wgt)=>{x.font=`${wgt||700} ${px}px "Barlow Condensed","Arial Narrow",sans-serif`;x.fillStyle=col;x.textAlign=al||'left';x.fillText(t,X,Y)};
   const B=(t,px,X,Y,col,al,wgt)=>{x.font=`${wgt||500} ${px}px "IBM Plex Sans",system-ui,sans-serif`;x.fillStyle=col;x.textAlign=al||'left';x.fillText(t,X,Y)};
-  D('NA RÉGUA',40,80,110,C.acc);B(`${(prof().nome||'').toUpperCase()}`,30,W-80,108,C.mut,'right',600);
+  D('FERRATO',40,80,110,C.acc);B(`${(prof().nome||'').toUpperCase()}`,30,W-80,108,C.mut,'right',600);
   D('MINHA SEMANA',120,80,250,C.ink);B(`${ddmm(w)} a ${ddmm(fim)}`,40,80,310,C.mut);
   const tm=Math.round(s.tempo/60000);const tiles=[[`${s.feitos}`,`/${s.plan||'–'}`,'TREINOS'],[tm>=60?`${Math.floor(tm/60)}h${tm%60?String(tm%60).padStart(2,'0'):''}`:`${tm||'–'}`,tm>=60?'':tm?'min':'','TEMPO DE TREINO'],[s.vol?s.vol.toLocaleString('pt-BR'):'–',s.vol?'kg':'','VOLUME'],[`${s.prs}`,'','RECORDES']];
   tiles.forEach(([a,b,l],i)=>{const X=80+(i%2)*470,Y=370+Math.floor(i/2)*250;x.fillStyle=C.card;x.beginPath();x.roundRect(X,Y,450,220,28);x.fill();
@@ -1725,12 +1729,12 @@ async function cartaoSemana(w){
   if(top.length){B('MÚSCULOS MAIS TREINADOS (SÉRIES)',26,80,Y,C.mut,'left',600);
     top.forEach(([g,n],i)=>{const yy=Y+34+i*56;B(MAPN[g],32,80,yy+28,C.ink);x.fillStyle=C.line;x.beginPath();x.roundRect(420,yy+6,500,26,13);x.fill();
       x.fillStyle=C.acc;x.beginPath();x.roundRect(420,yy+6,Math.max(26,Math.min(500,n/20*500)),26,13);x.fill();D(String(n),40,1000,yy+32,C.ink,'right')})}
-  B('Treino e dieta na régua.',30,80,H-70,C.mut);
+  B('Ferro e prato, todo dia.',30,80,H-70,C.mut);
   return await new Promise(r=>c.toBlob(r,'image/png'))}
 async function compartilharSemana(w){
   let blob;try{blob=await cartaoSemana(w)}catch(e){toast('Não consegui gerar a imagem');return}
-  const nome=`na-regua-semana-${iso(w)}.png`;const file=new File([blob],nome,{type:'image/png'});
-  try{if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:'Minha semana no Na Régua'});return}}catch(e){if(e&&e.name==='AbortError')return}
+  const nome=`ferrato-semana-${iso(w)}.png`;const file=new File([blob],nome,{type:'image/png'});
+  try{if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:'Minha semana no Ferrato'});return}}catch(e){if(e&&e.name==='AbortError')return}
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=nome;document.body.appendChild(a);a.click();a.remove();toast('Imagem salva','Procure na pasta de downloads')}
 
 /* ================= escolher exercício: abas Selecionar e Escrever ================= */
@@ -2171,7 +2175,7 @@ app.addEventListener('click',e=>{
     editPlan(p=>{delete p.treinos[l];for(const k of Object.keys(p.dias))if(p.dias[k]===l)p.dias[k]=null});return}
   if(ds.semdieta){const P=plans();P.dieta.ativo=null;planMsg='Usando orientações gerais de alimentação.';savePlans(P);return}
   if(ds.edit){editId=ds.edit;goSub('editor');return}
-  if(ds.exp){const [t,id]=ds.exp.split(':');const p=plans()[t].lista[id];baixar('na-regua-'+slug(p.nome)+'.json',{app:'na-regua',v:1,plano:p});return}
+  if(ds.exp){const [t,id]=ds.exp.split(':');const p=plans()[t].lista[id];baixar('ferrato-'+slug(p.nome)+'.json',{app:'ferrato',v:1,plano:p});return}
   if(ds.del){const [t,id]=ds.del.split(':');if(pendDel!==id){pendDel=id;render();return}
     const P=plans();const nome=P[t].lista[id].nome;delete P[t].lista[id];if(P[t].ativo===id){const r=Object.keys(P[t].lista);P[t].ativo=t==='treino'&&r.length?r[0]:null}
     pendDel=null;planMsg=`"${nome}" excluído.`;savePlans(P);return}
