@@ -477,6 +477,38 @@ body.lock{overflow:hidden}
 .ativ-crono{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;border-radius:14px;background:var(--ink);color:var(--bg)}
 .ativ-crono .mono-big{font-family:var(--mono);font-size:2rem;color:var(--accent)}
 .ativ-crono .btn.ghost{background:transparent;color:var(--bg);border-color:color-mix(in srgb,var(--bg) 35%,transparent)}
+.mis{gap:12px;border-color:var(--accent)}
+.mis.cumprido{border-color:var(--ok)}
+.motivo{margin:0;font-style:italic;color:var(--muted)}
+.hero .motivo{color:var(--bar-ink);opacity:.8}
+.mis .meter,.hb-bar .meter{background:var(--line)}
+.mh{display:flex;gap:12px;align-items:center;padding:7px 0;border-top:1px solid var(--line)}
+.mh:first-child{border-top:0;padding-top:0}
+.mh .tick{width:38px;height:38px;flex:none}
+.mh .tick:disabled{cursor:default}
+.mh>div{display:grid;min-width:0}
+.mh .auto{font-size:.74rem;color:var(--ok);font-weight:600}
+.mh .sub{font-size:.76rem}
+.mh.feito>div>span:first-child{color:var(--muted)}
+.mh .na{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;border:1.5px dashed var(--line);color:var(--muted);flex:none}
+.mis-st{margin:0;padding:10px 12px;border-radius:12px;background:var(--bg);font-weight:600;font-size:.9rem}
+.mis-st.ok{background:var(--ok-soft);color:var(--ok)}
+.mis-st.alerta{background:color-mix(in srgb,var(--warn) 14%,var(--bg));color:var(--warn)}
+.mstats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;text-align:center}
+.mstats b{font-family:var(--display);font-size:2.2rem;display:block;line-height:1}
+.mstats span{font-size:.72rem;opacity:.75}
+.mcal{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:4px}
+.mcal .cd{font-size:.66rem;border-radius:7px;padding:0}
+.cd.x{background:var(--surface);color:var(--warn);border:1.5px dashed var(--warn);text-decoration:line-through}
+.cd.sel{outline:2px solid var(--accent);outline-offset:1px}
+.mleg{display:flex;gap:14px;flex-wrap:wrap;font-size:.72rem;color:var(--muted)}
+.mleg span{display:flex;align-items:center;gap:5px}
+.mleg i.cd{width:12px;height:12px;aspect-ratio:auto;border-radius:3px}
+.hb-bar{display:grid;grid-template-columns:minmax(0,1fr) 48px;gap:4px 10px;align-items:center;font-size:.88rem}
+.hb-bar .meter{grid-column:1/-1;height:6px}
+.addrow{display:flex;gap:8px;align-items:end}
+.addrow .bf{flex:1;min-width:0}
+.addrow .btn{height:44px;padding:0 14px}
 </style>
 
 
@@ -1021,6 +1053,7 @@ setInterval(()=>{const el=document.getElementById('sessT');if(!el)return;const s
 
 /* ================= telas ================= */
 function vHoje(){
+  misCongelar();const MH=(mis()||{}).habs||[];const habs=[['h-prot','Proteína em todas as refeições','prot'],['h-sono','7 h de sono ou mais na última noite','sono']].filter(x=>!MH.includes(x[2]));
   const d=TODAY,p=prog(d),td=treinoDia(d),h=new Date().getHours();
   const greet=h<12?'Bom dia':h<18?'Boa tarde':'Boa noite';
   const dieta=dietaAtiva();const nm=dieta?nextMeal(d):null;const dd=dayDoc(d);const goal=waterGoal();const w=dd.water||0;const st=streak();const ph=phaseText(d);const tp=treinoAtivo();
@@ -1042,14 +1075,15 @@ function vHoje(){
   <section class="card hero"><div class="row" style="align-items:end"><div><div class="big">${p.total?Math.round(p.done/p.total*100):0}%</div><span class="sub">${p.done} de ${p.total} itens do dia</span></div>
    <div style="text-align:right"><div class="big" style="font-size:2rem">${st}</div><span class="sub">${st===1?'dia seguido':'dias seguidos'} acima de 80%</span></div></div>
    <div class="meter"><i style="width:${p.total?p.done/p.total*100:0}%"></i></div></section>
+  ${misCard()}
   ${TODAY.getDay()===0?weekCard(monday(TODAY),'Sua semana até aqui'):TODAY.getDay()===1?weekCard(addD(monday(TODAY),-7),'Como foi sua semana'):''}
   ${addD(TODAY,1).getDate()===1?monthCard(TODAY.getFullYear(),TODAY.getMonth(),'Seu mês até aqui'):TODAY.getDate()<=3?(()=>{const p=new Date(TODAY.getFullYear(),TODAY.getMonth()-1,1);return monthCard(p.getFullYear(),p.getMonth(),'Como foi '+MESES[p.getMonth()])})():''}
   ${ref}${tr}
   <section class="card"><div class="row"><span class="label">Água</span><span class="sub mono">${(w*0.25).toFixed(2).replace('.',',')} de ${(goal*0.25).toFixed(1).replace('.',',')} L</span></div>
    <div class="cups">${Array.from({length:Math.max(goal,w)},(_,i)=>`<span class="cup${i<w?' full':''}"></span>`).join('')}</div>
    <div class="row"><span class="sub">1 copo = 250 ml${latestBody('peso')?' · 35 ml por kg':' · registre seu peso para ajustar a meta'}</span><div class="stepper"><button data-water="-1" aria-label="Tirar um copo">−</button><button data-water="1" aria-label="Adicionar um copo">+</button></div></div></section>
-  <section class="card"><span class="label">Hábitos</span>
-   ${[['h-prot','Proteína em todas as refeições'],['h-sono','7 h de sono ou mais na última noite']].map(([k,l])=>`<div class="chk">${tick(on(d,k),`data-k="${k}"`,l)}<span>${l}</span></div>`).join('')}</section>`}
+  ${habs.length?`<section class="card"><span class="label">Hábitos</span>
+   ${habs.map(([k,l])=>`<div class="chk">${tick(on(d,k),`data-k="${k}"`,l)}<span>${l}</span></div>`).join('')}</section>`:''}`}
 
 function rotacaoCard(){const p=treinoAtivo();if(!p||!p.criado)return '';const sem=Math.floor((TODAY-fromIso(p.criado))/(7*864e5));if(sem<6)return '';
   return `<section class="card note-card"><span class="label">Hora de variar?</span><p style="margin:0">Você está neste treino há <b>${sem} semanas</b>. Trocar exercícios a cada 6 a 8 semanas ajuda a continuar evoluindo.</p>
@@ -1159,7 +1193,7 @@ function vProgresso(){
   const first=f=>{const ds=Object.keys(E).filter(d=>E[d][f]!=null&&E[d][f]!=='').sort();return ds.length?+E[ds[0]][f]:null};
   const P=((docs.photos||{}).items||[]).slice().sort((a,b)=>a.d<b.d?-1:1);
   const img=p=>photoURL[p.id]||'';
-  return head('Progresso')+perfilCard()+weekCard(addD(monday(TODAY),7*wsOff),wsOff?'Resumo da semana':'Esta semana',true)+(()=>{const mm=new Date(TODAY.getFullYear(),TODAY.getMonth()+msOff,1);return monthCard(mm.getFullYear(),mm.getMonth(),msOff?'Resumo do mês':'Este mês',true)})()+mapaCard(addD(monday(TODAY),7*wsOff))+histPreview()+`
+  return head('Progresso')+perfilCard()+misAtalho()+weekCard(addD(monday(TODAY),7*wsOff),wsOff?'Resumo da semana':'Esta semana',true)+(()=>{const mm=new Date(TODAY.getFullYear(),TODAY.getMonth()+msOff,1);return monthCard(mm.getFullYear(),mm.getMonth(),msOff?'Resumo do mês':'Este mês',true)})()+mapaCard(addD(monday(TODAY),7*wsOff))+histPreview()+`
   <section class="card"><div class="row"><span class="label">Corpo</span><span class="sub">peso 1–2× por semana, medidas a cada 15 dias</span></div>
    ${lineChart(pesoPts)}
    <div class="bodygrid">${BODY.map(([f,l,u])=>{const lb=latestBody(f);const f0=first(f);const dl=lb&&f0!=null?+(lb.v-f0).toFixed(1):null;
@@ -1865,9 +1899,181 @@ function vEsportes(){const P=(docs.esportes||{}).padrao||{};const ordem=[1,2,3,4
     <div class="hscroll esp-row">${ESP_ORDEM.map(k=>`<button class="esp-chip sm" aria-pressed="${k===v}" data-esppad="${i}:${k}">${espIc(k)}<span>${ESP[k].nome}</span></button>`).join('')}</div></section>`}).join('')}
   <section class="card"><p class="sub" style="margin:0">Musculação segue o plano de treino ativo. Se marcar musculação num dia sem treino no plano, o app avisa para ajustar o plano.</p></section>`}
 
+/* ================= missão: desafio de N dias com poucos hábitos, montado para o perfil logado ================= */
+/* regras: dia cumprido = todos os hábitos (ou a versão mínima); a sequência só quebra com dois dias seguidos sem cumprir */
+const HAB={
+ treino:{nome:'Treinar conforme o plano',sub:'Musculação ou esporte do dia. Descanso conta.'},
+ cardio:{nome:'Cardio de 30 min',sub:'Caminhada, bike, corrida...'},
+ dieta:{nome:'Seguir a dieta',sub:'80% das refeições marcadas'},
+ acucar:{nome:'Zero açúcar líquido',sub:'Refrigerante, suco, energético'},
+ doce:{nome:'Sem doce',sub:'Sobremesa, bala, chocolate'},
+ ultra:{nome:'Sem fast food',sub:'Nada de ultraprocessado'},
+ alcool:{nome:'Zero álcool'},
+ agua:{nome:'Bater a meta de água'},
+ prot:{nome:'Proteína em todas as refeições'},
+ sono:{nome:'Dormir 7 h ou mais'},
+ passos:{nome:'8 mil passos'},
+ alonga:{nome:'Alongar 10 min',sub:'Mobilidade ou alongamento'},
+ tela:{nome:'Celular longe antes de dormir',sub:'30 min antes de deitar'}};
+const MOBJ={
+ emagrecimento:{nome:'Perder gordura',habs:['treino','cardio','acucar','dieta','sono'],min:'20 min de caminhada e seguir a dieta',dias:90,ph:'Ex.: perder 6 kg e chegar bem no próximo exame'},
+ hipertrofia:{nome:'Ganhar massa',habs:['treino','prot','dieta','sono','agua'],min:'Treino curto de 30 min e bater a proteína',dias:60,ph:'Ex.: ganhar 3 kg de massa magra'},
+ forca:{nome:'Ganhar força',habs:['treino','prot','sono','alonga'],min:'Só os exercícios principais do treino',dias:60,ph:'Ex.: supino com 100 kg'},
+ saude:{nome:'Saúde e exames',habs:['treino','cardio','agua','sono','alcool'],min:'20 min de caminhada e beber a água',dias:90,ph:'Ex.: melhorar os exames na próxima coleta'},
+ constancia:{nome:'Criar constância',habs:['treino','agua','sono','passos'],min:'15 min de qualquer atividade',dias:30,ph:'Ex.: não largar a academia de novo'}};
+const DUR=[21,30,60,90];
+let misEd=null,misPend=false,misSel=null;
+const mis=()=>(docs.missao||{}).ativa||null;
+const misHab=(M,h)=>HAB[h]||((M&&M.custom)||{})[h]||{nome:h};
+const habKey=h=>h==='sono'?'h-sono':h==='prot'?'h-prot':'mh-'+h;
+const misDias=M=>Math.round((fromIso(M.fim)-fromIso(M.inicio))/864e5)+1;
+const ddmmaa=d=>ddmm(d)+'/'+d.getFullYear();
+const brl=v=>'R$ '+Math.round(v).toLocaleString('pt-BR');
+const misObjPerfil=()=>{const o=prof().objetivo;return MOBJ[o]?o:'saude'};
+
+/* hábitos que o app marca sozinho: true/false, ou 'na' quando não se aplica no dia (descanso) */
+function habAuto(h,d){const x=dayDoc(d);
+  if(h==='treino'){const e=espDia(d);
+    if(e==='descanso'){const P=((docs.esportes||{}).padrao||{})[d.getDay()];return treinoAtivo()||x.esp==='descanso'||P?'na':false}
+    if(ativDia(d))return !!(x.ativ&&x.ativ.feito);
+    const td=treinoDia(d);if(!td)return false;if(x.sess&&x.sess.end)return true;
+    const ks=dayKeys(d).filter(k=>k.startsWith('t-'));return ks.length>0&&ks.every(k=>on(d,k))}
+  if(h==='cardio'){if(on(d,'cardio'))return true;const a=x.ativ;return !!(a&&a.feito&&espDia(d)!=='yoga'&&(+a.tempo||0)>=20)}
+  if(h==='dieta'){const ms=meals(d);if(!ms.length)return false;return ms.filter(m=>on(d,'m-'+m[0])).length/ms.length>=.8}
+  if(h==='agua')return (x.water||0)>=waterGoal();
+  return false}
+function habFeito(h,d){const a=habAuto(h,d);if(a==='na')return 'na';return a||on(d,habKey(h))}
+function misEstado(M,d){const s=iso(d);if(s<M.inicio||s>M.fim)return null;if(mid(d)>TODAY)return 'fut';
+  const r=(M.res||{})[s];if(r)return r;
+  if(M.habs.every(h=>habFeito(h,d)))return 'ok';if(on(d,'mis-min'))return 'min';
+  return +mid(d)===+TODAY?'aberto':'falhou'}
+/* dias com mais de 2 dias ficam fechados (não mudam se você trocar os hábitos depois) */
+function misCongelar(){const M=mis();if(!M)return;const lim=iso(addD(TODAY,-2));const res=Object.assign({},M.res);let mud=false;
+  for(let d=fromIso(M.inicio);iso(d)<lim&&iso(d)<=M.fim;d=addD(d,1)){const s=iso(d);if(!res[s]){res[s]=misEstado(Object.assign({},M,{res:{}}),d);mud=true}}
+  if(mud){const X=clone(docs.missao);X.ativa.res=res;save('missao',X,true)}}
+function misStats(M){const ini=fromIso(M.inicio);const N=misDias(M);const ate=iso(TODAY)<M.fim?TODAY:fromIso(M.fim);
+  let ok=0,min=0,fal=0,seq=0,best=0,falSeg=0;const est={};
+  for(let d=new Date(ini);d<=ate;d=addD(d,1)){const e=misEstado(M,d);est[iso(d)]=e;
+    if(e==='ok'||e==='min'){e==='ok'?ok++:min++;seq++;falSeg=0;best=Math.max(best,seq)}
+    else if(e==='falhou'){fal++;falSeg++;if(falSeg===2)seq=0}}
+  let sem=0,semOk=0;for(let w=0;w*7+6<N;w++){if(addD(ini,w*7+6)>=TODAY)break;sem++;let c=0;for(let i=0;i<7;i++){const e=est[iso(addD(ini,w*7+i))];if(e==='ok'||e==='min')c++}if(c>=6)semOk++}
+  const passados=ok+min+fal;const dia=Math.round((TODAY-ini)/864e5)+1;
+  return {ok,min,fal,seq,best,N,est,sem,semOk,passados,dia:Math.min(Math.max(dia,1),N),adesao:passados?Math.round((ok+min)/passados*100):null,
+    acabou:iso(TODAY)>M.fim,ontemFalhou:est[iso(addD(TODAY,-1))]==='falhou'}}
+
+/* ---------- peças de tela ---------- */
+function misHabRows(M,d){const D=iso(d);return M.habs.map(h=>{const H=misHab(M,h);const a=habAuto(h,d);const f=habFeito(h,d);
+  const ctl=a==='na'?`<span class="na" aria-label="Não se aplica hoje">–</span>`:a===true?`<button class="tick" aria-pressed="true" disabled aria-label="${esc(H.nome)}: feito">${CHECK}</button>`:tick(!!f,`data-mh="${D}:${h}"`,H.nome);
+  const st=a==='na'?'Dia de descanso: conta como feito':a===true?'Marcado pelo que você registrou':H.sub||'';
+  return `<div class="mh${f?' feito':''}">${ctl}<div><span>${esc(H.nome)}</span>${st?`<span class="${a===true?'auto':'sub'}">${esc(st)}</span>`:''}</div></div>`}).join('')}
+function misMinBtn(M,d){if(misEstado(M,d)==='ok')return '';const m=on(d,'mis-min');
+  return `<button class="btn ghost" data-mismin="${iso(d)}">${m?'Desfazer dia mínimo':'Dia ruim? Fiz a versão mínima'}</button>${m?'':`<span class="sub" style="text-align:center">${esc(M.minimo)}</span>`}`}
+function misCard(){const M=mis();const D=docs.missao||{};
+  if(!M){if(D.oculto)return '';const o=MOBJ[misObjPerfil()];
+    return `<section class="card mis"><div class="row"><span class="label">Missão</span><button class="link" data-mis="ocultar">Agora não</button></div>
+     <h3>Que tal um desafio de ${o.dias} dias?</h3><p class="sub" style="margin:0">Poucos hábitos por dia, sugeridos para o seu objetivo (${esc(o.nome.toLowerCase())}), com regra de nunca falhar dois dias seguidos.</p>
+     <button class="btn big-cta" data-sub="missao">Montar minha missão</button></section>`}
+  const s=misStats(M);
+  if(s.acabou)return `<section class="card mis cumprido"><span class="label">Missão concluída</span><h3>${s.ok+s.min} de ${s.N} dias cumpridos</h3>
+    <p class="sub" style="margin:0">Adesão de ${s.adesao??0}%. Veja o resultado e comece a próxima.</p><button class="btn big-cta" data-sub="missao">Ver resultado</button></section>`;
+  const e=misEstado(M,TODAY);const falta=M.habs.length-M.habs.filter(h=>habFeito(h,TODAY)).length;const rest=s.N-s.dia;
+  const st=e==='ok'?`<p class="mis-st ok">✓ Dia cumprido. Sequência de ${s.seq} ${s.seq===1?'dia':'dias'}.</p>`
+    :e==='min'?`<p class="mis-st">Versão mínima feita. Conta para a sequência; amanhã é dia completo.</p>`
+    :s.ontemFalhou?`<p class="mis-st alerta">Ontem não rolou. Hoje não pode falhar: dois dias seguidos quebram a sequência.</p>`
+    :`<p class="mis-st">Falta${falta===1?'':'m'} ${falta} de ${M.habs.length}. ${new Date().getHours()>=18?'Ainda dá tempo.':'Um de cada vez.'}</p>`;
+  const med=s.dia>1&&(s.dia-1)%14===0&&!bodyE()[iso(TODAY)];
+  return `<section class="card mis${e==='ok'?' cumprido':''}"><div class="row"><span class="label">Missão · dia ${s.dia} de ${s.N}</span><span class="sub mono">${rest?`faltam ${rest} ${rest===1?'dia':'dias'}`:'último dia!'}</span></div>
+   <h3>${esc(M.nome)}</h3>${M.motivo?`<p class="motivo">“${esc(M.motivo)}”</p>`:''}
+   <div class="meter"><i style="width:${(s.ok+s.min)/s.N*100}%"></i></div>
+   <div>${misHabRows(M,TODAY)}</div>${st}${misMinBtn(M,TODAY)}
+   ${med?`<div class="note"><b>Dia de medir.</b> Registre peso e cintura para ver a evolução da missão. <button class="link" data-go="progresso">Registrar</button></div>`:''}
+   <button class="link" data-sub="missao" style="justify-self:start">Ver missão completa</button></section>`}
+function misAtalho(){const M=mis();if(!M)return `<section class="card"><div class="row"><span class="label">Missão</span></div><p class="sub" style="margin:0">Desafio de dias com hábitos do seu objetivo.</p><button class="btn ghost" data-sub="missao">Montar missão</button></section>`;
+  const s=misStats(M);return `<section class="card"><div class="row"><span class="label">Missão</span><span class="sub mono">${s.ok+s.min}/${s.N} dias</span></div><div class="meter"><i style="width:${(s.ok+s.min)/s.N*100}%"></i></div><button class="btn ghost" data-sub="missao">Ver missão</button></section>`}
+
+/* ---------- tela da missão ---------- */
+function vMissao(){misCongelar();const M=mis();if(!M&&!misEd)misEd=misNovo();if(misEd)return vMissaoForm();
+  const s=misStats(M);const N=s.N;const ini=fromIso(M.inicio);const D=docs.missao||{};const hoje=iso(TODAY);const lim=iso(addD(TODAY,-2));
+  const selD=misSel&&misSel<=hoje&&misSel>=lim&&misSel>=M.inicio&&misSel<=M.fim?misSel:hoje<=M.fim?hoje:null;
+  let cal='';for(let i=0;i<N;i++){const d=addD(ini,i);const k=iso(d);const e=k>hoje?'fut':s.est[k];const cls={ok:'z3',min:'z1',falhou:'x',aberto:'hoje',fut:'fut'}[e]||'';
+    cal+=k>=lim&&k<=hoje&&!s.acabou?`<button class="cd ${cls}${k===selD?' sel':''}" data-misdia="${k}" aria-label="Dia ${i+1}, ${ddmm(d)}">${i+1}</button>`:`<span class="cd ${cls}" title="${ddmm(d)}">${i+1}</span>`}
+  const peso=latestBody('peso');const dp=M.pesoIni!=null&&peso&&peso.d>M.inicio?+(peso.v-M.pesoIni).toFixed(1):null;const cof=M.valor?s.semOk*M.valor:null;
+  const habPct=M.habs.map(h=>{let n=0,f=0;for(let d=new Date(ini);d<=TODAY&&iso(d)<=M.fim;d=addD(d,1)){if(iso(d)===hoje&&s.est[hoje]==='aberto')continue;const x=habFeito(h,d);if(x==='na')continue;n++;if(x)f++}return [misHab(M,h).nome,n?Math.round(f/n*100):null]});
+  return head('Missão',`<button class="pill" data-back="1">‹ Voltar</button>`)+
+  (s.acabou?`<section class="card hero"><span class="label">Missão concluída</span><h2 style="margin:0">${s.ok+s.min} de ${N} dias cumpridos</h2>
+    <p class="sub" style="margin:0">Adesão de ${s.adesao??0}% · melhor sequência de ${s.best} dias${cof!=null?` · cofrinho de ${brl(cof)}`:''}</p>${M.premio?`<p style="margin:0">Prêmio: <b>${esc(M.premio)}</b></p>`:''}
+    <button class="btn big-cta" data-mis="nova">Começar nova missão</button></section>`
+  :`<section class="card hero"><div class="row"><span class="label">${esc(M.nome)} · dia ${s.dia} de ${N}</span><span class="sub">até ${ddmmaa(fromIso(M.fim))}</span></div>
+   <div class="mstats"><div><b>${s.ok+s.min}</b><span>dias cumpridos</span></div><div><b>${s.seq}</b><span>sequência</span></div><div><b>${s.adesao==null?'–':s.adesao+'%'}</b><span>adesão</span></div></div>
+   <div class="meter"><i style="width:${(s.ok+s.min)/N*100}%"></i></div>${M.motivo?`<p class="motivo">“${esc(M.motivo)}”</p>`:''}</section>`)+`
+  <section class="card"><div class="row"><span class="label">Os ${N} dias</span>${s.acabou?'':'<span class="sub">ajuste hoje, ontem ou anteontem</span>'}</div><div class="mcal">${cal}</div>
+   <div class="mleg"><span><i class="cd z3"></i>cumprido</span><span><i class="cd z1"></i>mínimo</span><span><i class="cd x"></i>falhou</span></div></section>
+  ${selD&&!s.acabou?`<section class="card"><span class="label">${selD===hoje?'Hoje':DWL[fromIso(selD).getDay()]+', '+ddmm(fromIso(selD))}</span><div>${misHabRows(M,fromIso(selD))}</div>${misMinBtn(M,fromIso(selD))}</section>`:''}
+  <section class="card"><span class="label">Por hábito</span>${habPct.map(([n,p])=>`<div class="hb-bar"><span>${esc(n)}</span><span class="mono" style="text-align:right">${p==null?'–':p+'%'}</span><div class="meter"><i style="width:${p||0}%"></i></div></div>`).join('')}</section>
+  ${M.premio||cof!=null||dp!=null?`<section class="card"><span class="label">Placar</span>${dp!=null?`<div class="row"><span>Peso</span><b class="mono">${fmtKg(M.pesoIni)} → ${fmtKg(peso.v)} kg (${dp>0?'+':''}${fmtKg(dp)})</b></div>`:''}${cof!=null?`<div class="row"><span>Cofrinho · ${s.semOk} de ${s.sem} ${s.sem===1?'semana':'semanas'}</span><b class="mono">${brl(cof)}</b></div>`:''}${M.premio?`<div class="row"><span>Prêmio no fim</span><b>${esc(M.premio)}</b></div>`:''}</section>`:''}
+  <section class="card"><span class="label">Regras</span><p style="margin:0">Nunca falhe dois dias seguidos. Um dia ruim não quebra a sequência, dois quebram.</p><p class="sub" style="margin:0">Versão mínima: ${esc(M.minimo)}${M.valor?` · semana cumprida no cofrinho: 6 de 7 dias`:''}</p></section>
+  ${s.acabou?'':`<section class="card"><button class="btn ghost" data-mis="editar">Editar missão</button><button class="link danger" data-mis="encerrar" style="justify-self:center">${misPend?'Toque de novo para encerrar':'Encerrar missão'}</button></section>`}
+  ${(D.hist||[]).length?`<section class="card"><span class="label">Missões anteriores</span>${D.hist.map(h=>`<div class="row"><span>${esc(h.nome)} <span class="sub">${isoDdmm(h.inicio)} a ${isoDdmm(h.fim)}${h.encerrada?' · encerrada':''}</span></span><b class="mono">${h.ok+h.min}/${h.N}</b></div>`).join('')}</section>`:''}`}
+
+/* ---------- montar e editar ---------- */
+function misNovo(obj){obj=MOBJ[obj]?obj:misObjPerfil();const o=MOBJ[obj];return {obj,habs:o.habs.slice(0,3),custom:{},dur:o.dias,fim:'',motivo:'',minimo:o.min,premio:'',valor:''}}
+function misLer(){if(!misEd)return;const g=id=>{const el=document.getElementById(id);return el?el.value:null};const E=misEd;
+  const m=g('mf-motivo');if(m!==null)E.motivo=m;const mn=g('mf-min');if(mn!==null){if(mn!==E.minimo)E.minMexeu=true;E.minimo=mn}
+  const p=g('mf-premio');if(p!==null)E.premio=p;const v=g('mf-valor');if(v!==null)E.valor=v;const f=g('mf-fim');if(f!==null)E.fim=f}
+function misForm(a){misLer();const E=misEd;if(!E)return;const i=a.indexOf(':');const k=a.slice(0,i),v=a.slice(i+1);
+  if(k==='obj'){E.obj=v;const o=MOBJ[v];if(!E.mexeu)E.habs=o.habs.slice(0,3);if(!E.minMexeu)E.minimo=o.min;if(!E.durMexeu)E.dur=o.dias}
+  else if(k==='hab'){const j=E.habs.indexOf(v);if(j>=0)E.habs.splice(j,1);else{if(E.habs.length>=5){toast('No máximo 5 hábitos','Menos hábitos, mais chance de cumprir todos');return}E.habs.push(v)}E.mexeu=true}
+  else if(k==='dur'){E.dur=v==='data'?'data':+v;E.durMexeu=true}
+  else if(k==='add'){const el=document.getElementById('mf-custom');const n=(el&&el.value||'').trim();if(!n)return;if(E.habs.length>=5){toast('No máximo 5 hábitos','Tire um antes de criar outro');return}
+    const id='c'+Date.now().toString(36);E.custom[id]={nome:n.slice(0,60)};E.habs.push(id);E.mexeu=true}
+  render()}
+function vMissaoForm(){const E=misEd;const o=MOBJ[E.obj];const sug=o.habs;const nome=prof().nome;const base=E.editando?fromIso(E.inicio):TODAY;
+  const chip=h=>`<button type="button" class="chipb sm" aria-pressed="${E.habs.includes(h)}" data-mf="hab:${h}">${esc(misHab(E,h).nome)}</button>`;
+  const outros=Object.keys(HAB).filter(h=>!sug.includes(h)).concat(Object.keys(E.custom));
+  return head(E.editando?'Editar missão':'Nova missão',`<button class="pill" data-back="1">‹ Voltar</button>`)+`
+  <section class="card"><p style="margin:0">${nome?esc(nome)+', a':'A'} missão é um desafio com data para acabar: poucos hábitos por dia, nunca falhar dois dias seguidos e uma versão mínima para os dias ruins.</p></section>
+  <form id="misF" style="display:grid;gap:12px">
+  <section class="card"><span class="label">1 · Objetivo</span><div class="chips">${Object.entries(MOBJ).map(([k,x])=>`<button type="button" class="chipb sm" aria-pressed="${E.obj===k}" data-mf="obj:${k}">${esc(x.nome)}</button>`).join('')}</div>
+   ${!E.editando&&MOBJ[prof().objetivo]?`<span class="sub">Seu perfil: ${esc(OBJ_NOMES[prof().objetivo])}</span>`:''}</section>
+  <section class="card"><div class="row"><span class="label">2 · Hábitos do dia</span><span class="sub mono">${E.habs.length}/5</span></div>
+   <span class="sub">Sugeridos para ${esc(o.nome.toLowerCase())}. Três é um bom começo.</span><div class="chips">${sug.map(chip).join('')}</div>
+   <span class="sub">Outros</span><div class="chips">${outros.map(chip).join('')}</div>
+   <div class="addrow"><label class="bf"><span class="sub">Criar um hábito seu</span><input id="mf-custom" maxlength="60" placeholder="Ex.: Ler 10 páginas"></label><button type="button" class="btn ghost" data-mf="add:1">Adicionar</button></div>
+   <p class="sub" style="margin:0">Treino, dieta, água e cardio marcam sozinhos com o que você registra no app.</p></section>
+  <section class="card"><span class="label">3 · Duração</span><div class="chips">${DUR.map(n=>`<button type="button" class="chipb sm" aria-pressed="${E.dur===n}" data-mf="dur:${n}">${n} dias</button>`).join('')}<button type="button" class="chipb sm" aria-pressed="${E.dur==='data'}" data-mf="dur:data">Até uma data</button></div>
+   ${E.dur==='data'?`<label class="bf"><span class="sub">Termina em (ex.: data do próximo exame)</span><input id="mf-fim" type="date" min="${iso(addD(TODAY,1))}" max="${iso(addD(TODAY,365))}" value="${esc(E.fim)}"></label>`:`<span class="sub">Termina em ${ddmmaa(addD(base,E.dur-1))}</span>`}</section>
+  <section class="card"><span class="label">4 · Seu porquê</span>
+   <label class="bf"><span class="sub">Aparece todo dia no app. Quanto mais concreto, melhor.</span><input id="mf-motivo" maxlength="120" value="${esc(E.motivo)}" placeholder="${esc(o.ph)}"></label>
+   <label class="bf"><span class="sub">Versão mínima, para o dia ruim</span><input id="mf-min" maxlength="80" value="${esc(E.minimo)}"></label></section>
+  <section class="card"><span class="label">5 · Prêmio (opcional)</span><div class="g2">
+   <label class="bf"><span class="sub">No fim, você ganha</span><input id="mf-premio" maxlength="60" value="${esc(E.premio)}" placeholder="Ex.: tênis novo"></label>
+   <label class="bf"><span class="sub">R$ por semana cumprida</span><input id="mf-valor" inputmode="numeric" value="${esc(E.valor)}" placeholder="50"></label></div>
+   <span class="sub">Semana cumprida: 6 dos 7 dias. O app soma no cofrinho.</span></section>
+  <button class="btn big-cta" type="submit">${E.editando?'Salvar alterações':'Começar missão hoje'}</button></form>`}
+function misSalvar(){document.activeElement&&document.activeElement.blur();misLer();const E=misEd;if(!E)return;
+  if(!E.habs.length){toast('Escolha pelo menos 1 hábito');return}
+  const ini=E.editando?E.inicio:iso(TODAY);let fim;
+  if(E.dur==='data'){if(!E.fim||E.fim<=iso(TODAY)){toast('Escolha a data final','Precisa ser depois de hoje');return}fim=E.fim}else fim=iso(addD(fromIso(ini),E.dur-1));
+  if(fim<iso(TODAY)){toast('Essa duração já passou','Escolha uma duração maior');return}
+  const D=clone(docs.missao);const custom={};E.habs.forEach(h=>{if(E.custom[h])custom[h]=E.custom[h]});
+  const M=Object.assign(E.editando&&D.ativa?D.ativa:{id:'m'+Date.now().toString(36),inicio:ini,res:{},pesoIni:(latestBody('peso')||{}).v??null},
+    {obj:E.obj,nome:MOBJ[E.obj].nome,fim,habs:E.habs.slice(),custom,motivo:E.motivo.trim(),minimo:E.minimo.trim()||MOBJ[E.obj].min,premio:E.premio.trim(),valor:num(E.valor)||null});
+  D.ativa=M;D.oculto=false;const ed=E.editando;misEd=null;misSel=null;sub=null;tab='hoje';try{localStorage.setItem('ui:tab','hoje')}catch(e){}window.scrollTo(0,0);save('missao',D);
+  toast(ed?'Missão atualizada':'Missão começou!',ed?'':`Dia 1 de ${misDias(M)}. Um dia de cada vez.`)}
+function misAcao(a){const D=clone(docs.missao);
+  if(a==='ocultar'){D.oculto=true;save('missao',D);return}
+  if(a==='editar'){const M=D.ativa;if(!M)return;const n=misDias(M);
+    misEd={obj:M.obj,habs:M.habs.slice(),custom:clone(M.custom),dur:DUR.includes(n)?n:'data',fim:M.fim,motivo:M.motivo||'',minimo:M.minimo||'',premio:M.premio||'',valor:M.valor??'',mexeu:true,minMexeu:true,durMexeu:true,editando:true,inicio:M.inicio};
+    window.scrollTo(0,0);render();return}
+  if(a==='encerrar'||a==='nova'){if(a==='encerrar'&&!misPend){misPend=true;render();setTimeout(()=>{if(misPend){misPend=false;render()}},5000);return}misPend=false;
+    const M=D.ativa;if(M){const s=misStats(M);D.hist=[{nome:M.nome,inicio:M.inicio,fim:a==='encerrar'?iso(TODAY):M.fim,N:s.N,ok:s.ok,min:s.min,adesao:s.adesao,best:s.best,encerrada:a==='encerrar'}].concat(D.hist||[]).slice(0,20)}
+    D.ativa=null;misEd=misNovo(M&&M.obj);misSel=null;window.scrollTo(0,0);save('missao',D);return}}
+function misToggle(d,h){const M=mis();if(!M)return;const a=misEstado(M,d);toggle(d,habKey(h));const M2=mis();
+  if(a!=='ok'&&misEstado(M2,d)==='ok'){const s=misStats(M2);toast('Dia cumprido!',`Missão: ${s.ok+s.min} de ${s.N} dias · sequência de ${s.seq}`)}}
+
 /* ================= render e eventos ================= */
 const VIEWS={hoje:vHoje,treino:vTreino,dieta:vDieta,compras:vCompras,progresso:vProgresso};
-const SUBS={planos:vPlanos,quiz:vQuiz,editor:vEditor,historico:vHistorico,esportes:vEsportes};
+const SUBS={planos:vPlanos,quiz:vQuiz,editor:vEditor,historico:vHistorico,esportes:vEsportes,missao:vMissao};
 const app=document.getElementById('app');
 function render(){
   const act=document.activeElement;if(act&&/INPUT|TEXTAREA|SELECT/.test(act.tagName)&&app.contains(act))return;
@@ -1909,6 +2115,12 @@ app.addEventListener('click',e=>{
   if(ds.pkg){pk.g=ds.pkg;if(ds.pkg!=='todos')pk.wg=ds.pkg;document.activeElement&&document.activeElement.blur();render();const L=document.getElementById('pk-list');if(L)L.scrollTop=0;return}
   if(ds.pkeq){pk.eq=ds.pkeq;document.activeElement&&document.activeElement.blur();render();return}
   if(ds.pkpick){pkAplicar(ds.pkpick);return}
+  /* missão */
+  if(ds.mf){misForm(ds.mf);return}
+  if(ds.mh){const [D,h]=ds.mh.split(':');misToggle(fromIso(D),h);return}
+  if(ds.mismin){toggle(fromIso(ds.mismin),'mis-min');return}
+  if(ds.misdia){misSel=ds.misdia;render();return}
+  if(ds.mis){misAcao(ds.mis);return}
   /* perfis */
   if(ds.pick){const p=profs().list[ds.pick];if(p&&p.pin){pinFor=ds.pick;pinMsg='';pinReset=false;gate='pin';render();setTimeout(()=>{const i=document.getElementById('pin-in');i&&i.focus()},60)}else enterProfile(ds.pick);return}
   if(ds.pnew){pfEdit=null;pfMsg='';gate='form';window.scrollTo(0,0);render();return}
@@ -1918,7 +2130,8 @@ app.addEventListener('click',e=>{
   if(ds.pinoff){const P=profs();delete P.list[pfEdit].pin;saveProfs(P);pfMsg='PIN removido.';render();return}
   if(ds.pdel){if(!pfDel){pfDel=true;render();return}deleteProfile(pfEdit);pfDel=false;pfEdit=null;PID=null;loadDocs();startGate();if(!gate)enterProfile(PID);else render();return}
   /* navegação */
-  if(ds.sub){if(ds.sub==='quiz'){qz=QZ0();gerado=null}if(ds.sub==='planos'){planMsg='';pendDel=null}goSub(ds.sub);return}
+  if(ds.back&&sub==='missao'){misEd=null;misPend=false;misSel=null}
+  if(ds.sub){if(ds.sub==='missao'){misEd=null;misPend=false;misSel=null}if(ds.sub==='quiz'){qz=QZ0();gerado=null}if(ds.sub==='planos'){planMsg='';pendDel=null}goSub(ds.sub);return}
   if(ds.back){if(sub==='editor'){const P=plans();const ep=P.treino.lista[editId];if(ep){if(ep.origem==='montado'&&!Object.values(ep.treinos).some(T=>T.ex.length)&&P.treino.ativo!==ep.id){delete P.treino.lista[editId];planMsg='Treino vazio descartado.'}else ep.salvo=true}savePlans(P,true);pendSug=null;pendRmT=null;goSub('planos');return}sub=null;gerado=null;planMsg='';pendDel=null;window.scrollTo(0,0);render();return}
   if(ds.go){if(ds.go==='treino')sel=new Date(TODAY);setTab(ds.go);return}
   /* planos */
@@ -2007,6 +2220,7 @@ app.addEventListener('change',e=>{const i=e.target;const ds=i.dataset;
 app.addEventListener('submit',e=>{e.preventDefault();const f=e.target;
   if(f.id==='pkF'){pkEscrever();return}
   if(f.id==='ativF'){concluirAtiv();return}
+  if(f.id==='misF'){misSalvar();return}
   if(f.id==='pfF'){submitPerfil();return}
   if(f.id==='pinF'){submitPin();return}
   if(f.id==='resetF'){submitReset();return}
